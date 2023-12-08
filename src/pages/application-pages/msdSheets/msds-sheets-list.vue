@@ -1,17 +1,7 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">Training List</h3>
-      <!-- <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <a href="javascript:void(0);">Table</a>
-              </li>
-              <li class="breadcrumb-item active" aria-current="page">
-                Advanced Table
-              </li>
-            </ol>
-          </nav> -->
+      <h3 class="page-title">Msds Sheets List</h3>
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -43,8 +33,8 @@
             >
               <template #cell(name)="data">
                 <!-- name & profile -->
-                <!-- <img :src="data.item.profile" class="mr-2" alt="image" /> -->
-                {{ data.item.title }}
+                <img :src="data.item.profile" class="mr-2" alt="image" />
+                {{ data.item.name }}
               </template>
 
               <!-- when no item found -->
@@ -56,9 +46,7 @@
               <template v-slot:cell(status)="data">
                 <span v-html="data.value"></span>
               </template>
-              <template v-slot:cell(file)="data">
-                <span v-html="data.value"></span>
-              </template>
+
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
@@ -80,10 +68,10 @@
                 ></i>
                 <span v-html="data.value"></span>
               </template>
-              <template #cell(TrainingMedia)="data">
-                <button @click="viewMedia(data.item.TrainingMedia)">
-                  View
-                </button>
+              <template v-slot:cell(Media)="data">
+                <div>
+                  <button @click="openPdf(data.item.file)">Open Pdf</button>
+                </div>
               </template>
             </b-table>
             <b-pagination
@@ -98,11 +86,10 @@
         </div>
       </div>
     </div>
-    <!-- <button @click="openModal">Open Modal</button> -->
-
     <div v-if="isModalOpen" class="modal">
       <span @click="closeModal" class="close">&times;</span>
       <video :src="videoSource" controls></video>
+      <p v-if="!videoSource">No video source provided</p>
     </div>
     <div></div>
   </section>
@@ -133,9 +120,10 @@ export default {
       sortable: true,
       fields: [
         { key: "title", sortable: true },
+        { key: "description", sortable: true },
         { key: "status", sortable: true },
         { key: "created_at", sortable: true },
-        { key: "TrainingMedia", sortable: true },
+        { key: "Media", sortable: true },
         { key: "action", sortable: true },
       ],
       items: [],
@@ -143,93 +131,65 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getTrainings", "getDefaultImage", "getImageUrl"]),
+    ...mapGetters(["getMsdSheets", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
   },
+  created() {
+    // Access the ID from the route parameters
+    const id = this.$route.params.id;
+
+    // Call the fetchDataById method with the ID
+    this.fetchDataById(id);
+  },
   methods: {
-    ...mapActions(["fetchTrainings", "fetchTrainingId"]),
-    generateViewButton(id) {
-      return `<button @click="viewMedia(${id})">View</button>`;
-    },
+    ...mapActions(["fetchMsdSheets"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
         let baseUrl = "http://localhost:8000/";
         obj.id = element.id;
         obj.title = element.title;
-        obj.TrainingMedia = element.id;
-        // obj.button = `<button @click="playVideo('${obj.file}')">View</button>`;
+        obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
+        obj.description = element.description; // Assuming element.file_type is the correct property for the file type
         obj.status = `<label class="badge ${
           element.status === "Active" ? "badge-success" : "badge-danger"
         }">${element.status}</label>`;
+
+        obj.role_id = element.role?.id;
         obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
         );
         this.items.push(obj);
       });
-
-      console.log("mister", this.items);
-    },
-
-    viewMedia(id) {
-      // Implement your logic to view media based on the ID
-      console.log("View media with ID:", id);
-      this.$router.push({ name: "training-media", params: { id } });
     },
     openModal(videoUrl) {
+      console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
     closeModal() {
       this.isModalOpen = false;
     },
-
+    openPdf(pdfUrl) {
+      // Open the PDF file in a new window or tab
+      window.open(pdfUrl, "_blank");
+    },
     view(itemId) {
       console.log(itemId);
     },
-    async deleteItem(itemId) {
+    deleteItem(itemId) {
       console.log(itemId);
-
-      try {
-        // Perform the deletion operation
-        await this.fetchTrainingId(itemId);
-
-        // If the deletion is successful, fetch updated data
-        await this.fetchTrainings();
-
-        // Update the component's data with the latest data
-        this.items = [];
-        this.getTrainings.length > 0
-          ? this.setItems(this.getTrainings)
-          : (this.noItems = "No Training Found.");
-
-        // Redirect to the desired route
-        this.$router.push("/user/training-list");
-      } catch (error) {
-        // Handle any errors during deletion or data fetching
-        console.error("Error deleting item or fetching data:", error);
-      }
     },
-    // openVideoModal(videoUrl) {
-    //   console.log("Opening video modal with URL:", videoUrl);
-    //   this.currentVideo = videoUrl;
-    //   this.$bvModal.show("video-modal");
-    //   console.log("Video modal shown", this.currentVideo);
-    // },
-
-    // resetModal() {
-    //   this.currentVideo = null;
-    // },
   },
   async mounted() {
-    await this.fetchTrainings();
-    console.log("all training", this.getTrainings.length);
-    this.getTrainings.length > 0
-      ? this.setItems(this.getTrainings)
-      : (this.noItems = "No Training Found.");
+    // const id = this.$route.params.id;
+    await this.fetchMsdSheets();
+    this.getMsdSheets.length > 0
+      ? this.setItems(this.getMsdSheets)
+      : (this.noItems = "No MsdSheet Found.");
   },
 };
 </script>

@@ -73,10 +73,15 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
                 ></i>
+                <i
+                  @click="deleteItem(data.item.id)"
+                  :ref="'btnDelete' + data.index"
+                  class="mr-2 mdi mdi-delete text-danger icon-sm"
+                ></i>
                 <span v-html="data.value"></span>
               </template>
-              <template v-slot:cell(Video)="data">
-                <button @click="openModal(data.item.file)">Play</button>
+              <template v-slot:cell(Media)="data">
+                <button @click="openModal(data.item.file)">Play Video</button>
               </template>
             </b-table>
             <b-pagination
@@ -112,6 +117,7 @@ import Vue from "vue";
 import SortedTablePlugin from "vue-sorted-table";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
+import router from "../../../router";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -135,10 +141,10 @@ export default {
         { key: "title", sortable: true },
         { key: "description", sortable: true },
         // { key: 'phone', sortable: true },
-        { key: "Video", sortable: true },
-        // { key: "file", sortable: true },
         { key: "status", sortable: true },
+        // { key: "file", sortable: true },
         { key: "created_at", sortable: true },
+        { key: "Media", sortable: true },
         { key: "action", sortable: true },
       ],
       items: [],
@@ -152,7 +158,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["fetchWelcomeVideos"]),
+    ...mapActions(["fetchWelcomeVideos", "fetchWelcomeVideoId"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
@@ -182,7 +188,32 @@ export default {
     closeModal() {
       this.isModalOpen = false;
     },
+    view(itemId) {
+      console.log(itemId);
+    },
+    async deleteItem(itemId) {
+      console.log(itemId);
 
+      try {
+        // Perform the deletion operation
+        await this.fetchWelcomeVideoId(itemId);
+
+        // If the deletion is successful, fetch updated data
+        await this.fetchWelcomeVideos();
+
+        // Update the component's data with the latest data
+        this.items = [];
+        this.getWelcomeVideos.length > 0
+          ? this.setItems(this.getWelcomeVideos)
+          : (this.noItems = "No Video Found.");
+
+        // Redirect to the desired route
+        // this.$router.push("/user/welcome-videos");
+      } catch (error) {
+        // Handle any errors during deletion or data fetching
+        console.error("Error deleting item or fetching data:", error);
+      }
+    },
     // openVideoModal(videoUrl) {
     //   console.log("Opening video modal with URL:", videoUrl);
     //   this.currentVideo = videoUrl;

@@ -61,6 +61,11 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
                 ></i>
+                <i
+                  @click="deleteItem(data.item.id)"
+                  :ref="'btnDelete' + data.index"
+                  class="mr-2 mdi mdi-delete text-danger icon-sm"
+                ></i>
                 <span v-html="data.value"></span>
               </template>
               <template v-slot:cell(Media)="data">
@@ -69,13 +74,13 @@
                     v-if="data.item.type === 'video'"
                     @click="openModal(data.item.file)"
                   >
-                    Play
+                    Play Video
                   </button>
                   <button
                     v-else-if="data.item.type === 'pdf'"
                     @click="openPdf(data.item.file)"
                   >
-                    Open
+                    Open Pdf
                   </button>
                   <span v-else> Unsupported file type </span>
                 </div>
@@ -126,7 +131,7 @@ export default {
       filter: "",
       sortable: true,
       fields: [
-        // { key: "media", sortable: true },
+        { key: "title", sortable: true },
         { key: "type", sortable: true },
         { key: "status", sortable: true },
         { key: "created_at", sortable: true },
@@ -157,6 +162,7 @@ export default {
         let obj = {};
         let baseUrl = "http://localhost:8000/";
         obj.id = element.id;
+        obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
         obj.type = element.file_type; // Assuming element.file_type is the correct property for the file type
 
@@ -190,13 +196,19 @@ export default {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
+    view(itemId) {
+      console.log(itemId);
+    },
+    deleteItem(itemId) {
+      console.log(itemId);
+    },
   },
   async mounted() {
     const id = this.$route.params.id;
     await this.fetchTrainingMedia(id);
     this.getTrainingMedia.length > 0
       ? this.setItems(this.getTrainingMedia)
-      : (this.noItems = "No User Found.");
+      : (this.noItems = "No TrainingMedia Found.");
   },
   //   async fetchDataById(id) {
   //     try {

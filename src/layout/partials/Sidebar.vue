@@ -12,9 +12,9 @@
               <span class="font-weight-bold mb-2">{{
                 getCurrentUser.name
               }}</span>
-              <!-- <span class="text-secondary text-small">{{
-                getCurrentUser.role.name
-              }}</span> -->
+              <span class="text-secondary text-small">{{
+                getCurrentUser.type
+              }}</span>
             </div>
             <i
               class="mdi mdi-bookmark-check text-success nav-profile-badge"
@@ -49,7 +49,7 @@
           <span class="nav-link" v-b-toggle="'job'">
             <span class="menu-title">Welcome Videos</span>
             <i class="menu-arrow"></i>
-            <i class="fas fa-video"></i>
+            <i class="fas fa-film"></i>
           </span>
           <b-collapse accordion="sidebar-accordion" id="job">
             <ul class="nav flex-column sub-menu">
@@ -73,6 +73,40 @@
               <li class="nav-item">
                 <router-link class="nav-link" to="/user/training-list"
                   >Training-List</router-link
+                >
+              </li>
+            </ul>
+          </b-collapse>
+        </li>
+
+        <li class="nav-item">
+          <span class="nav-link" v-b-toggle="'sheets'">
+            <span class="menu-title">MSDS Sheets</span>
+            <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i>
+          </span>
+          <b-collapse accordion="sidebar-accordion" id="sheets">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/user/msds-sheets-list"
+                  >MSDS-Sheets-List</router-link
+                >
+              </li>
+            </ul>
+          </b-collapse>
+        </li>
+
+        <li class="nav-item">
+          <span class="nav-link" v-b-toggle="'product'">
+            <span class="menu-title">Products</span>
+            <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i>
+          </span>
+          <b-collapse accordion="sidebar-accordion" id="product">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/user/product-list"
+                  >Product-List</router-link
                 >
               </li>
             </ul>

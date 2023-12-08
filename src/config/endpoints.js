@@ -10,10 +10,18 @@ export const endpoints = {
   },
   welcomeVideos: {
     fetchAll: `admin/all-welcome-videos`, // GET
+    deleteMedia: `admin/delete-welcome-video`,
   },
   trainings: {
     fetchAll: `admin/all-training`, // GET
     fetchMedia: `admin/training-media`,
+    deleteTraining: "admin/delete-training",
+  },
+  msdSheets: {
+    fetchMsdSheetList: `admin/all-sheets`, // GET
+  },
+  products: {
+    fetchProducts: `admin/all-products`, // GET
   },
   // job: {
   //     fetchAll: `job/fetch`, // GET

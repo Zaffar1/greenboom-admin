@@ -1,7 +1,7 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">Training List</h3>
+      <h3 class="page-title">Product List</h3>
       <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
@@ -40,7 +40,16 @@
               :filter="filter"
               striped
               hover
-            >
+              ><template #cell(image)="data">
+                <div>
+                  <img
+                    :src="data.item.file"
+                    class="mr-2"
+                    alt="image"
+                    style="max-width: 50px; max-height: 50px"
+                  />
+                </div>
+              </template>
               <template #cell(name)="data">
                 <!-- name & profile -->
                 <!-- <img :src="data.item.profile" class="mr-2" alt="image" /> -->
@@ -80,10 +89,8 @@
                 ></i>
                 <span v-html="data.value"></span>
               </template>
-              <template #cell(TrainingMedia)="data">
-                <button @click="viewMedia(data.item.TrainingMedia)">
-                  View
-                </button>
+              <template v-slot:cell(view)="data">
+                <button @click="openModal(data.item.file)">View</button>
               </template>
             </b-table>
             <b-pagination
@@ -104,6 +111,13 @@
       <span @click="closeModal" class="close">&times;</span>
       <video :src="videoSource" controls></video>
     </div>
+    <!-- v-if="currentVideo" -->
+    <!-- <b-modal title="Video Player" @hidden="resetModal" id="video-modal">
+        <video width="100%" controls>
+          <source :src="currentVideo" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </b-modal> -->
     <div></div>
   </section>
 </template>
@@ -132,10 +146,14 @@ export default {
       filter: "",
       sortable: true,
       fields: [
+        { key: "image", sortable: true },
         { key: "title", sortable: true },
+        { key: "description", sortable: true },
+        { key: "price", sortable: true },
         { key: "status", sortable: true },
+        // { key: "file", sortable: true },
         { key: "created_at", sortable: true },
-        { key: "TrainingMedia", sortable: true },
+        // { key: "view", sortable: true },
         { key: "action", sortable: true },
       ],
       items: [],
@@ -143,24 +161,24 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getTrainings", "getDefaultImage", "getImageUrl"]),
+    ...mapGetters(["getProducts", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
   },
   methods: {
-    ...mapActions(["fetchTrainings", "fetchTrainingId"]),
-    generateViewButton(id) {
-      return `<button @click="viewMedia(${id})">View</button>`;
-    },
+    ...mapActions(["fetchProducts"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
         let baseUrl = "http://localhost:8000/";
         obj.id = element.id;
+        obj.image = baseUrl + element.file;
         obj.title = element.title;
-        obj.TrainingMedia = element.id;
-        // obj.button = `<button @click="playVideo('${obj.file}')">View</button>`;
+        obj.description = element.description;
+        obj.price = element.price;
+        obj.file = baseUrl.concat(element.file);
+        // obj.button = `<button @click="playVideo('${obj.file}')">Play Video</button>`;
         obj.status = `<label class="badge ${
           element.status === "Active" ? "badge-success" : "badge-danger"
         }">${element.status}</label>`;
@@ -174,11 +192,6 @@ export default {
       console.log("mister", this.items);
     },
 
-    viewMedia(id) {
-      // Implement your logic to view media based on the ID
-      console.log("View media with ID:", id);
-      this.$router.push({ name: "training-media", params: { id } });
-    },
     openModal(videoUrl) {
       this.videoSource = videoUrl;
       this.isModalOpen = true;
@@ -186,33 +199,13 @@ export default {
     closeModal() {
       this.isModalOpen = false;
     },
-
     view(itemId) {
       console.log(itemId);
     },
-    async deleteItem(itemId) {
+    deleteItem(itemId) {
       console.log(itemId);
-
-      try {
-        // Perform the deletion operation
-        await this.fetchTrainingId(itemId);
-
-        // If the deletion is successful, fetch updated data
-        await this.fetchTrainings();
-
-        // Update the component's data with the latest data
-        this.items = [];
-        this.getTrainings.length > 0
-          ? this.setItems(this.getTrainings)
-          : (this.noItems = "No Training Found.");
-
-        // Redirect to the desired route
-        this.$router.push("/user/training-list");
-      } catch (error) {
-        // Handle any errors during deletion or data fetching
-        console.error("Error deleting item or fetching data:", error);
-      }
     },
+
     // openVideoModal(videoUrl) {
     //   console.log("Opening video modal with URL:", videoUrl);
     //   this.currentVideo = videoUrl;
@@ -225,11 +218,11 @@ export default {
     // },
   },
   async mounted() {
-    await this.fetchTrainings();
-    console.log("all training", this.getTrainings.length);
-    this.getTrainings.length > 0
-      ? this.setItems(this.getTrainings)
-      : (this.noItems = "No Training Found.");
+    await this.fetchProducts();
+    console.log("all products", this.getProducts.length);
+    this.getProducts.length > 0
+      ? this.setItems(this.getProducts)
+      : (this.noItems = "No Product Found.");
   },
 };
 </script>

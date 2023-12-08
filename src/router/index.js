@@ -94,6 +94,30 @@ export default new Router({
       ],
     },
     {
+      path: "/user",
+      component: layout,
+      children: [
+        {
+          path: "msds-sheets-list",
+          name: "msds-sheets-list",
+          component: () =>
+            import("@/pages/application-pages/msdSheets/msds-sheets-list"),
+        },
+      ],
+    },
+    {
+      path: "/user",
+      component: layout,
+      children: [
+        {
+          path: "product-list",
+          name: "product-list",
+          component: () =>
+            import("@/pages/application-pages/products/product-list"),
+        },
+      ],
+    },
+    {
       path: "/job",
       component: layout,
       children: [

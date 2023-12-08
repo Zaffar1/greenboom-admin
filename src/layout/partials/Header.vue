@@ -1,18 +1,32 @@
 <template>
-  <b-navbar id="template-header" class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row" toggleable="lg">
-    <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center">
+  <b-navbar
+    id="template-header"
+    class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row"
+    toggleable="lg"
+  >
+    <div
+      class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center"
+    >
       <router-link class="navbar-brand brand-logo" to="/">
-        <!-- <img src="@/assets/images/supportsnap-logo.png" alt="logo" /> -->
+        <img
+          src="../../../public/favicon.jpg"
+          alt="logo"
+          style="width: 100px; height: 70px"
+        />
       </router-link>
       <router-link class="navbar-brand brand-logo-mini" to="/">
         <!-- <img src="@/assets/images/supportsnap-mini.png" alt="logo" /> -->
       </router-link>
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-center ml-auto ml-lg-0">
-      <button class="navbar-toggler navbar-toggler align-self-center d-lg-block" type="button" @click="toggleSidebar()">
+      <button
+        class="navbar-toggler navbar-toggler align-self-center d-lg-block"
+        type="button"
+        @click="toggleSidebar()"
+      >
         <span class="mdi mdi-menu"></span>
       </button>
-      <div class="search-field d-none d-md-block">
+      <!-- <div class="search-field d-none d-md-block">
         <form action="#">
           <div class="d-flex align-items-center input-group">
             <div class="input-group-prepend bg-transparent">
@@ -21,13 +35,19 @@
             <input type="text" class="form-control bg-transparent border-0" placeholder="Search projects">
           </div>
         </form>
-      </div>
+      </div> -->
       <b-navbar-nav class="navbar-nav-right ml-auto">
         <b-nav-item-dropdown right class="nav-profile">
           <template slot="button-content">
-            <span class="nav-link dropdown-toggle" id="profileDropdown" href="javascript:void(0);" data-toggle="dropdown" aria-expanded="false">
+            <span
+              class="nav-link dropdown-toggle"
+              id="profileDropdown"
+              href="javascript:void(0);"
+              data-toggle="dropdown"
+              aria-expanded="false"
+            >
               <div class="nav-profile-img">
-                <img :src="this.getUserImage" alt="image">
+                <img :src="this.getUserImage" alt="image" />
                 <span class="availability-status online"></span>
               </div>
               <div class="nav-profile-text">
@@ -122,17 +142,40 @@
           </b-dropdown-item>
           <h6 class="p-3 mb-0 text-center border-top">4 new messages</h6>
         </b-nav-item-dropdown> -->
-        
-        <b-nav-item @click="() => {this.$router.push({name: 'my-profile'})}" class="text-p1 d-none d-lg-block">
-          <i v-b-tooltip.html.top title="Account Settings" variant="primary" class="mdi mdi-account-settings"></i>
+
+        <b-nav-item
+          @click="
+            () => {
+              this.$router.push({ name: 'my-profile' });
+            }
+          "
+          class="text-p1 d-none d-lg-block"
+        >
+          <i
+            v-b-tooltip.html.top
+            title="Account Settings"
+            variant="primary"
+            class="mdi mdi-account-settings"
+          ></i>
         </b-nav-item>
-        
-        <b-nav-item @click="logoutUser" class="text-danger nav-logout d-none d-lg-block">
-          <i v-b-tooltip.html.top title="Logout" variant="primary" class="mdi mdi-power"></i>
+
+        <b-nav-item
+          @click="logoutUser"
+          class="text-danger nav-logout d-none d-lg-block"
+        >
+          <i
+            v-b-tooltip.html.top
+            title="Logout"
+            variant="primary"
+            class="mdi mdi-power"
+          ></i>
         </b-nav-item>
-      
       </b-navbar-nav>
-      <button class="navbar-toggler navbar-toggler-right align-self-center" type="button" @click="toggleMobileSidebar()">
+      <button
+        class="navbar-toggler navbar-toggler-right align-self-center"
+        type="button"
+        @click="toggleMobileSidebar()"
+      >
         <span class="mdi mdi-menu"></span>
       </button>
     </div>
@@ -140,23 +183,22 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters } from "vuex";
 export default {
-  name: 'app-header',
+  name: "app-header",
   computed: {
-    ...mapGetters(['getCurrentUser', 'getUserImage'])
+    ...mapGetters(["getCurrentUser", "getUserImage"]),
   },
   methods: {
-    ...mapActions(['logoutUser']),
+    ...mapActions(["logoutUser"]),
     toggleSidebar: () => {
-      document.querySelector('body').classList.toggle('sidebar-icon-only');
+      document.querySelector("body").classList.toggle("sidebar-icon-only");
     },
     toggleMobileSidebar: () => {
-      document.querySelector('#sidebar').classList.toggle('active');
-    }
-  }
-}
+      document.querySelector("#sidebar").classList.toggle("active");
+    },
+  },
+};
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

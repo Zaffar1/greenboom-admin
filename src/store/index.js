@@ -18,6 +18,8 @@ export default new Vuex.Store({
     welcomeVideos: [],
     trainings: [],
     trainingMedia: [],
+    msdSheets: [],
+    products: [],
     allJobs: [],
 
     imageUrl:
@@ -41,6 +43,8 @@ export default new Vuex.Store({
     getWelcomeVideos: (state) => state.welcomeVideos,
     getTrainings: (state) => state.trainings,
     getTrainingMedia: (state) => state.trainingMedia,
+    getMsdSheets: (state) => state.msdSheets,
+    getProducts: (state) => state.products,
     getUserImage: (state, getters) => {
       return getters.getCurrentUser.profile_image === null
         ? getters.getDefaultImage
@@ -94,6 +98,17 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+    fetchWelcomeVideoId: async ({ commit }, id) => {
+      try {
+        let response = await API.delete(
+          `${endpoints.welcomeVideos.deleteMedia}/${id}`
+        );
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
     fetchTrainings: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.trainings.fetchAll);
@@ -104,11 +119,42 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+    fetchTrainingId: async ({ commit }, id) => {
+      try {
+        let response = await API.delete(
+          `${endpoints.trainings.deleteTraining}/${id}`
+        );
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
     fetchTrainingMedia: async ({ commit }, id) => {
       try {
         let response = await API.get(`${endpoints.trainings.fetchMedia}/${id}`);
         commit("setTrainingMedia", response.data.training_media);
         console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    fetchMsdSheets: async ({ commit }) => {
+      try {
+        let response = await API.get(endpoints.msdSheets.fetchMsdSheetList);
+        commit("setMsdSheets", response.data.all_msds);
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    fetchProducts: async ({ commit }) => {
+      try {
+        let response = await API.get(endpoints.products.fetchProducts);
+        commit("setProducts", response.data.all_products);
+        // console.log(response);
         return true;
       } catch (error) {
         return error.response;
@@ -130,7 +176,9 @@ export default new Vuex.Store({
       (state.welcomeVideos = welcomeVideos),
     setTrainings: (state, trainings) => (state.trainings = trainings),
     setTrainingMedia: (state, trainingMedia) =>
-      (state.trainingMedia = trainingMedia),
+      ``((state.trainingMedia = trainingMedia)),
+    setMsdSheets: (state, msdSheets) => (state.msdSheets = msdSheets),
+    setProducts: (state, products) => (state.products = products),
     setJobs: (state, jobs) => (state.allJobs = jobs),
     setUserLogin: (state, data) => {
       state.currentUser = data.user;

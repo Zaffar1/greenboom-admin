@@ -20,11 +20,27 @@
             <h4 class="card-title"></h4>
             <div class="float-right">
               <!-- search field -->
-              <b-input v-model="filter" placeholder="Search User" id="user-search" style="padding: 10px"></b-input>
+              <b-input
+                v-model="filter"
+                placeholder="Search User"
+                id="user-search"
+                style="padding: 10px"
+              ></b-input>
             </div>
-            <b-table :items="items" id="table-list" responsive :per-page="perPage" :current-page="currentPage"
-              :fields="fields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" show-empty :filter="filter" striped
-              hover>
+            <b-table
+              :items="items"
+              id="table-list"
+              responsive
+              :per-page="perPage"
+              :current-page="currentPage"
+              :fields="fields"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              show-empty
+              :filter="filter"
+              striped
+              hover
+            >
               <template #cell(name)="data">
                 <!-- name & profile -->
                 <img :src="data.item.profile" class="mr-2" alt="image" />
@@ -44,14 +60,27 @@
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
-                <i @click="view(data.item.id)" :ref="'btn' + data.index" class="mr-2 mdi mdi-eye text-muted icon-sm"></i>
-                <i v-b-modal.modallg @click="edit(data.item.id)" :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil text-muted icon-sm"></i>
+                <i
+                  @click="view(data.item.id)"
+                  :ref="'btn' + data.index"
+                  class="mr-2 mdi mdi-eye text-muted icon-sm"
+                ></i>
+                <i
+                  v-b-modal.modallg
+                  @click="edit(data.item.id)"
+                  :ref="'btn' + data.index"
+                  class="mr-2 mdi mdi-pencil text-muted icon-sm"
+                ></i>
                 <span v-html="data.value"></span>
               </template>
             </b-table>
-            <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="table-list"
-              align="right">
+            <b-pagination
+              v-model="currentPage"
+              :total-rows="rows"
+              :per-page="perPage"
+              aria-controls="table-list"
+              align="right"
+            >
             </b-pagination>
           </div>
         </div>
@@ -116,8 +145,9 @@ export default {
         obj.email = element.email;
         // obj.role = element.role?.name ?? "DELETED";
 
-        obj.status = `<label class="badge ${element.status === "Active" ? "badge-success" : "badge-danger"
-          }">${element.status}</label>`;
+        obj.status = `<label class="badge ${
+          element.status === "Active" ? "badge-success" : "badge-danger"
+        }">${element.status}</label>`;
 
         obj.role_id = element.role?.id;
         obj.status_id = element.status?.id;
@@ -126,6 +156,12 @@ export default {
         );
         this.items.push(obj);
       });
+    },
+    view(itemId) {
+      console.log(itemId);
+    },
+    deleteItem(itemId) {
+      console.log(itemId);
     },
   },
   async mounted() {
