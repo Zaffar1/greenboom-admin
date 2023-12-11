@@ -6,7 +6,7 @@ export const endpoints = {
     fetchAll: `admin/users`, // GET
     fetchOne: `customer/verify/`, // GET id
     verify: `customer/verify`,
-    updateStatus: `update-status`,
+    updateStatus: `admin/user-status`,
   },
   welcomeVideos: {
     fetchAll: `admin/all-welcome-videos`, // GET

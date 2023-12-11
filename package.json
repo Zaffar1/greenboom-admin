@@ -34,6 +34,7 @@
     "react-router-dom": "^6.20.1",
     "resumablejs": "^1.1.0",
     "simple-line-icons": "^2.4.1",
+    "sweetalert2": "^11.10.1",
     "ti-icons": "^0.1.2",
     "v-clipboard": "^2.2.2",
     "vee-validate": "^2.2.15",

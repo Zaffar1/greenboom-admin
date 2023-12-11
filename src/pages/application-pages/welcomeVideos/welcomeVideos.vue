@@ -118,6 +118,7 @@ import SortedTablePlugin from "vue-sorted-table";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
 import router from "../../../router";
+import Swal from "sweetalert2";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -194,26 +195,40 @@ export default {
     async deleteItem(itemId) {
       console.log(itemId);
 
-      try {
-        // Perform the deletion operation
-        await this.fetchWelcomeVideoId(itemId);
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this video!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      });
 
-        // If the deletion is successful, fetch updated data
-        await this.fetchWelcomeVideos();
+      if (result.isConfirmed) {
+        try {
+          // Perform the deletion operation
+          await this.fetchWelcomeVideoId(itemId);
 
-        // Update the component's data with the latest data
-        this.items = [];
-        this.getWelcomeVideos.length > 0
-          ? this.setItems(this.getWelcomeVideos)
-          : (this.noItems = "No Video Found.");
+          // If the deletion is successful, fetch updated data
+          await this.fetchWelcomeVideos();
 
-        // Redirect to the desired route
-        // this.$router.push("/user/welcome-videos");
-      } catch (error) {
-        // Handle any errors during deletion or data fetching
-        console.error("Error deleting item or fetching data:", error);
+          // Update the component's data with the latest data
+          this.items = [];
+          this.getWelcomeVideos.length > 0
+            ? this.setItems(this.getWelcomeVideos)
+            : (this.noItems = "No Video Found.");
+
+          // Show success message
+          Swal.fire("Deleted!", "The video has been deleted.", "success");
+        } catch (error) {
+          // Handle any errors during deletion or data fetching
+          console.error("Error deleting item or fetching data:", error);
+          Swal.fire("Error!", "An error occurred during deletion.", "error");
+        }
       }
     },
+
     // openVideoModal(videoUrl) {
     //   console.log("Opening video modal with URL:", videoUrl);
     //   this.currentVideo = videoUrl;
