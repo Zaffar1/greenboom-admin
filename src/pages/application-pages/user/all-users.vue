@@ -54,22 +54,35 @@
 
               <!-- status -->
               <template v-slot:cell(status)="data">
-                <span v-html="data.value"></span>
+                <!-- <span v-html="data.value"></span> -->
+                <toggle-button
+                  @change="changeStatus(data.item)"
+                  :value="data.item.status == 'Active'"
+                />
               </template>
 
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
-
-                <i
+                <router-link
+                  :to="{ name: 'user-details', params: { id: data.item.id } }"
+                >
+                  <i class="mr-2 mdi mdi-eye text-muted icon-sm"></i>
+                </router-link>
+                <!-- <i
                   @click="view(data.item.id)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i>
-                <i
+                ></i> -->
+                <!-- <i
                   v-b-modal.modallg
                   @click="edit(data.item.id)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
+                ></i> -->
+                <i
+                  @click="deleteItem(data.item.id)"
+                  :ref="'btnDelete' + data.index"
+                  class="mr-2 mdi mdi-delete text-danger icon-sm"
                 ></i>
                 <span v-html="data.value"></span>
               </template>
@@ -94,6 +107,9 @@ import Vue from "vue";
 import SortedTablePlugin from "vue-sorted-table";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
+import Swal from "sweetalert2";
+import API from "../../../config/api";
+import { endpoints } from "../../../config/endpoints";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -131,7 +147,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["fetchUsers"]),
+    ...mapActions(["fetchUsers", "fetchUserDetails", "deleteUser"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
@@ -144,10 +160,10 @@ export default {
             : this.getImageUrl + element.profile_picture;
         obj.email = element.email;
         // obj.role = element.role?.name ?? "DELETED";
-
-        obj.status = `<label class="badge ${
-          element.status === "Active" ? "badge-success" : "badge-danger"
-        }">${element.status}</label>`;
+        obj.status = element.status;
+        // obj.status = `<label class="badge ${
+        //   element.status === "Active" ? "badge-success" : "badge-danger"
+        // }">${element.status}</label>`;
 
         obj.role_id = element.role?.id;
         obj.status_id = element.status?.id;
@@ -157,11 +173,74 @@ export default {
         this.items.push(obj);
       });
     },
-    view(itemId) {
+    async view(itemId) {
+      await this.fetchUserDetails(itemId);
       console.log(itemId);
     },
-    deleteItem(itemId) {
+    async deleteItem(itemId) {
       console.log(itemId);
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this user!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      });
+
+      if (result.isConfirmed) {
+        try {
+          // Perform the deletion operation
+          await this.deleteUser(itemId);
+
+          // If the deletion is successful, fetch updated data
+          await this.fetchUsers();
+
+          // Update the component's data with the latest data
+          this.items = [];
+          this.getUsers.length > 0
+            ? this.setItems(this.getUsers)
+            : (this.noItems = "No User Found.");
+
+          // Show success message
+          Swal.fire("Deleted!", "User has been deleted.", "success");
+        } catch (error) {
+          // Handle any errors during deletion or data fetching
+          console.error("Error deleting item or fetching data:", error);
+          Swal.fire("Error!", "An error occurred during deletion.", "error");
+        }
+      }
+    },
+    async changeStatus(item) {
+      try {
+        // Note the use of await here
+        let result = await API.post(`${endpoints.user.userStatus}/${item.id}`);
+
+        // Check the result or handle the response as needed
+        if (result.status === 200) {
+          // Toggle the status locally in the items array
+          const updatedItems = this.items.map((user) => {
+            if (user.id === item.id) {
+              user.status = user.status === "Active" ? "InActive" : "Active";
+            }
+            return user;
+          });
+
+          // Update the items array with the new data
+          this.items = updatedItems;
+
+          // Show success message
+          Swal.fire("Success!", "Status successfully changed.", "success");
+        } else {
+          // Handle other status codes or error conditions
+          console.error("Error updating user status:", result);
+        }
+      } catch (error) {
+        // Handle any errors during deletion or data fetching
+        console.error("Error updating user status:", error);
+        Swal.fire("Error!", "An error occurred during status update.", "error");
+      }
     },
   },
   async mounted() {

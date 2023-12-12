@@ -2,6 +2,9 @@
   <section class="tables">
     <div class="page-header">
       <h3 class="page-title">Welcome Videos List</h3>
+      <router-link :to="{ name: 'add-welcome-video' }">
+        <b-button variant="success" class="mr-2">Add Welcome Video</b-button>
+      </router-link>
       <!-- <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
             <li class="breadcrumb-item">

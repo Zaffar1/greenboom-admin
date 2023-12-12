@@ -13,7 +13,7 @@ export default new Vuex.Store({
 
     currentUser: {},
     token: null,
-
+    user: {},
     allUsers: [],
     welcomeVideos: [],
     trainings: [],
@@ -88,6 +88,38 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+    async fetchUserDetails({ commit }, userId) {
+      try {
+        let response = await API.get(
+          `${endpoints.user.fetchUserDetail}/${userId}`
+        );
+        console.log("user", response.user_detail);
+        // const userData = await response.json();
+        commit("setUser", response.data.user_detail);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    },
+    deleteUser: async ({ commit }, id) => {
+      try {
+        let response = await API.post(`${endpoints.user.deleteUser}/${id}`);
+        i;
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    updateUserStatus: async ({ commit }, id) => {
+      try {
+        let response = await API.post(`${endpoints.user.userStatus}/${id}`);
+        // i;
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
     fetchWelcomeVideos: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.welcomeVideos.fetchAll);
@@ -103,6 +135,7 @@ export default new Vuex.Store({
         let response = await API.delete(
           `${endpoints.welcomeVideos.deleteMedia}/${id}`
         );
+        i;
         console.log(response);
         return true;
       } catch (error) {
@@ -172,6 +205,9 @@ export default new Vuex.Store({
   },
   mutations: {
     setUsers: (state, users) => (state.allUsers = users),
+    setUser(state, user) {
+      state.user = user;
+    },
     setWelcomeVideos: (state, welcomeVideos) =>
       (state.welcomeVideos = welcomeVideos),
     setTrainings: (state, trainings) => (state.trainings = trainings),

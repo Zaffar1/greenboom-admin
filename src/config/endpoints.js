@@ -7,6 +7,9 @@ export const endpoints = {
     fetchOne: `customer/verify/`, // GET id
     verify: `customer/verify`,
     updateStatus: `admin/user-status`,
+    fetchUserDetail: "admin/user-detail",
+    deleteUser: "admin/block-user",
+    userStatus: "admin/user-status",
   },
   welcomeVideos: {
     fetchAll: `admin/all-welcome-videos`, // GET

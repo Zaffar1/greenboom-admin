@@ -74,6 +74,18 @@ export default new Router({
       component: layout,
       children: [
         {
+          path: "add-welcome-video",
+          name: "add-welcome-video",
+          component: () =>
+            import("@/pages/application-pages/welcomeVideos/addWelcomeVideo"),
+        },
+      ],
+    },
+    {
+      path: "/user",
+      component: layout,
+      children: [
+        {
           path: "training-list",
           name: "training-list",
           component: () =>
@@ -117,6 +129,19 @@ export default new Router({
         },
       ],
     },
+    {
+      path: "/user",
+      component: layout,
+      children: [
+        {
+          path: "/user/:id",
+          name: "user-details",
+          component: () =>
+            import("@/pages/application-pages/user/user-details"),
+        },
+      ],
+    },
+
     {
       path: "/job",
       component: layout,
