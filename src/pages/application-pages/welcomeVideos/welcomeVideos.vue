@@ -57,7 +57,11 @@
 
               <!-- status -->
               <template v-slot:cell(status)="data">
-                <span v-html="data.value"></span>
+                <!-- <span v-html="data.value"></span> -->
+                <toggle-button
+                  @change="changeStatus(data.item)"
+                  :value="data.item.status == 'Active'"
+                />
               </template>
               <template v-slot:cell(file)="data">
                 <span v-html="data.value"></span>
@@ -65,14 +69,14 @@
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
-                <i
+                <!-- <i
                   @click="view(data.item.id)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i>
+                ></i> -->
                 <i
                   v-b-modal.modallg
-                  @click="edit(data.item.id)"
+                  @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
                 ></i>
@@ -112,6 +116,38 @@
         Your browser does not support the video tag.
       </video>
     </b-modal> -->
+
+    <!-- Modal for editing video -->
+    <b-modal v-model="showEditModal" title="Edit Welcome Video">
+      <form @submit.prevent="submitEditForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="editedTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Description" label-for="editInputDescription">
+          <b-form-input
+            v-model="editedDescription"
+            id="editInputDescription"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="editedFile"
+            id="editInputFile"
+            :state="Boolean(editedFile)"
+            placeholder="Choose a file..."
+          ></b-form-file>
+        </b-form-group>
+        <!-- You can add more fields as needed -->
+
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
+
     <div></div>
   </section>
 </template>
@@ -120,8 +156,9 @@ import Vue from "vue";
 import SortedTablePlugin from "vue-sorted-table";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
-import router from "../../../router";
 import Swal from "sweetalert2";
+import API from "../../../config/api";
+import { endpoints } from "../../../config/endpoints";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -139,6 +176,12 @@ export default {
       sortDesc: false,
       sortByFormatted: true,
       filterByFormatted: true,
+      showEditModal: false,
+      editedTitle: "",
+      editedDescription: "",
+      editedFile: null,
+      // Add a property to store the current edited item
+      editedItem: null,
       filter: "",
       sortable: true,
       fields: [
@@ -172,10 +215,11 @@ export default {
         obj.description = element.description;
         obj.file = baseUrl.concat(element.file);
         // obj.button = `<button @click="playVideo('${obj.file}')">Play Video</button>`;
-        obj.status = `<label class="badge ${
-          element.status === "Active" ? "badge-success" : "badge-danger"
-        }">${element.status}</label>`;
-        obj.status_id = element.status?.id;
+        // obj.status = `<label class="badge ${
+        //   element.status === "Active" ? "badge-success" : "badge-danger"
+        // }">${element.status}</label>`;
+        obj.status = element.status;
+        // obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
         );
@@ -184,7 +228,90 @@ export default {
 
       console.log("mister", this.items);
     },
+    openEditModal(item) {
+      // Set initial values when opening the modal
+      this.editedItem = item;
+      this.editedTitle = item.title;
+      this.editedDescription = item.description;
+      this.editedFile = null; // Clear the file input
+      this.showEditModal = true;
+    },
 
+    async submitEditForm() {
+      const editedFormData = new FormData();
+      editedFormData.append("title", this.editedTitle);
+      editedFormData.append("description", this.editedDescription);
+      if (this.editedFile) {
+        editedFormData.append("file", this.editedFile);
+      }
+
+      // Add an identifier for the edited item (e.g., item ID) to the form data
+      editedFormData.append("video_id", this.editedItem.id); // Change "itemId" to "video_id"
+
+      try {
+        await API.post(
+          endpoints.welcomeVideos.editWelcomeVideo,
+          editedFormData
+        );
+
+        // Handle success
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Video edited successfully",
+        }).then(() => {
+          // Redirect to the same page after Swal success message
+          // this.$router.go(); // This will reload the current route
+        });
+
+        this.showEditModal = false; // Close the modal after success
+        await this.fetchWelcomeVideos();
+
+        // Update the component's data with the latest data
+        this.items = [];
+        this.getWelcomeVideos.length > 0
+          ? this.setItems(this.getWelcomeVideos)
+          : (this.noItems = "No Video Found.");
+      } catch (error) {
+        // Handle error
+        console.error("Error editing video:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while editing the video",
+        });
+      }
+    },
+    async changeStatus(item) {
+      try {
+        // Note the use of await here
+        let result = await API.post(`${endpoints.welcomeVideos.videoStatus}/${item.id}`);
+
+        // Check the result or handle the response as needed
+        if (result.status === 200) {
+          // Toggle the status locally in the items array
+          const updatedItems = this.items.map((video) => {
+            if (video.id === item.id) {
+              video.status = video.status === "Active" ? "InActive" : "Active";
+            }
+            return video;
+          });
+
+          // Update the items array with the new data
+          this.items = updatedItems;
+
+          // Show success message
+          Swal.fire("Success!", "Status successfully changed.", "success");
+        } else {
+          // Handle other status codes or error conditions
+          console.error("Error updating user status:", result);
+        }
+      } catch (error) {
+        // Handle any errors during deletion or data fetching
+        console.error("Error updating user status:", error);
+        Swal.fire("Error!", "An error occurred during status update.", "error");
+      }
+    },
     openModal(videoUrl) {
       this.videoSource = videoUrl;
       this.isModalOpen = true;

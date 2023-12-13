@@ -14,11 +14,16 @@ export const endpoints = {
   welcomeVideos: {
     fetchAll: `admin/all-welcome-videos`, // GET
     deleteMedia: `admin/delete-welcome-video`,
+    addWelcomeVideo: `admin/add-welcome-video`,
+    editWelcomeVideo: `admin/update-welcome-video`,
+    videoStatus: `admin/change-status`,
   },
   trainings: {
     fetchAll: `admin/all-training`, // GET
     fetchMedia: `admin/training-media`,
     deleteTraining: "admin/delete-training",
+    trainingStatus: "admin/training-status",
+    addTraining: "admin/add-training",
   },
   msdSheets: {
     fetchMsdSheetList: `admin/all-sheets`, // GET

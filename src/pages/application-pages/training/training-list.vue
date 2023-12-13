@@ -2,6 +2,11 @@
   <section class="tables">
     <div class="page-header">
       <h3 class="page-title">Training List</h3>
+      <!-- <router-link :to="{ name: 'add-training' }"> -->
+      <b-button @click="addTrainingModal" variant="success" class="mr-2"
+        >Add Training</b-button
+      >
+      <!-- </router-link> -->
       <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
@@ -54,7 +59,11 @@
 
               <!-- status -->
               <template v-slot:cell(status)="data">
-                <span v-html="data.value"></span>
+                <!-- <span v-html="data.value"></span> -->
+                <toggle-button
+                  @change="changeStatus(data.item)"
+                  :value="data.item.status == 'Active'"
+                />
               </template>
               <template v-slot:cell(file)="data">
                 <span v-html="data.value"></span>
@@ -104,6 +113,20 @@
       <span @click="closeModal" class="close">&times;</span>
       <video :src="videoSource" controls></video>
     </div>
+    <b-modal v-model="addModel" title="Add Training">
+      <form @submit.prevent="submitAddForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="addTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <!-- You can add more fields as needed -->
+
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
     <div></div>
   </section>
 </template>
@@ -112,6 +135,9 @@ import Vue from "vue";
 import SortedTablePlugin from "vue-sorted-table";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
+import Swal from "sweetalert2";
+import API from "../../../config/api";
+import { endpoints } from "../../../config/endpoints";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -131,6 +157,8 @@ export default {
       filterByFormatted: true,
       filter: "",
       sortable: true,
+      addModel: false,
+      addTitle: "",
       fields: [
         { key: "title", sortable: true },
         { key: "status", sortable: true },
@@ -160,11 +188,12 @@ export default {
         obj.id = element.id;
         obj.title = element.title;
         obj.TrainingMedia = element.id;
+        obj.status = element.status;
         // obj.button = `<button @click="playVideo('${obj.file}')">View</button>`;
-        obj.status = `<label class="badge ${
-          element.status === "Active" ? "badge-success" : "badge-danger"
-        }">${element.status}</label>`;
-        obj.status_id = element.status?.id;
+        // obj.status = `<label class="badge ${
+        //   element.status === "Active" ? "badge-success" : "badge-danger"
+        // }">${element.status}</label>`;
+        // obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
         );
@@ -172,6 +201,48 @@ export default {
       });
 
       console.log("mister", this.items);
+    },
+
+    addTrainingModal(item) {
+      // Set initial values when opening the modal
+      this.addItem = item;
+      this.addTitle = item.title;
+      this.addModel = true;
+    },
+
+    async submitAddForm() {
+      const addFormData = new FormData();
+      addFormData.append("title", this.addTitle);
+
+      try {
+        const result = await API.post(
+          endpoints.trainings.addTraining,
+          addFormData
+        );
+
+        if (result.status === 200) {
+          this.addModel = false; // Close the modal after success
+
+          // Fetch updated training data
+          await this.fetchTrainings();
+
+          // Update the component's data with the latest data
+          this.items = [];
+          this.getTrainings.length > 0
+            ? this.setItems(this.getTrainings)
+            : (this.noItems = "No Training Found.");
+
+          Swal.fire("Success!", "Training successfully added.", "success");
+        }
+      } catch (error) {
+        // Handle error
+        console.error("Error adding training:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding training",
+        });
+      }
     },
 
     viewMedia(id) {
@@ -192,25 +263,71 @@ export default {
     },
     async deleteItem(itemId) {
       console.log(itemId);
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this training!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      });
 
+      if (result.isConfirmed) {
+        try {
+          // Perform the deletion operation
+          await this.fetchTrainingId(itemId);
+
+          // If the deletion is successful, fetch updated data
+          await this.fetchTrainings();
+
+          // Update the component's data with the latest data
+          this.items = [];
+          this.getTrainings.length > 0
+            ? this.setItems(this.getTrainings)
+            : (this.noItems = "No Training Found.");
+
+          Swal.fire("Deleted!", "Training has been deleted.", "success");
+          // Redirect to the desired route
+          // this.$router.push("/user/training-list");
+        } catch (error) {
+          // Handle any errors during deletion or data fetching
+          console.error("Error deleting item or fetching data:", error);
+          Swal.fire("Error!", "An error occurred during deletion.", "error");
+        }
+      }
+    },
+    async changeStatus(item) {
       try {
-        // Perform the deletion operation
-        await this.fetchTrainingId(itemId);
+        // Note the use of await here
+        let result = await API.post(
+          `${endpoints.trainings.trainingStatus}/${item.id}`
+        );
 
-        // If the deletion is successful, fetch updated data
-        await this.fetchTrainings();
+        // Check the result or handle the response as needed
+        if (result.status === 200) {
+          // Toggle the status locally in the items array
+          const updatedItems = this.items.map((training) => {
+            if (training.id === item.id) {
+              training.status =
+                training.status === "Active" ? "InActive" : "Active";
+            }
+            return training;
+          });
 
-        // Update the component's data with the latest data
-        this.items = [];
-        this.getTrainings.length > 0
-          ? this.setItems(this.getTrainings)
-          : (this.noItems = "No Training Found.");
+          // Update the items array with the new data
+          this.items = updatedItems;
 
-        // Redirect to the desired route
-        this.$router.push("/user/training-list");
+          // Show success message
+          Swal.fire("Success!", "Status successfully changed.", "success");
+        } else {
+          // Handle other status codes or error conditions
+          console.error("Error updating user status:", result);
+        }
       } catch (error) {
         // Handle any errors during deletion or data fetching
-        console.error("Error deleting item or fetching data:", error);
+        console.error("Error updating user status:", error);
+        Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
     // openVideoModal(videoUrl) {

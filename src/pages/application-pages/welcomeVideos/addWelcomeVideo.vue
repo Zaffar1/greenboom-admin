@@ -5,11 +5,12 @@
         <div class="card-body">
           <h4 class="card-title">Welcome Video</h4>
           <p class="card-description">Add Welcome Video Form</p>
-          <form class="forms-sample">
+          <form @submit.stop.prevent="addWelcomeVideo" class="forms-sample">
             <b-form-group label="Title" label-for="input5">
               <b-form-input
                 type="text"
                 id="input5"
+                v-model="posts.title"
                 placeholder="Type Title"
                 required
               ></b-form-input>
@@ -18,15 +19,15 @@
               <b-form-input
                 type="text"
                 id="input6"
+                v-model="posts.description"
                 placeholder="Type Description"
                 required
               ></b-form-input>
             </b-form-group>
             <b-form-group label="Upload file" label-for="input8">
               <b-form-file
-                v-model="file"
+                v-model="posts.file"
                 id="inpu8"
-                :state="Boolean(file)"
                 placeholder="Choose a file..."
                 required
               ></b-form-file>
@@ -45,36 +46,37 @@
 </template>
 
 <script lang="js">
+import API from "../../../config/api";
+import { endpoints } from "../../../config/endpoints";
+import Swal from "sweetalert2";
+
 export default {
   name: 'basicFormsElements',
   data () {
     return {
       file: null,
-      options: [
-        { value: null, text: 'Please select an option' },
-        { value: 'a', text: 'This is First option' },
-        { value: 'b', text: 'Selected Option' },
-        { value: {'C': '3PO'}, text: 'This is an option with object value' },
-        { value: 'd', text: 'This one is disabled', disabled: true }
-      ],
-      GenderSelect: [
-        { value: 'Male', text: 'Male' },
-        { value: 'Female', text: 'Female' }
-      ],
-      Category: [
-        { value: 'a', text: 'Category 1' },
-        { value: 'b', text: 'Category 2' },
-        { value: 'c', text: 'Category 3' },
-        { value: 'd', text: 'Category 4' },
-        { value: 'e', text: 'Category 5' }
-      ],
-      countries: [
-        { value: 'America', text: 'America' },
-        { value: 'Italy', text: 'Italy' },
-        { value: 'Russia', text: 'Russia' },
-        { value: 'China', text: 'China' },
-        { value: 'Britain', text: 'Britain' }
-      ]
+      posts: {
+                title: "",
+            },
+
+    }
+  },
+  methods:{
+    async addWelcomeVideo(){
+      // console.log("Hello Welcome to Add Video");
+      const formData = new FormData();
+      formData.append("title", this.posts?.title);
+      formData.append("description", this.posts?.description);
+      formData.append("file", this.posts?.file);
+      await API.post(endpoints.welcomeVideos.addWelcomeVideo,formData).then((resp) => {
+                console.log(resp)
+                Swal.fire({
+                title: 'Welcome Video Added',
+                text: 'Welcome video has been successfully added!',
+                icon: 'success',
+             })
+                this.$router.push('/user/welcome-videos')
+            });
     }
   }
 }

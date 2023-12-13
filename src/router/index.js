@@ -110,6 +110,18 @@ export default new Router({
       component: layout,
       children: [
         {
+          path: "add-training",
+          name: "add-training",
+          component: () =>
+            import("@/pages/application-pages/training/addTraining"),
+        },
+      ],
+    },
+    {
+      path: "/user",
+      component: layout,
+      children: [
+        {
           path: "msds-sheets-list",
           name: "msds-sheets-list",
           component: () =>
