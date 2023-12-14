@@ -17,6 +17,7 @@ export default new Vuex.Store({
     allUsers: [],
     welcomeVideos: [],
     trainings: [],
+    trainingTitle: {},
     trainingMedia: [],
     msdSheets: [],
     products: [],

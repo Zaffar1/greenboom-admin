@@ -98,7 +98,7 @@ export default new Router({
       component: layout,
       children: [
         {
-          path: "training-media/:id",
+          path: "training-media/:id/:title",
           name: "training-media",
           component: () =>
             import("@/pages/application-pages/training/training-media-list"),

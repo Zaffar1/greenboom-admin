@@ -24,6 +24,11 @@ export const endpoints = {
     deleteTraining: "admin/delete-training",
     trainingStatus: "admin/training-status",
     addTraining: "admin/add-training",
+    editTraining: "admin/update-training",
+    addTrainingMedia: "admin/add-training-media",
+    deleteTrainingMedia: "admin/delete-training-media",
+    editTrainingMedia: "admin/update-training-media",
+    trainingMediaStatus: "admin/training-media-status",
   },
   msdSheets: {
     fetchMsdSheetList: `admin/all-sheets`, // GET

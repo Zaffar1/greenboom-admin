@@ -3,7 +3,9 @@
     <div class="page-header">
       <h3 class="page-title">Welcome Videos List</h3>
       <router-link :to="{ name: 'add-welcome-video' }">
-        <b-button variant="success" class="mr-2">Add Welcome Video</b-button>
+        <b-button variant="success" class="mr-2"
+          ><i class="mdi mdi-plus"></i>Add Welcome Video</b-button
+        >
       </router-link>
       <!-- <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
@@ -88,7 +90,12 @@
                 <span v-html="data.value"></span>
               </template>
               <template v-slot:cell(Media)="data">
-                <button @click="openModal(data.item.file)">Play Video</button>
+                <button
+                  @click="openModal(data.item.file)"
+                  class="btn btn-primary"
+                >
+                  <i class="mdi mdi-play"></i> Play Video
+                </button>
               </template>
             </b-table>
             <b-pagination
@@ -118,7 +125,7 @@
     </b-modal> -->
 
     <!-- Modal for editing video -->
-    <b-modal v-model="showEditModal" title="Edit Welcome Video">
+    <b-modal v-model="showEditModal" title="Edit Welcome Video" hide-footer>
       <form @submit.prevent="submitEditForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -285,7 +292,9 @@ export default {
     async changeStatus(item) {
       try {
         // Note the use of await here
-        let result = await API.post(`${endpoints.welcomeVideos.videoStatus}/${item.id}`);
+        let result = await API.post(
+          `${endpoints.welcomeVideos.videoStatus}/${item.id}`
+        );
 
         // Check the result or handle the response as needed
         if (result.status === 200) {
@@ -403,5 +412,32 @@ export default {
   top: 10px;
   right: 10px;
   cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #6c757d; /* Change the background color as needed */
+  color: #fff; /* Change the text color as needed */
+  border: 1px solid #6c757d; /* Change the border color as needed */
+  padding: 10px 15px; /* Adjust padding as needed */
+  border-radius: 5px; /* Adjust border radius as needed */
+  cursor: pointer;
+}
+
+/* Example styles for the icon */
+.btn-primary {
+  background-color: #6c757d; /* Change the background color as needed */
+  color: #fff; /* Change the text color as needed */
+  border: 1px solid #6c757d; /* Change the border color as needed */
+  padding: 10px 15px; /* Adjust padding as needed */
+  border-radius: 5px; /* Adjust border radius as needed */
+  cursor: pointer;
+}
+
+/* Example styles for the icon */
+.btn-primary i {
+  margin-right: 5px; /* Adjust margin as needed */
+}
+.btn-primary i {
+  margin-right: 5px; /* Adjust margin as needed */
 }
 </style>

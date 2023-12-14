@@ -3,9 +3,9 @@
     <div class="page-header">
       <h3 class="page-title">Training List</h3>
       <!-- <router-link :to="{ name: 'add-training' }"> -->
-      <b-button @click="addTrainingModal" variant="success" class="mr-2"
-        >Add Training</b-button
-      >
+      <b-button @click="addTrainingModal" variant="success" class="mr-2">
+        <i class="mdi mdi-plus"></i> Add Training
+      </b-button>
       <!-- </router-link> -->
       <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -58,7 +58,7 @@
               </template>
 
               <!-- status -->
-              <template v-slot:cell(status)="data">
+              <template #cell(status)="data">
                 <!-- <span v-html="data.value"></span> -->
                 <toggle-button
                   @change="changeStatus(data.item)"
@@ -71,14 +71,14 @@
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
-                <i
+                <!-- <i
                   @click="view(data.item.id)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i>
+                ></i> -->
                 <i
                   v-b-modal.modallg
-                  @click="edit(data.item.id)"
+                  @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
                 ></i>
@@ -90,8 +90,11 @@
                 <span v-html="data.value"></span>
               </template>
               <template #cell(TrainingMedia)="data">
-                <button @click="viewMedia(data.item.TrainingMedia)">
-                  View
+                <button
+                  @click="viewMedia(data.item.TrainingMedia)"
+                  class="btn btn-primary"
+                >
+                  <i class="mr-2 mdi mdi-eye text-muted icon-sm"></i>View
                 </button>
               </template>
             </b-table>
@@ -113,7 +116,7 @@
       <span @click="closeModal" class="close">&times;</span>
       <video :src="videoSource" controls></video>
     </div>
-    <b-modal v-model="addModel" title="Add Training">
+    <b-modal v-model="addModel" title="Add Training" hide-footer>
       <form @submit.prevent="submitAddForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -124,6 +127,19 @@
         </b-form-group>
         <!-- You can add more fields as needed -->
 
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
+    <!-- Modal for editing video -->
+    <b-modal v-model="showEditModal" title="Edit Training" hide-footer>
+      <form @submit.prevent="submitEditForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="editedTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
         <b-button type="submit" variant="success">Save Changes</b-button>
       </form>
     </b-modal>
@@ -158,6 +174,10 @@ export default {
       filter: "",
       sortable: true,
       addModel: false,
+      showEditModal: false,
+      editedTitle: "",
+      // Add a property to store the current edited item
+      editedItem: null,
       addTitle: "",
       fields: [
         { key: "title", sortable: true },
@@ -187,7 +207,10 @@ export default {
         let baseUrl = "http://localhost:8000/";
         obj.id = element.id;
         obj.title = element.title;
-        obj.TrainingMedia = element.id;
+        obj.TrainingMedia = {
+          id: element.id,
+          title: element.title,
+        };
         obj.status = element.status;
         // obj.button = `<button @click="playVideo('${obj.file}')">View</button>`;
         // obj.status = `<label class="badge ${
@@ -231,7 +254,7 @@ export default {
           this.getTrainings.length > 0
             ? this.setItems(this.getTrainings)
             : (this.noItems = "No Training Found.");
-
+          console.log("submit data", this.items);
           Swal.fire("Success!", "Training successfully added.", "success");
         }
       } catch (error) {
@@ -245,11 +268,16 @@ export default {
       }
     },
 
-    viewMedia(id) {
-      // Implement your logic to view media based on the ID
-      console.log("View media with ID:", id);
-      this.$router.push({ name: "training-media", params: { id } });
+    viewMedia(trainingMedia, id) {
+      console.log("View media with ID:", trainingMedia.id);
+      console.log("Route ID:", trainingMedia.id);
+      // perform the necessary actions with trainingMedia and id
+      this.$router.push({
+        name: "training-media",
+        params: { id: trainingMedia.id, title: trainingMedia.title },
+      });
     },
+
     openModal(videoUrl) {
       this.videoSource = videoUrl;
       this.isModalOpen = true;
@@ -258,6 +286,54 @@ export default {
       this.isModalOpen = false;
     },
 
+    openEditModal(item) {
+      // Set initial values when opening the modal
+      this.editedItem = item;
+      this.editedTitle = item.title;
+      this.showEditModal = true;
+    },
+    async submitEditForm() {
+      const editedFormData = new FormData();
+      editedFormData.append("title", this.editedTitle);
+      editedFormData.append("description", this.editedDescription);
+      if (this.editedFile) {
+        editedFormData.append("file", this.editedFile);
+      }
+
+      // Add an identifier for the edited item (e.g., item ID) to the form data
+      editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
+
+      try {
+        await API.post(endpoints.trainings.editTraining, editedFormData);
+
+        // Handle success
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Training edited successfully",
+        }).then(() => {
+          // Redirect to the same page after Swal success message
+          // this.$router.go(); // This will reload the current route
+        });
+
+        this.showEditModal = false; // Close the modal after success
+        await this.fetchTrainings();
+
+        // Update the component's data with the latest data
+        this.items = [];
+        this.getTrainings.length > 0
+          ? this.setItems(this.getTrainings)
+          : (this.noItems = "No Training Found.");
+      } catch (error) {
+        // Handle error
+        console.error("Error editing training:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while editing the training",
+        });
+      }
+    },
     view(itemId) {
       console.log(itemId);
     },
@@ -343,7 +419,8 @@ export default {
   },
   async mounted() {
     await this.fetchTrainings();
-    console.log("all training", this.getTrainings.length);
+    // console.log("mounted all training", this.getTrainings.length);
+    console.log("mounted all training", this.getTrainings);
     this.getTrainings.length > 0
       ? this.setItems(this.getTrainings)
       : (this.noItems = "No Training Found.");
@@ -374,5 +451,23 @@ export default {
   top: 10px;
   right: 10px;
   cursor: pointer;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff; /* Change the background color as needed */
+  color: #fff; /* Change the text color as needed */
+  border: 1px solid #007bff; /* Change the border color as needed */
+  padding: 10px 15px; /* Adjust padding as needed */
+  border-radius: 5px; /* Adjust border radius as needed */
+  cursor: pointer;
+  margin-right: 10px; /* Adjust margin as needed */
+}
+
+/* Example styles for the icon */
+.mdi {
+  font-size: 18px; /* Adjust the font size as needed */
 }
 </style>

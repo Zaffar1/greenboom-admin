@@ -70,7 +70,12 @@
               </template>
               <template v-slot:cell(Media)="data">
                 <div>
-                  <button @click="openPdf(data.item.file)">Open Pdf</button>
+                  <button
+                    @click="openPdf(data.item.file)"
+                    class="btn btn-secondary"
+                  >
+                    <i class="mdi mdi-file-pdf"></i>Open Pdf
+                  </button>
                 </div>
               </template>
             </b-table>
@@ -217,5 +222,19 @@ export default {
   top: 10px;
   right: 10px;
   cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Change the background color as needed */
+  color: #fff; /* Change the text color as needed */
+  border: 1px solid #6c757d; /* Change the border color as needed */
+  padding: 10px 15px; /* Adjust padding as needed */
+  border-radius: 5px; /* Adjust border radius as needed */
+  cursor: pointer;
+}
+
+/* Example styles for the icon */
+.btn-secondary i {
+  margin-right: 5px; /* Adjust margin as needed */
 }
 </style>

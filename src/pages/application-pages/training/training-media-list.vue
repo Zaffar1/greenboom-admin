@@ -1,7 +1,17 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">Training Media</h3>
+      <h3 class="page-title">
+        Training Media of ( {{ this.$route.params.title }} )
+      </h3>
+      <div>
+        <b-button @click="addTrainingModal" variant="success" class="mr-2"
+          ><i class="mdi mdi-plus"></i>Add Training Media</b-button
+        >
+        <button @click="goBack" class="btn btn-primary">
+          <i class="mdi mdi-arrow-left"></i> Go Back
+        </button>
+      </div>
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -44,20 +54,24 @@
 
               <!-- status -->
               <template v-slot:cell(status)="data">
-                <span v-html="data.value"></span>
+                <!-- <span v-html="data.value"></span> -->
+                <toggle-button
+                  @change="changeStatus(data.item)"
+                  :value="data.item.status == 'Active'"
+                />
               </template>
 
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
-                <i
+                <!-- <i
                   @click="view(data.item.id)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i>
+                ></i> -->
                 <i
                   v-b-modal.modallg
-                  @click="edit(data.item.id)"
+                  @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
                 ></i>
@@ -73,14 +87,16 @@
                   <button
                     v-if="data.item.type === 'video'"
                     @click="openModal(data.item.file)"
+                    class="btn btn-primary"
                   >
-                    Play Video
+                    <i class="mdi mdi-play"></i> Play Video
                   </button>
                   <button
                     v-else-if="data.item.type === 'pdf'"
                     @click="openPdf(data.item.file)"
+                    class="btn btn-secondary"
                   >
-                    Open Pdf
+                    <i class="mdi mdi-file-pdf"></i> Open PDF
                   </button>
                   <span v-else> Unsupported file type </span>
                 </div>
@@ -103,6 +119,53 @@
       <video :src="videoSource" controls></video>
       <p v-if="!videoSource">No video source provided</p>
     </div>
+
+    <b-modal v-model="addMediaModel" title="Add Training Media" hide-footer>
+      <form @submit.prevent="submitAddForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="addTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="addFile"
+            id="editInputFile"
+            :state="Boolean(addFile)"
+            placeholder="Choose a file..."
+            required
+          ></b-form-file>
+        </b-form-group>
+
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
+
+    <!-- Modal for training media -->
+    <b-modal v-model="showEditModal" title="Edit Training Media" hide-footer>
+      <form @submit.prevent="submitEditForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="editedTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="editedFile"
+            id="editInputFile"
+            :state="Boolean(editedFile)"
+            placeholder="Choose a file..."
+          ></b-form-file>
+        </b-form-group>
+        <!-- You can add more fields as needed -->
+
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
     <div></div>
   </section>
 </template>
@@ -111,6 +174,9 @@ import Vue from "vue";
 import SortedTablePlugin from "vue-sorted-table";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
+import Swal from "sweetalert2";
+import API from "../../../config/api";
+import { endpoints } from "../../../config/endpoints";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -130,6 +196,14 @@ export default {
       filterByFormatted: true,
       filter: "",
       sortable: true,
+      addMediaModel: false,
+      addTitle: "",
+      addFile: null,
+      showEditModal: false,
+      editedTitle: "",
+      editedFile: null,
+      // Add a property to store the current edited item
+      editedItem: null,
       fields: [
         { key: "title", sortable: true },
         { key: "type", sortable: true },
@@ -151,9 +225,10 @@ export default {
   created() {
     // Access the ID from the route parameters
     const id = this.$route.params.id;
-
+    const title = this.$route.params.title;
+    console.log(this.$route.params.title);
     // Call the fetchDataById method with the ID
-    this.fetchDataById(id);
+    // this.fetchDataById(id);
   },
   methods: {
     ...mapActions(["fetchTrainingMedia"]),
@@ -165,24 +240,173 @@ export default {
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
         obj.type = element.file_type; // Assuming element.file_type is the correct property for the file type
-
-        obj.status = `<label class="badge ${
-          element.status === "Active" ? "badge-success" : "badge-danger"
-        }">${element.status}</label>`;
-
-        obj.role_id = element.role?.id;
-        obj.status_id = element.status?.id;
+        obj.status = element.status;
+        // obj.status = `<label class="badge ${
+        //   element.status === "Active" ? "badge-success" : "badge-danger"
+        // }">${element.status}</label>`;
+        // obj.role_id = element.role?.id;
+        // obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
         );
         this.items.push(obj);
       });
     },
+    async changeStatus(item) {
+      try {
+        // Note the use of await here
+        let result = await API.post(
+          `${endpoints.trainings.trainingMediaStatus}/${item.id}`
+        );
+
+        // Check the result or handle the response as needed
+        if (result.status === 200) {
+          // Toggle the status locally in the items array
+          const updatedItems = this.items.map((training) => {
+            if (training.id === item.id) {
+              training.status =
+                training.status === "Active" ? "InActive" : "Active";
+            }
+            return training;
+          });
+
+          // Update the items array with the new data
+          this.items = updatedItems;
+
+          // Show success message
+          Swal.fire("Success!", "Status successfully changed.", "success");
+        } else {
+          // Handle other status codes or error conditions
+          console.error("Error updating user status:", result);
+        }
+      } catch (error) {
+        // Handle any errors during deletion or data fetching
+        console.error("Error updating user status:", error);
+        Swal.fire("Error!", "An error occurred during status update.", "error");
+      }
+    },
+
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+    addTrainingModal(item) {
+      // Set initial values when opening the modal
+      this.addItem = item;
+      this.addTitle = item.title;
+      this.addFile = null;
+      this.addMediaModel = true;
+    },
+
+    openEditModal(item) {
+      // Set initial values when opening the modal
+      this.editedItem = item;
+      this.editedTitle = item.title;
+      this.editedFile = null; // Clear the file input
+      this.showEditModal = true;
+    },
+
+    async submitAddForm() {
+      const addFormData = new FormData();
+      addFormData.append("title", this.addTitle);
+
+      try {
+        const addFormData = new FormData();
+        const training_id = this.$route.params.id;
+        addFormData.append("title", this.addTitle);
+        addFormData.append("training_id", training_id);
+        if (this.addFile) {
+          addFormData.append("file", this.addFile);
+        }
+        const result = await API.post(
+          endpoints.trainings.addTrainingMedia,
+          addFormData
+        );
+
+        if (result.status === 200) {
+          this.addMediaModel = false; // Close the modal after success
+
+          // Clear the items array before adding new data
+          this.items = [];
+
+          // Fetch updated training media data
+          const training_id = this.$route.params.id;
+          await this.fetchTrainingMedia(training_id);
+
+          // Update the component's data with the latest data
+          this.getTrainingMedia.length > 0
+            ? this.setItems(this.getTrainingMedia)
+            : (this.noItems = "No TrainingMedia Found.");
+
+          Swal.fire(
+            "Success!",
+            "Training media successfully added.",
+            "success"
+          );
+        }
+      } catch (error) {
+        // Handle error
+        console.error("Error adding training media:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding training media",
+        });
+      }
+    },
+
+    async submitEditForm() {
+      const editedFormData = new FormData();
+      editedFormData.append("title", this.editedTitle);
+      editedFormData.append("training_id", this.$route.params.id);
+      if (this.editedFile) {
+        editedFormData.append("file", this.editedFile);
+      }
+
+      // Add an identifier for the edited item (e.g., item ID) to the form data
+      editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
+      console.log("media id", this.editedItem.id);
+      console.log("params id", this.$route.params.id);
+      try {
+        // Attempt to make the API request
+        await API.post(endpoints.trainings.editTrainingMedia, editedFormData);
+
+        // Handle success
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "TrainingMedia edited successfully",
+        }).then(() => {
+          // Redirect to the same page after Swal success message
+          // this.$router.go(); // This will reload the current route
+        });
+
+        // Close the modal after success
+        this.showEditModal = false;
+
+        // Fetch updated training media data
+        const training_id = this.$route.params.id;
+        await this.fetchTrainingMedia(training_id);
+
+        // Update the component's data with the latest data
+        this.items = [];
+        this.getTrainingMedia.length > 0
+          ? this.setItems(this.getTrainingMedia)
+          : (this.noItems = "No TrainingMedia Found.");
+      } catch (error) {
+        // Handle error
+        console.error("Error editing TrainingMedia:", error);
+
+        // Display an error message
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while editing the training media",
+        });
+      }
+    },
+
     // openModal(videoUrl) {
     //   // Replace with a known video URL for testing
     //   this.videoSource =
@@ -200,7 +424,62 @@ export default {
       console.log(itemId);
     },
     deleteItem(itemId) {
-      console.log(itemId);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this training media!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            // Make an API request to delete the item
+            const response = await API.delete(
+              `${endpoints.trainings.deleteTrainingMedia}/${itemId}`
+            );
+
+            if (response.status === 200) {
+              Swal.fire(
+                "Deleted!",
+                "TrainingMedia has been deleted.",
+                "success"
+              );
+
+              // Fetch updated training media data
+              const training_id = this.$route.params.id;
+              await this.fetchTrainingMedia(training_id);
+
+              // Update the component's data with the latest data
+              this.items = [];
+              this.getTrainingMedia.length > 0
+                ? this.setItems(this.getTrainingMedia)
+                : (this.noItems = "No TrainingMedia Found.");
+
+              // Navigate back to the same page
+              // this.$router.go();
+            } else {
+              // Handle other status codes or error conditions
+              console.error("Error deleting training media:", response);
+              Swal.fire(
+                "Error!",
+                "An error occurred during deletion.",
+                "error"
+              );
+            }
+          } catch (error) {
+            // Handle any errors during deletion
+            console.error("Error deleting training media:", error);
+            Swal.fire("Error!", "An error occurred during deletion.", "error");
+          }
+        }
+      });
+    },
+    goBack() {
+      // Use Vue Router to navigate back to the previous page
+      this.$router.go(-1); // This will go back one step in the history
+      // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
     },
   },
   async mounted() {
@@ -250,5 +529,32 @@ export default {
   top: 10px;
   right: 10px;
   cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Change the background color as needed */
+  color: #fff; /* Change the text color as needed */
+  border: 1px solid #6c757d; /* Change the border color as needed */
+  padding: 10px 15px; /* Adjust padding as needed */
+  border-radius: 5px; /* Adjust border radius as needed */
+  cursor: pointer;
+}
+
+/* Example styles for the icon */
+.btn-secondary i {
+  margin-right: 5px; /* Adjust margin as needed */
+}
+.btn-primary {
+  background-color: #6c757d; /* Change the background color as needed */
+  color: #fff; /* Change the text color as needed */
+  border: 1px solid #6c757d; /* Change the border color as needed */
+  padding: 10px 15px; /* Adjust padding as needed */
+  border-radius: 5px; /* Adjust border radius as needed */
+  cursor: pointer;
+}
+
+/* Example styles for the icon */
+.btn-primary i {
+  margin-right: 5px; /* Adjust margin as needed */
 }
 </style>
