@@ -2,6 +2,9 @@
   <section class="tables">
     <div class="page-header">
       <h3 class="page-title">Msds Sheets List</h3>
+      <b-button @click="addMsdSheetModal" variant="success" class="mr-2">
+        <i class="mdi mdi-plus"></i> Add Msds Sheet
+      </b-button>
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -12,7 +15,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search User"
+                placeholder="Search Msds Sheet"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -44,20 +47,24 @@
 
               <!-- status -->
               <template v-slot:cell(status)="data">
-                <span v-html="data.value"></span>
+                <!-- <span v-html="data.value"></span> -->
+                <toggle-button
+                  @change="changeStatus(data.item)"
+                  :value="data.item.status == 'Active'"
+                />
               </template>
 
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
-                <i
+                <!-- <i
                   @click="view(data.item.id)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i>
+                ></i> -->
                 <i
                   v-b-modal.modallg
-                  @click="edit(data.item.id)"
+                  @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
                 ></i>
@@ -91,11 +98,75 @@
         </div>
       </div>
     </div>
-    <div v-if="isModalOpen" class="modal">
+    <!-- <div v-if="isModalOpen" class="modal">
       <span @click="closeModal" class="close">&times;</span>
       <video :src="videoSource" controls></video>
       <p v-if="!videoSource">No video source provided</p>
-    </div>
+    </div> -->
+
+    <!-- Add Msd Sheet -->
+    <b-modal v-model="addMsdModel" title="Add Msd Sheet" hide-footer>
+      <form @submit.prevent="submitAddForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="addTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Description" label-for="editInputTitle">
+          <b-form-input
+            v-model="addDescription"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="addFile"
+            id="editInputFile"
+            :state="Boolean(addFile)"
+            placeholder="Choose a file..."
+            required
+          ></b-form-file>
+        </b-form-group>
+        <!-- You can add more fields as needed -->
+
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
+
+    <!-- Edit Msd Sheet -->
+    <b-modal v-model="showEditModal" title="Edit Msd Sheet" hide-footer>
+      <form @submit.prevent="submitEditForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="editedTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Description" label-for="editInputDescription">
+          <b-form-input
+            v-model="editedDescription"
+            id="editInputDescription"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="editedFile"
+            id="editInputFile"
+            :state="Boolean(editedFile)"
+            placeholder="Choose a file..."
+          ></b-form-file>
+        </b-form-group>
+        <!-- You can edit more fields as needed -->
+
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
+
     <div></div>
   </section>
 </template>
@@ -104,6 +175,9 @@ import Vue from "vue";
 import SortedTablePlugin from "vue-sorted-table";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
+import Swal from "sweetalert2";
+import API from "../../../config/api";
+import { endpoints } from "../../../config/endpoints";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -123,6 +197,16 @@ export default {
       filterByFormatted: true,
       filter: "",
       sortable: true,
+      addMsdModel: false,
+      showEditModal: false,
+      addTitle: "",
+      addDescription: "",
+      addFile: null,
+      // Add a property to store the current edited item
+      // addItem: null,
+      editedTitle: "",
+      editedDescription: "",
+      editedFile: null,
       fields: [
         { key: "title", sortable: true },
         { key: "description", sortable: true },
@@ -158,10 +242,10 @@ export default {
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
         obj.description = element.description; // Assuming element.file_type is the correct property for the file type
-        obj.status = `<label class="badge ${
-          element.status === "Active" ? "badge-success" : "badge-danger"
-        }">${element.status}</label>`;
-
+        // obj.status = `<label class="badge ${
+        //   element.status === "Active" ? "badge-success" : "badge-danger"
+        // }">${element.status}</label>`;
+        obj.status = element.status;
         obj.role_id = element.role?.id;
         obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
@@ -182,11 +266,192 @@ export default {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
+
+    addMsdSheetModal(item) {
+      // Set initial values when opening the modal
+      this.addItem = item;
+      this.addTitle = item.title;
+      this.addDescription = item.description;
+      this.addFile = null;
+      this.addMsdModel = true;
+    },
+
+    async submitAddForm() {
+      try {
+        const addFormData = new FormData();
+        addFormData.append("title", this.addTitle);
+        addFormData.append("description", this.addDescription);
+        if (this.addFile) {
+          addFormData.append("file", this.addFile);
+        }
+        const result = await API.post(
+          endpoints.msdSheets.addMsdSheet,
+          addFormData
+        );
+
+        if (result.status === 200) {
+          this.addMsdModel = false; // Close the modal after success
+
+          // Clear the items array before adding new data
+          this.items = [];
+
+          // Fetch updated msd sheet data
+          await this.fetchMsdSheets();
+
+          // Update the component's data with the latest data
+          this.getMsdSheets.length > 0
+            ? this.setItems(this.getMsdSheets)
+            : (this.noItems = "No Msds Sheet Found.");
+
+          Swal.fire("Success!", "Msds Sheet successfully added.", "success");
+        }
+      } catch (error) {
+        // Handle error
+        console.error("Error adding msds sheet:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding msds sheet",
+        });
+      }
+    },
+
+    openEditModal(item) {
+      // Set initial values when opening the modal
+      this.editedItem = item;
+      this.editedTitle = item.title;
+      this.editedDescription = item.description;
+      this.editedFile = null; // Clear the file input
+      this.showEditModal = true;
+    },
+
+    async submitEditForm() {
+      const editedFormData = new FormData();
+      editedFormData.append("title", this.editedTitle);
+      editedFormData.append("description", this.editedDescription);
+      if (this.editedFile) {
+        editedFormData.append("file", this.editedFile);
+      }
+
+      // Add an identifier for the edited item (e.g., item ID) to the form data
+      editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
+
+      try {
+        await API.post(endpoints.msdSheets.editMsdSheet, editedFormData);
+
+        // Handle success
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "MsdSheet edited successfully",
+        }).then(() => {
+          // Redirect to the same page after Swal success message
+          // this.$router.go(); // This will reload the current route
+        });
+
+        this.showEditModal = false; // Close the modal after success
+        await this.fetchMsdSheets();
+
+        // Update the component's data with the latest data
+        this.items = [];
+        this.getMsdSheets.length > 0
+          ? this.setItems(this.getMsdSheets)
+          : (this.noItems = "No MsdSheet Found.");
+      } catch (error) {
+        // Handle error
+        console.error("Error editing MsdSheet:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while editing the msd sheet",
+        });
+      }
+    },
+
+    async changeStatus(item) {
+      try {
+        // Note the use of await here
+        let result = await API.post(
+          `${endpoints.msdSheets.msdSheetStatus}/${item.id}`
+        );
+
+        // Check the result or handle the response as needed
+        if (result.status === 200) {
+          // Toggle the status locally in the items array
+          const updatedItems = this.items.map((msdSheet) => {
+            if (msdSheet.id === item.id) {
+              msdSheet.status =
+                msdSheet.status === "Active" ? "InActive" : "Active";
+            }
+            return msdSheet;
+          });
+
+          // Update the items array with the new data
+          this.items = updatedItems;
+
+          // Show success message
+          Swal.fire("Success!", "Status successfully changed.", "success");
+        } else {
+          // Handle other status codes or error conditions
+          console.error("Error updating user status:", result);
+        }
+      } catch (error) {
+        // Handle any errors during deletion or data fetching
+        console.error("Error updating user status:", error);
+        Swal.fire("Error!", "An error occurred during status update.", "error");
+      }
+    },
+
     view(itemId) {
       console.log(itemId);
     },
     deleteItem(itemId) {
-      console.log(itemId);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this msd sheet!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            // Make an API request to delete the item
+            const response = await API.delete(
+              `${endpoints.msdSheets.deleteMsdSheet}/${itemId}`
+            );
+
+            if (response.status === 200) {
+              Swal.fire("Deleted!", "MsdSheet has been deleted.", "success");
+
+              // Fetch updated msds sheet data
+              await this.fetchMsdSheets();
+
+              // Update the component's data with the latest data
+              this.items = [];
+              this.getMsdSheets.length > 0
+                ? this.setItems(this.getMsdSheets)
+                : (this.noItems = "No MsdSheets Found.");
+
+              // Navigate back to the same page
+              // this.$router.go();
+            } else {
+              // Handle other status codes or error conditions
+              console.error("Error deleting msd sheet:", response);
+              Swal.fire(
+                "Error!",
+                "An error occurred during deletion.",
+                "error"
+              );
+            }
+          } catch (error) {
+            // Handle any errors during deletion
+            console.error("Error deleting msd sheet:", error);
+            Swal.fire("Error!", "An error occurred during deletion.", "error");
+          }
+        }
+      });
     },
   },
   async mounted() {

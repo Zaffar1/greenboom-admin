@@ -2,11 +2,9 @@
   <section class="tables">
     <div class="page-header">
       <h3 class="page-title">Welcome Videos List</h3>
-      <router-link :to="{ name: 'add-welcome-video' }">
-        <b-button variant="success" class="mr-2"
-          ><i class="mdi mdi-plus"></i>Add Welcome Video</b-button
-        >
-      </router-link>
+      <b-button @click="addWelcomeModal" variant="success" class="mr-2">
+        <i class="mdi mdi-plus"></i> Add Welcome Video
+      </b-button>
       <!-- <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -27,7 +25,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search User"
+                placeholder="Search Welcome Video"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -124,6 +122,42 @@
       </video>
     </b-modal> -->
 
+    <!-- Add Welcome Video -->
+    <b-modal
+      v-model="addWelcomeVideoModel"
+      title="Add Welcome Video"
+      hide-footer
+    >
+      <form @submit.prevent="submitAddForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="addTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Description" label-for="editInputTitle">
+          <b-form-input
+            v-model="addDescription"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="addFile"
+            id="editInputFile"
+            :state="Boolean(addFile)"
+            placeholder="Choose a file..."
+            required
+          ></b-form-file>
+        </b-form-group>
+        <!-- You can add more fields as needed -->
+
+        <b-button type="submit" variant="success">Save Changes</b-button>
+      </form>
+    </b-modal>
+
     <!-- Modal for editing video -->
     <b-modal v-model="showEditModal" title="Edit Welcome Video" hide-footer>
       <form @submit.prevent="submitEditForm">
@@ -189,6 +223,11 @@ export default {
       editedFile: null,
       // Add a property to store the current edited item
       editedItem: null,
+      addWelcomeVideoModel: false,
+      addTitle: "",
+      addDescription: "",
+      addFile: null,
+      addTitle: "",
       filter: "",
       sortable: true,
       fields: [
@@ -235,6 +274,56 @@ export default {
 
       console.log("mister", this.items);
     },
+
+    addWelcomeModal(item) {
+      // Set initial values when opening the modal
+      this.addItem = item;
+      this.addTitle = item.title;
+      this.addDescription = item.description;
+      this.addFile = null;
+      this.addWelcomeVideoModel = true;
+    },
+
+    async submitAddForm() {
+      try {
+        const addFormData = new FormData();
+        addFormData.append("title", this.addTitle);
+        addFormData.append("description", this.addDescription);
+        if (this.addFile) {
+          addFormData.append("file", this.addFile);
+        }
+        const result = await API.post(
+          endpoints.welcomeVideos.addWelcomeVideo,
+          addFormData
+        );
+
+        if (result.status === 200) {
+          this.addWelcomeVideoModel = false; // Close the modal after success
+
+          // Clear the items array before adding new data
+          this.items = [];
+
+          // Fetch updated training media data
+          await this.fetchWelcomeVideos();
+
+          // Update the component's data with the latest data
+          this.getWelcomeVideos.length > 0
+            ? this.setItems(this.getWelcomeVideos)
+            : (this.noItems = "No Welcome Video Found.");
+
+          Swal.fire("Success!", "Welcome video successfully added.", "success");
+        }
+      } catch (error) {
+        // Handle error
+        console.error("Error adding welcome video:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding welcome video",
+        });
+      }
+    },
+
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -424,19 +513,6 @@ export default {
 }
 
 /* Example styles for the icon */
-.btn-primary {
-  background-color: #6c757d; /* Change the background color as needed */
-  color: #fff; /* Change the text color as needed */
-  border: 1px solid #6c757d; /* Change the border color as needed */
-  padding: 10px 15px; /* Adjust padding as needed */
-  border-radius: 5px; /* Adjust border radius as needed */
-  cursor: pointer;
-}
-
-/* Example styles for the icon */
-.btn-primary i {
-  margin-right: 5px; /* Adjust margin as needed */
-}
 .btn-primary i {
   margin-right: 5px; /* Adjust margin as needed */
 }

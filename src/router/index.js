@@ -142,6 +142,18 @@ export default new Router({
       ],
     },
     {
+      path: "/videos",
+      component: layout,
+      children: [
+        {
+          path: "videos-list",
+          name: "videos-list",
+          component: () =>
+            import("@/pages/application-pages/videos/videos-list"),
+        },
+      ],
+    },
+    {
       path: "/user",
       component: layout,
       children: [

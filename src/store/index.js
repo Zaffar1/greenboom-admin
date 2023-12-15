@@ -22,6 +22,7 @@ export default new Vuex.Store({
     msdSheets: [],
     products: [],
     allJobs: [],
+    videos: [],
 
     imageUrl:
       process.env.NODE_ENV === "production"
@@ -45,6 +46,7 @@ export default new Vuex.Store({
     getTrainings: (state) => state.trainings,
     getTrainingMedia: (state) => state.trainingMedia,
     getMsdSheets: (state) => state.msdSheets,
+    getVideos: (state) => state.videos,
     getProducts: (state) => state.products,
     getUserImage: (state, getters) => {
       return getters.getCurrentUser.profile_image === null
@@ -184,6 +186,28 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+    fetchVideos: async ({ commit }) => {
+      try {
+        let response = await API.get(endpoints.videos.fetchAllVideos);
+        commit("setVideos", response.data.all_videos);
+        // console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    deleteVideo: async ({ commit }, id) => {
+      try {
+        let response = await API.delete(
+          `${endpoints.videos.deleteVideo}/${id}`
+        );
+        i;
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
     fetchProducts: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.products.fetchProducts);
@@ -215,6 +239,7 @@ export default new Vuex.Store({
     setTrainingMedia: (state, trainingMedia) =>
       ``((state.trainingMedia = trainingMedia)),
     setMsdSheets: (state, msdSheets) => (state.msdSheets = msdSheets),
+    setVideos: (state, videos) => (state.videos = videos),
     setProducts: (state, products) => (state.products = products),
     setJobs: (state, jobs) => (state.allJobs = jobs),
     setUserLogin: (state, data) => {

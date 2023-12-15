@@ -27,7 +27,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search User"
+                placeholder="Search Training"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>

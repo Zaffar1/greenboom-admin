@@ -97,6 +97,23 @@
         </li>
 
         <li class="nav-item">
+          <span class="nav-link" v-b-toggle="'video'">
+            <span class="menu-title">Videos</span>
+            <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i>
+          </span>
+          <b-collapse accordion="sidebar-accordion" id="video">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/videos/videos-list"
+                  >Videos-List</router-link
+                >
+              </li>
+            </ul>
+          </b-collapse>
+        </li>
+
+        <li class="nav-item">
           <span class="nav-link" v-b-toggle="'product'">
             <span class="menu-title">Products</span>
             <i class="menu-arrow"></i>

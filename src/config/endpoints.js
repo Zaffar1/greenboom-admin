@@ -32,6 +32,15 @@ export const endpoints = {
   },
   msdSheets: {
     fetchMsdSheetList: `admin/all-sheets`, // GET
+    addMsdSheet: "admin/add-sheet",
+    editMsdSheet: "admin/update-sheet",
+    deleteMsdSheet: "admin/delete-sheet",
+    msdSheetStatus: "admin/msd-sheet-status",
+  },
+  videos: {
+    fetchAllVideos: `admin/all-videos`, // GET
+    deleteVideo: "admin/delete-video",
+    addVideo: "admin/add-video",
   },
   products: {
     fetchProducts: `admin/all-products`, // GET
