@@ -114,6 +114,23 @@
         </li>
 
         <li class="nav-item">
+          <span class="nav-link" v-b-toggle="'faqs'">
+            <span class="menu-title">Faqs & BenDuffy</span>
+            <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i>
+          </span>
+          <b-collapse accordion="sidebar-accordion" id="faqs">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/faqs/faqs-list"
+                  >faqs-benDuffy</router-link
+                >
+              </li>
+            </ul>
+          </b-collapse>
+        </li>
+
+        <li class="nav-item">
           <span class="nav-link" v-b-toggle="'product'">
             <span class="menu-title">Products</span>
             <i class="menu-arrow"></i>

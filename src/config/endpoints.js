@@ -1,6 +1,7 @@
 export const endpoints = {
   login: `login`, // POST email, password
   logout: `auth/logout`, // GET
+  forgotPassword: "forgot-password",
   // auth/admin/
   user: {
     fetchAll: `admin/users`, // GET
@@ -41,6 +42,8 @@ export const endpoints = {
     fetchAllVideos: `admin/all-videos`, // GET
     deleteVideo: "admin/delete-video",
     addVideo: "admin/add-video",
+    videoStatus: "admin/video-status",
+    editVideo: "admin/update-video",
   },
   products: {
     fetchProducts: `admin/all-products`, // GET

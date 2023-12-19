@@ -16,23 +16,23 @@
                       font-family: Arial, Helvetica, sans-serif;
                     "
                   >
-                    Green Boom
+                    Forgot Password
                   </h1>
                 </div>
-                <h4>Hello! let's get started</h4>
-                <h6 class="font-weight-light">Log in to continue.</h6>
-                <form @submit.prevent="login" class="pt-3">
+                <h4>Hello! enter your email address here!</h4>
+                <!-- <h6 class="font-weight-light">Log in to continue.</h6> -->
+                <form @submit.prevent="forgotPassword" class="pt-3">
                   <div class="form-group">
                     <input
-                      v-model="state.email"
+                      v-model="email"
                       required
                       type="email"
                       class="form-control form-control-lg"
                       id="exampleInputEmail1"
-                      placeholder="Username"
+                      placeholder="Enter Email"
                     />
                   </div>
-                  <div class="form-group">
+                  <!-- <div class="form-group">
                     <input
                       v-model="state.password"
                       required
@@ -41,23 +41,25 @@
                       id="exampleInputPassword1"
                       placeholder="Password"
                     />
-                  </div>
+                  </div>-->
+
                   <div class="mt-3">
                     <button
                       class="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
                     >
-                      LOG IN
+                      Send Link
                     </button>
                   </div>
                 </form>
-                <br />
-                <button
-                  class="btn btn-block btn-gradient-secondary"
-                  @click="forgotPassword"
-                >
-                  <!-- <a href="">Forgot Password</a> -->
-                  Forgot Password
-                </button>
+                <div style="padding-top: 2%" class="text-right">
+                  <button
+                    class="btn btn-secondary"
+                    style="text-decoration: none"
+                    @click="goBack"
+                  >
+                    Back to login
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -68,44 +70,45 @@
     </div>
   </section>
 </template>
-
 <script>
-import { mapActions, mapGetters } from "vuex";
-import { reactive } from "vue";
-import Toast from "primevue/toast";
+import Swal from "sweetalert2";
+import API from "../../config/api";
+import { endpoints } from "../../config/endpoints";
 
 export default {
-  name: "login-2",
-  components: {
-    Toast,
-  },
-  setup() {
-    const state = reactive({
-      email: null,
-      password: null,
-    });
+  name: "forgotPassword",
+  setup() {},
+  data() {
     return {
-      state,
+      email: null,
     };
   },
-  data() {
-    return {};
-  },
   methods: {
-    ...mapActions(["fetchUsers", "userLogin"]),
-    async login() {
-      let response = await this.userLogin({
-        email: this.state.email,
-        password: this.state.password,
-      });
-      this.showAuthenticationMessages(response);
-      response.status == 200 ? this.$router.push({ name: "dashboard" }) : null;
-    },
+    async forgotPassword() {
+      try {
+        // Use an object to send email as part of the request body
+        let result = await API.post(endpoints.forgotPassword, {
+          email: this.email,
+        });
 
-    forgotPassword() {
-      this.$router.push({ name: "forgot-password" });
+        // Show success message
+        Swal.fire("Success!", "Check your email for a link.", "success");
+        this.$router.push({ name: "login" });
+      } catch (error) {
+        // Handle any errors during forgot password
+        console.error("Error resetting user password:", error);
+        Swal.fire(
+          "Error!",
+          "An error occurred during forgot password.",
+          "error"
+        );
+      }
+    },
+    goBack() {
+      // Use Vue Router to navigate back to the previous page
+      this.$router.go(-1); // This will go back one step in the history
+      // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
     },
   },
-  async mounted() {},
 };
 </script>

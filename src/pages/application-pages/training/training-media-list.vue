@@ -490,12 +490,7 @@ export default {
       : (this.noItems = "No TrainingMedia Found.");
   },
   //   async fetchDataById(id) {
-  //     try {
-  //       // Make an API request to fetch data using the provided ID
-  //       const response = await axios.get(
-  //         `http://localhost:8000/training-media/${id}`
-  //       );
-  //       const data = response.data;
+  //     try {×
 
   //       // Do something with the fetched data, e.g., update component state
   //       //   this.$dataById = data; // Assuming you have a data property to store the fetched data
@@ -520,7 +515,7 @@ export default {
   transform: translate(-50%, -50%);
   padding: 20px;
   background-color: white;
-  z-index: 1;
+  z-index: 1000;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 

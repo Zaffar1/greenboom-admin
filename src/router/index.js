@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import login from "../pages/application-pages/login.vue";
-
+import forgotPassword from "../pages/application-pages/forgotPassword.vue";
 import layout from "../layout";
 
 import { authGuard } from "../config/guards";
@@ -24,6 +24,12 @@ export default new Router({
       component: login,
       name: "login",
     },
+    {
+      path: "/forgot-password",
+      component: forgotPassword,
+      name: "forgot-password",
+    },
+
     {
       path: "/dashboard",
       component: layout,
