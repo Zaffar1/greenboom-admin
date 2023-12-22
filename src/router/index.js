@@ -164,6 +164,65 @@ export default new Router({
       component: layout,
       children: [
         {
+          path: "videoCat-videos/:id/:title",
+          name: "videoCat-videos",
+          component: () =>
+            import("@/pages/application-pages/videos/videoCat-videos"),
+        },
+      ],
+    },
+    {
+      path: "/videos",
+      component: layout,
+      children: [
+        {
+          path: "all-videos",
+          name: "all-videos",
+          component: () =>
+            import("@/pages/application-pages/videos/all-videos"),
+        },
+      ],
+    },
+    {
+      path: "/faqs",
+      component: layout,
+      children: [
+        {
+          path: "faqs-list",
+          name: "faqs-list",
+          component: () => import("@/pages/application-pages/faqs/faqs-list"),
+        },
+      ],
+    },
+    {
+      path: "/benDuffy",
+      component: layout,
+      children: [
+        {
+          path: "benDuffy-list",
+          name: "benDuffy-list",
+          component: () =>
+            import("@/pages/application-pages/benDuffy/benDuffy-list"),
+        },
+      ],
+    },
+    {
+      path: "/salesTips",
+      component: layout,
+      children: [
+        {
+          path: "sales-tips-list",
+          name: "sales-tips-list",
+          component: () =>
+            import("@/pages/application-pages/salesTips/sales-tips-list"),
+        },
+      ],
+    },
+    {
+      path: "/user",
+      component: layout,
+      children: [
+        {
           path: "/user/:id",
           name: "user-details",
           component: () =>

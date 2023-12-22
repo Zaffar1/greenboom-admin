@@ -98,14 +98,14 @@
 
         <li class="nav-item">
           <span class="nav-link" v-b-toggle="'video'">
-            <span class="menu-title">Videos</span>
+            <span class="menu-title">Video</span>
             <i class="menu-arrow"></i>
             <i class="fas fa-film"></i>
           </span>
           <b-collapse accordion="sidebar-accordion" id="video">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
-                <router-link class="nav-link" to="/videos/videos-list"
+                <router-link class="nav-link" to="/videos/all-videos"
                   >Videos-List</router-link
                 >
               </li>
@@ -115,7 +115,7 @@
 
         <li class="nav-item">
           <span class="nav-link" v-b-toggle="'faqs'">
-            <span class="menu-title">Faqs & BenDuffy</span>
+            <span class="menu-title">Perfect Sales Pitch</span>
             <i class="menu-arrow"></i>
             <i class="fas fa-film"></i>
           </span>
@@ -123,7 +123,21 @@
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/faqs/faqs-list"
-                  >faqs-benDuffy</router-link
+                  >FAQS</router-link
+                >
+              </li>
+            </ul>
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/benDuffy/benDuffy-list"
+                  >Ben Duffy Questions</router-link
+                >
+              </li>
+            </ul>
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/salesTips/sales-tips-list"
+                  >Sales Tips</router-link
                 >
               </li>
             </ul>

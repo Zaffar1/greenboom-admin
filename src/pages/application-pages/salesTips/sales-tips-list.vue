@@ -1,20 +1,10 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">All Video Categories</h3>
-      <b-button @click="addVideosModal" variant="success" class="mr-2">
-        <i class="mdi mdi-plus"></i> Add Video Category
+      <h3 class="page-title">Sales Tips List</h3>
+      <b-button @click="addMsdSheetModal" variant="success" class="mr-2">
+        <i class="mdi mdi-plus"></i> Add Sales Tip
       </b-button>
-      <!-- <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="javascript:void(0);">Table</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-              Advanced Table
-            </li>
-          </ol>
-        </nav> -->
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -25,7 +15,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search Videos"
+                placeholder="Search Msds Sheet"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -44,10 +34,10 @@
               striped
               hover
             >
-              <template #cell(title)="data">
-                <!-- title & profile -->
-                <!-- <img :src="data.item.profile" class="mr-2" alt="image" /> -->
-                {{ data.item.title }}
+              <template #cell(name)="data">
+                <!-- name & profile -->
+                <img :src="data.item.profile" class="mr-2" alt="image" />
+                {{ data.item.name }}
               </template>
 
               <!-- when no item found -->
@@ -64,22 +54,9 @@
                 />
               </template>
 
-              <template v-slot:cell(Videos)="data">
-                <button
-                  @click="viewMedia(data.item.videos)"
-                  class="btn btn-primary"
-                >
-                  <i class="mr-2 mdi mdi-eye text-muted icon-sm"></i>View
-                </button>
-              </template>
-
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
-                <!-- <router-link
-                    :to="{ title: 'user-details', params: { id: data.item.id } }"
-                  >
-                    <i class="mr-2 mdi mdi-eye text-muted icon-sm"></i>
-                  </router-link> -->
+
                 <!-- <i
                     @click="view(data.item.id)"
                     :ref="'btn' + data.index"
@@ -98,6 +75,16 @@
                 ></i>
                 <span v-html="data.value"></span>
               </template>
+              <template v-slot:cell(Media)="data">
+                <div>
+                  <button
+                    @click="openPdf(data.item.file)"
+                    class="btn btn-secondary"
+                  >
+                    <i class="mdi mdi-file-pdf"></i>Open Pdf
+                  </button>
+                </div>
+              </template>
             </b-table>
             <b-pagination
               v-model="currentPage"
@@ -111,9 +98,14 @@
         </div>
       </div>
     </div>
+    <!-- <div v-if="isModalOpen" class="modal">
+        <span @click="closeModal" class="close">&times;</span>
+        <video :src="videoSource" controls></video>
+        <p v-if="!videoSource">No video source provided</p>
+      </div> -->
 
-    <!-- Add Video -->
-    <b-modal v-model="addVideoModel" title="Add Video Category" hide-footer>
+    <!-- Add Msd Sheet -->
+    <b-modal v-model="addMsdModel" title="Add Msd Sheet" hide-footer>
       <form @submit.prevent="submitAddForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -144,8 +136,8 @@
       </form>
     </b-modal>
 
-    <!-- Modal for editing video -->
-    <b-modal v-model="showEditModal" title="Edit Welcome Video" hide-footer>
+    <!-- Edit Msd Sheet -->
+    <b-modal v-model="showEditModal" title="Edit Msd Sheet" hide-footer>
       <form @submit.prevent="submitEditForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -169,16 +161,12 @@
             placeholder="Choose a file..."
           ></b-form-file>
         </b-form-group>
-        <!-- You can add more fields as needed -->
+        <!-- You can edit more fields as needed -->
 
         <b-button type="submit" variant="success">Save Changes</b-button>
       </form>
     </b-modal>
 
-    <div v-if="isModalOpen" class="modal">
-      <span @click="closeModal" class="close">&times;</span>
-      <video :src="videoSource" controls></video>
-    </div>
     <div></div>
   </section>
 </template>
@@ -199,7 +187,9 @@ Vue.use(SortedTablePlugin, {
 export default {
   data: function () {
     return {
-      sortBy: "title",
+      isModalOpen: false,
+      videoSource: "", // Set a default video source
+      sortBy: "name",
       perPage: 10,
       currentPage: 1,
       sortDesc: false,
@@ -207,23 +197,22 @@ export default {
       filterByFormatted: true,
       filter: "",
       sortable: true,
-      addVideoModel: false,
+      addMsdModel: false,
       showEditModal: false,
-      editedTitle: "",
-      editedDescription: "",
-      editedFile: null,
-      // Add a property to store the current edited item
-      editedItem: null,
       addTitle: "",
       addDescription: "",
       addFile: null,
-      isModalOpen: false,
+      // Add a property to store the current edited item
+      // addItem: null,
+      editedTitle: "",
+      editedDescription: "",
+      editedFile: null,
       fields: [
         { key: "title", sortable: true },
         { key: "description", sortable: true },
         { key: "status", sortable: true },
         { key: "created_at", sortable: true },
-        { key: "Videos", sortable: true },
+        { key: "Media", sortable: true },
         { key: "action", sortable: true },
       ],
       items: [],
@@ -231,29 +220,34 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getVideos", "getDefaultImage", "getImageUrl"]),
+    ...mapGetters(["getSalesTips", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
   },
+  created() {
+    // Access the ID from the route parameters
+    const id = this.$route.params.id;
+
+    // Call the fetchDataById method with the ID
+    this.fetchDataById(id);
+  },
   methods: {
-    ...mapActions(["fetchVideoCat", "deleteVideo"]),
+    ...mapActions(["fetchSalesTips"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
         let baseUrl = "http://localhost:8000/";
         obj.id = element.id;
         obj.title = element.title;
-        obj.description = element.description;
-        // obj.file = baseUrl.concat(element.file);
-        obj.status = element.status;
-        obj.videos = {
-          id: element.id,
-          title: element.title,
-        };
+        obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
+        obj.description = element.description; // Assuming element.file_type is the correct property for the file type
         // obj.status = `<label class="badge ${
         //   element.status === "Active" ? "badge-success" : "badge-danger"
         // }">${element.status}</label>`;
+        obj.status = element.status;
+        obj.role_id = element.role?.id;
+        obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
         );
@@ -261,25 +255,25 @@ export default {
       });
     },
     openModal(videoUrl) {
+      console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
     closeModal() {
       this.isModalOpen = false;
     },
-    // async view(itemId) {
-    //   await this.fetchUserDetails(itemId);
-    //   console.log(itemId);
-    // },
+    openPdf(pdfUrl) {
+      // Open the PDF file in a new window or tab
+      window.open(pdfUrl, "_blank");
+    },
 
-    addVideosModal(item) {
+    addMsdSheetModal(item) {
       // Set initial values when opening the modal
-      //   console.log("hiting");
       this.addItem = item;
       this.addTitle = item.title;
       this.addDescription = item.description;
       this.addFile = null;
-      this.addVideoModel = true;
+      this.addMsdModel = true;
     },
 
     async submitAddForm() {
@@ -288,36 +282,36 @@ export default {
         addFormData.append("title", this.addTitle);
         addFormData.append("description", this.addDescription);
         if (this.addFile) {
-          addFormData.append("image", this.addFile);
+          addFormData.append("file", this.addFile);
         }
         const result = await API.post(
-          endpoints.videos.addVideoCat,
+          endpoints.salesTips.addSalesTip,
           addFormData
         );
 
         if (result.status === 200) {
-          this.addVideoModel = false; // Close the modal after success
+          this.addMsdModel = false; // Close the modal after success
 
           // Clear the items array before adding new data
           this.items = [];
 
           // Fetch updated msd sheet data
-          await this.fetchVideoCat();
+          await this.fetchSalesTips();
 
           // Update the component's data with the latest data
-          this.getVideos.length > 0
-            ? this.setItems(this.getVideos)
-            : (this.noItems = "No Video Found.");
+          this.getSalesTips.length > 0
+            ? this.setItems(this.getSalesTips)
+            : (this.noItems = "No sales tips found.");
 
-          Swal.fire("Success!", "Video successfully added.", "success");
+          Swal.fire("Success!", "Sales Tip successfully added.", "success");
         }
       } catch (error) {
         // Handle error
-        console.error("Error adding video:", error);
+        console.error("Error adding sales tip:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding video",
+          text: "An error occurred while adding sales tip",
         });
       }
     },
@@ -336,94 +330,60 @@ export default {
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("description", this.editedDescription);
       if (this.editedFile) {
-        editedFormData.append("image", this.editedFile);
+        editedFormData.append("file", this.editedFile);
       }
 
       // Add an identifier for the edited item (e.g., item ID) to the form data
       editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
 
       try {
-        await API.post(endpoints.videos.editVideoCat, editedFormData);
+        await API.post(endpoints.salesTips.editSalesTip, editedFormData);
 
         // Handle success
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Video edited successfully",
+          text: "SalesTip edited successfully",
         }).then(() => {
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
         });
 
         this.showEditModal = false; // Close the modal after success
-        await this.fetchVideoCat();
+        await this.fetchSalesTips();
 
         // Update the component's data with the latest data
         this.items = [];
-        this.getVideos.length > 0
-          ? this.setItems(this.getVideos)
-          : (this.noItems = "No Video Found.");
+        this.getSalesTips.length > 0
+          ? this.setItems(this.getSalesTips)
+          : (this.noItems = "No sales tip.");
       } catch (error) {
         // Handle error
-        console.error("Error editing video:", error);
+        console.error("Error editing sales tip:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while editing the video",
+          text: "An error occurred while editing the sales tip",
         });
       }
     },
 
-    async deleteItem(itemId) {
-      console.log(itemId);
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover this video category!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "Cancel",
-        reverseButtons: true,
-      });
-
-      if (result.isConfirmed) {
-        try {
-          // Perform the deletion operation
-          await this.deleteVideo(itemId);
-
-          // If the deletion is successful, fetch updated data
-          await this.fetchVideoCat();
-
-          // Update the component's data with the latest data
-          this.items = [];
-          this.getVideos.length > 0
-            ? this.setItems(this.getVideos)
-            : (this.noItems = "No Video Category Found.");
-
-          // Show success message
-          Swal.fire("Deleted!", "Video category has been deleted.", "success");
-        } catch (error) {
-          // Handle any errors during deletion or data fetching
-          console.error("Error deleting item or fetching data:", error);
-          Swal.fire("Error!", "An error occurred during deletion.", "error");
-        }
-      }
-    },
     async changeStatus(item) {
       try {
         // Note the use of await here
         let result = await API.post(
-          `${endpoints.videos.videoCatStatus}/${item.id}`
+          `${endpoints.salesTips.salesTipStatus}/${item.id}`
         );
 
         // Check the result or handle the response as needed
         if (result.status === 200) {
           // Toggle the status locally in the items array
-          const updatedItems = this.items.map((video) => {
-            if (video.id === item.id) {
-              video.status = video.status === "Active" ? "InActive" : "Active";
+          const updatedItems = this.items.map((salesTip) => {
+            if (salesTip.id === item.id) {
+              salesTip.status =
+                salesTip.status === "Active" ? "InActive" : "Active";
             }
-            return video;
+            return salesTip;
           });
 
           // Update the items array with the new data
@@ -442,25 +402,67 @@ export default {
       }
     },
 
-    viewMedia(videos, id) {
-      console.log("View videos with ID:", videos.id);
-      console.log("Route ID:", videos.id);
-      // perform the necessary actions with videos and id
-      this.$router.push({
-        name: "videoCat-videos",
-        params: { id: videos.id, title: videos.title },
+    view(itemId) {
+      console.log(itemId);
+    },
+    deleteItem(itemId) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this sales tip!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            // Make an API request to delete the item
+            const response = await API.delete(
+              `${endpoints.salesTips.deleteSalesTip}/${itemId}`
+            );
+
+            if (response.status === 200) {
+              Swal.fire("Deleted!", "Sales Tip has been deleted.", "success");
+
+              // Fetch updated sales tips data
+              await this.fetchSalesTips();
+
+              // Update the component's data with the latest data
+              this.items = [];
+              this.getSalesTips.length > 0
+                ? this.setItems(this.getSalesTips)
+                : (this.noItems = "No sales tip found.");
+
+              // Navigate back to the same page
+              // this.$router.go();
+            } else {
+              // Handle other status codes or error conditions
+              console.error("Error deleting sales tip:", response);
+              Swal.fire(
+                "Error!",
+                "An error occurred during deletion.",
+                "error"
+              );
+            }
+          } catch (error) {
+            // Handle any errors during deletion
+            console.error("Error deleting sales tip:", error);
+            Swal.fire("Error!", "An error occurred during deletion.", "error");
+          }
+        }
       });
     },
   },
   async mounted() {
-    await this.fetchVideoCat();
-    this.getVideos.length > 0
-      ? this.setItems(this.getVideos)
-      : (this.noItems = "No User Found.");
+    // const id = this.$route.params.id;
+    await this.fetchSalesTips();
+    this.getSalesTips.length > 0
+      ? this.setItems(this.getSalesTips)
+      : (this.noItems = "No sales tips found.");
   },
 };
 </script>
-
 <style scoped>
 .modal video {
   width: 100%;
@@ -476,7 +478,7 @@ export default {
   transform: translate(-50%, -50%);
   padding: 20px;
   background-color: white;
-  z-index: 1000;
+  z-index: 1;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -487,7 +489,7 @@ export default {
   cursor: pointer;
 }
 
-.btn-primary {
+.btn-secondary {
   background-color: #6c757d; /* Change the background color as needed */
   color: #fff; /* Change the text color as needed */
   border: 1px solid #6c757d; /* Change the border color as needed */
@@ -497,7 +499,7 @@ export default {
 }
 
 /* Example styles for the icon */
-.btn-primary i {
+.btn-secondary i {
   margin-right: 5px; /* Adjust margin as needed */
 }
 </style>

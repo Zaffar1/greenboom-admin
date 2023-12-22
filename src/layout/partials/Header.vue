@@ -9,9 +9,9 @@
     >
       <router-link class="navbar-brand brand-logo" to="/">
         <img
-          src="../../../public/favicon.jpg"
+          src="../../../public/untitled.png"
           alt="logo"
-          style="width: 100px; height: 70px"
+          style="width: 150px; height: auto"
         />
       </router-link>
       <router-link class="navbar-brand brand-logo-mini" to="/">

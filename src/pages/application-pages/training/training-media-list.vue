@@ -235,7 +235,8 @@ export default {
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
-        let baseUrl = "http://localhost:8000/";
+        // let baseUrl = "http://localhost:8000/";
+        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path

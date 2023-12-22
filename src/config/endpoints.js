@@ -39,15 +39,31 @@ export const endpoints = {
     msdSheetStatus: "admin/msd-sheet-status",
   },
   videos: {
-    fetchAllVideos: `admin/all-videos`, // GET
-    deleteVideo: "admin/delete-video",
+    fetchAllVideoCat: `admin/video-categories`, // GET
+    deleteVideoCat: "admin/delete-category",
+    addVideoCat: "admin/add-category",
+    videoCatStatus: "admin/video-cat-status",
+    // videoStatus: "admin/video-status",
+    editVideoCat: "admin/update-category",
     addVideo: "admin/add-video",
+    fetchVideoCatVideos: "admin/video-cat-videos",
+    editVideoCatVideo: "admin/update-video",
+    deleteVideo: "admin/delete-video",
     videoStatus: "admin/video-status",
-    editVideo: "admin/update-video",
+    fetchAllVideos: "admin/all-videos",
   },
   products: {
     fetchProducts: `admin/all-products`, // GET
   },
+
+  salesTips: {
+    fetchAllSalesTips: "admin/all-sales-tips",
+    addSalesTip: "admin/add-sales-tip",
+    editSalesTip: "admin/update-sales-tip",
+    salesTipStatus: "admin/sales-tip-status",
+    deleteSalesTip: "admin/delete-sales-tip",
+  },
+
   // job: {
   //     fetchAll: `job/fetch`, // GET
   // }
