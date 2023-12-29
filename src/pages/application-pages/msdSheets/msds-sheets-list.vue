@@ -210,6 +210,7 @@ export default {
       fields: [
         { key: "title", sortable: true },
         { key: "description", sortable: true },
+        { key: "type", sortable: true },
         { key: "status", sortable: true },
         { key: "created_at", sortable: true },
         { key: "Media", sortable: true },
@@ -237,7 +238,8 @@ export default {
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
-        let baseUrl = "http://localhost:8000/";
+        // let baseUrl = "http://localhost:8000/";
+        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -245,6 +247,7 @@ export default {
         // obj.status = `<label class="badge ${
         //   element.status === "Active" ? "badge-success" : "badge-danger"
         // }">${element.status}</label>`;
+        obj.type = element.file_type;
         obj.status = element.status;
         obj.role_id = element.role?.id;
         obj.status_id = element.status?.id;

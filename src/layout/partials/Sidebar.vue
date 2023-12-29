@@ -30,12 +30,14 @@
         </li>
 
         <li class="nav-item">
-          <span class="nav-link" v-b-toggle="'user'">
+          <!-- <span class="nav-link" v-b-toggle="'user'"> -->
+          <router-link class="nav-link" to="/user/all-users">
             <span class="menu-title">Users</span>
-            <i class="menu-arrow"></i>
+            <!-- <i class="menu-arrow"></i> -->
             <i class="mdi mdi-account-multiple menu-icon"></i>
-          </span>
-          <b-collapse accordion="sidebar-accordion" id="user">
+          </router-link>
+          <!-- </span> -->
+          <!-- <b-collapse accordion="sidebar-accordion" id="user">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/user/all-users"
@@ -43,15 +45,17 @@
                 >
               </li>
             </ul>
-          </b-collapse>
+          </b-collapse> -->
         </li>
         <li class="nav-item">
-          <span class="nav-link" v-b-toggle="'job'">
+          <!-- <span class="nav-link" v-b-toggle="'job'"> -->
+          <router-link class="nav-link" to="/user/welcome-videos">
             <span class="menu-title">Welcome Videos</span>
-            <i class="menu-arrow"></i>
-            <i class="fas fa-film"></i>
-          </span>
-          <b-collapse accordion="sidebar-accordion" id="job">
+            <!-- <i class="menu-arrow"></i> -->
+            <!-- <i class="fas fa-film"></i> -->
+          </router-link>
+          <!-- </span> -->
+          <!-- <b-collapse accordion="sidebar-accordion" id="job">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/user/welcome-videos"
@@ -59,16 +63,18 @@
                 >
               </li>
             </ul>
-          </b-collapse>
+          </b-collapse> -->
         </li>
 
         <li class="nav-item">
-          <span class="nav-link" v-b-toggle="'training'">
+          <!-- <span class="nav-link" v-b-toggle="'training'"> -->
+          <router-link class="nav-link" to="/user/training-list">
             <span class="menu-title">Training</span>
-            <i class="menu-arrow"></i>
-            <i class="fas fa-film"></i>
-          </span>
-          <b-collapse accordion="sidebar-accordion" id="training">
+            <!-- <i class="menu-arrow"></i> -->
+            <!-- <i class="fas fa-film"></i> -->
+          </router-link>
+          <!-- </span> -->
+          <!-- <b-collapse accordion="sidebar-accordion" id="training">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/user/training-list"
@@ -76,16 +82,18 @@
                 >
               </li>
             </ul>
-          </b-collapse>
+          </b-collapse> -->
         </li>
 
         <li class="nav-item">
-          <span class="nav-link" v-b-toggle="'sheets'">
+          <!-- <span class="nav-link" v-b-toggle="'sheets'"> -->
+          <router-link class="nav-link" to="/user/msds-sheets-list">
             <span class="menu-title">MSDS Sheets</span>
-            <i class="menu-arrow"></i>
-            <i class="fas fa-film"></i>
-          </span>
-          <b-collapse accordion="sidebar-accordion" id="sheets">
+            <!-- <i class="menu-arrow"></i> -->
+            <!-- <i class="fas fa-film"></i> -->
+          </router-link>
+          <!-- </span> -->
+          <!-- <b-collapse accordion="sidebar-accordion" id="sheets">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/user/msds-sheets-list"
@@ -93,16 +101,18 @@
                 >
               </li>
             </ul>
-          </b-collapse>
+          </b-collapse> -->
         </li>
 
         <li class="nav-item">
-          <span class="nav-link" v-b-toggle="'video'">
+          <!-- <span class="nav-link" v-b-toggle="'video'"> -->
+          <router-link class="nav-link" to="/videos/all-videos">
             <span class="menu-title">Video</span>
-            <i class="menu-arrow"></i>
-            <i class="fas fa-film"></i>
-          </span>
-          <b-collapse accordion="sidebar-accordion" id="video">
+            <!-- <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i> -->
+          </router-link>
+          <!-- </span> -->
+          <!-- <b-collapse accordion="sidebar-accordion" id="video">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/videos/all-videos"
@@ -110,24 +120,26 @@
                 >
               </li>
             </ul>
-          </b-collapse>
+          </b-collapse> -->
         </li>
 
         <li class="nav-item">
-          <span class="nav-link" v-b-toggle="'faqs'">
-            <span class="menu-title">Perfect Sales Pitch</span>
+          <!-- <span class="nav-link" v-b-toggle="'faqs'"> -->
+          <router-link class="nav-link" to="/perfectSales/perfectSales-list">
+            <span class="menu-title">Perfect Sales Call</span>
             <i class="menu-arrow"></i>
             <i class="fas fa-film"></i>
-          </span>
-          <b-collapse accordion="sidebar-accordion" id="faqs">
-            <ul class="nav flex-column sub-menu">
+          </router-link>
+          <!-- </span> -->
+          <!-- <b-collapse accordion="sidebar-accordion" id="faqs"> -->
+          <!-- <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/faqs/faqs-list"
                   >FAQS</router-link
                 >
               </li>
-            </ul>
-            <ul class="nav flex-column sub-menu">
+            </ul> -->
+          <!-- <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/benDuffy/benDuffy-list"
                   >Ben Duffy Questions</router-link
@@ -141,16 +153,37 @@
                 >
               </li>
             </ul>
+          </b-collapse> -->
+        </li>
+
+        <li class="nav-item">
+          <!-- <span class="nav-link" v-b-toggle="'catalog'"> -->
+          <router-link class="nav-link" to="/catalogs/catalog-list">
+            <span class="menu-title">Catalog & Brouchers</span>
+            <!-- <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i> -->
+          </router-link>
+          <!-- </span> -->
+          <b-collapse accordion="sidebar-accordion" id="catalog">
+            <ul class="nav flex-column sub-menu">
+              <li class="nav-item">
+                <router-link class="nav-link" to="/catalogs/catalog-list"
+                  >Catalog List</router-link
+                >
+              </li>
+            </ul>
           </b-collapse>
         </li>
 
         <li class="nav-item">
-          <span class="nav-link" v-b-toggle="'product'">
+          <!-- <span class="nav-link" v-b-toggle="'product'"> -->
+          <router-link class="nav-link" to="/user/product-list">
             <span class="menu-title">Products</span>
-            <i class="menu-arrow"></i>
-            <i class="fas fa-film"></i>
-          </span>
-          <b-collapse accordion="sidebar-accordion" id="product">
+            <!-- <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i> -->
+            <!-- </span> -->
+          </router-link>
+          <!-- <b-collapse accordion="sidebar-accordion" id="product">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/user/product-list"
@@ -158,7 +191,7 @@
                 >
               </li>
             </ul>
-          </b-collapse>
+          </b-collapse> -->
         </li>
 
         <!-- <li class="nav-item">

@@ -1,15 +1,13 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">
-        Training Media of ( {{ this.$route.params.title }} )
-      </h3>
+      <h3 class="page-title">Data of ( {{ this.$route.params.title }} )</h3>
       <div>
         <b-button
           @click="addTrainingModal"
           variant="success"
           class="mr-2 orange-button"
-          ><i class="mdi mdi-plus"></i>Add Training Media</b-button
+          ><i class="mdi mdi-plus"></i>Add Data</b-button
         >
         <button @click="goBack" class="btn btn-primary orange-button">
           <i class="mdi mdi-arrow-left"></i> Go Back
@@ -25,7 +23,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                :placeholder="'Search ' + this.$route.params.title + ' Media'"
+                :placeholder="'Search ' + this.$route.params.title + ' Data'"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -68,10 +66,10 @@
                 <!-- Actions -->
 
                 <!-- <i
-                  @click="view(data.item.id)"
-                  :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i> -->
+                    @click="view(data.item.id)"
+                    :ref="'btn' + data.index"
+                    class="mr-2 mdi mdi-eye text-muted icon-sm"
+                  ></i> -->
                 <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
@@ -94,6 +92,15 @@
                   >
                     <i class="mdi mdi-play"></i> Play Video
                   </button>
+
+                  <button
+                    v-else-if="isScriptsTitle && data.item.type !== 'pdf'"
+                    @click="scriptData(data.item)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-eye"></i> View
+                  </button>
+
                   <button
                     v-else-if="data.item.type === 'pdf'"
                     @click="openPdf(data.item.file)"
@@ -117,6 +124,7 @@
                   >
                     <i class="mdi mdi-file-powerpoint"></i> Open PowerPoint
                   </button>
+
                   <span v-else> Unsupported file type </span>
                 </div>
               </template>
@@ -139,7 +147,7 @@
       <p v-if="!videoSource">No video source provided</p>
     </div>
 
-    <b-modal v-model="addMediaModel" title="Add Training Media" hide-footer>
+    <b-modal v-model="addMediaModel" title="Add Perfect Sale Media" hide-footer>
       <form @submit.prevent="submitAddForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -164,8 +172,12 @@
       </form>
     </b-modal>
 
-    <!-- Modal for training media -->
-    <b-modal v-model="showEditModal" title="Edit Training Media" hide-footer>
+    <!-- Modal for perfect sale media -->
+    <b-modal
+      v-model="showEditModal"
+      title="Edit Perfect Sale Media"
+      hide-footer
+    >
       <form @submit.prevent="submitEditForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -205,8 +217,14 @@ Vue.use(SortedTablePlugin, {
 });
 
 export default {
+  computed: {
+    isScriptsTitle() {
+      return this.$route.params.title === "scripts";
+    },
+  },
   data: function () {
     return {
+      isScriptsTitle: true,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -238,7 +256,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getTrainingMedia", "getDefaultImage", "getImageUrl"]),
+    ...mapGetters(["getPerfectSaleMedia", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
@@ -252,7 +270,7 @@ export default {
     // this.fetchDataById(id);
   },
   methods: {
-    ...mapActions(["fetchTrainingMedia"]),
+    ...mapActions(["fetchPerfectSaleData"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
@@ -278,18 +296,18 @@ export default {
       try {
         // Note the use of await here
         let result = await API.post(
-          `${endpoints.trainings.trainingMediaStatus}/${item.id}`
+          `${endpoints.perfectSales.perfectSaleMediaStatus}/${item.id}`
         );
 
         // Check the result or handle the response as needed
         if (result.status === 200) {
           // Toggle the status locally in the items array
-          const updatedItems = this.items.map((training) => {
-            if (training.id === item.id) {
-              training.status =
-                training.status === "Active" ? "InActive" : "Active";
+          const updatedItems = this.items.map((perfectSale) => {
+            if (perfectSale.id === item.id) {
+              perfectSale.status =
+                perfectSale.status === "Active" ? "InActive" : "Active";
             }
-            return training;
+            return perfectSale;
           });
 
           // Update the items array with the new data
@@ -335,14 +353,15 @@ export default {
 
       try {
         const addFormData = new FormData();
-        const training_id = this.$route.params.id;
+        const perfect_sale_id = this.$route.params.id;
+        console.log("perfect sale after add", perfect_sale_id);
         addFormData.append("title", this.addTitle);
-        addFormData.append("training_id", training_id);
+        addFormData.append("perfect_sale_id", perfect_sale_id);
         if (this.addFile) {
           addFormData.append("file", this.addFile);
         }
         const result = await API.post(
-          endpoints.trainings.addTrainingMedia,
+          endpoints.perfectSales.addPerfectSaleMedia,
           addFormData
         );
 
@@ -353,13 +372,13 @@ export default {
           this.items = [];
 
           // Fetch updated training media data
-          const training_id = this.$route.params.id;
-          await this.fetchTrainingMedia(training_id);
+          const perfect_sale_id = this.$route.params.id;
+          await this.fetchPerfectSaleData(perfect_sale_id);
 
           // Update the component's data with the latest data
-          this.getTrainingMedia.length > 0
-            ? this.setItems(this.getTrainingMedia)
-            : (this.noItems = "No TrainingMedia Found.");
+          this.getPerfectSaleMedia.length > 0
+            ? this.setItems(this.getPerfectSaleMedia)
+            : (this.noItems = "No perfect sale data found.");
 
           Swal.fire(
             "Success!",
@@ -381,7 +400,7 @@ export default {
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
-      editedFormData.append("training_id", this.$route.params.id);
+      editedFormData.append("perfect_sale_id", this.$route.params.id);
       if (this.editedFile) {
         editedFormData.append("file", this.editedFile);
       }
@@ -392,13 +411,16 @@ export default {
       console.log("params id", this.$route.params.id);
       try {
         // Attempt to make the API request
-        await API.post(endpoints.trainings.editTrainingMedia, editedFormData);
+        await API.post(
+          endpoints.perfectSales.editPerfectSaleMedia,
+          editedFormData
+        );
 
         // Handle success
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "TrainingMedia edited successfully",
+          text: "Perfect sale data edited successfully",
         }).then(() => {
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
@@ -408,23 +430,23 @@ export default {
         this.showEditModal = false;
 
         // Fetch updated training media data
-        const training_id = this.$route.params.id;
-        await this.fetchTrainingMedia(training_id);
+        const perfect_sale_id = this.$route.params.id;
+        await this.fetchPerfectSaleData(perfect_sale_id);
 
         // Update the component's data with the latest data
         this.items = [];
-        this.getTrainingMedia.length > 0
-          ? this.setItems(this.getTrainingMedia)
-          : (this.noItems = "No TrainingMedia Found.");
+        this.getPerfectSaleMedia.length > 0
+          ? this.setItems(this.getPerfectSaleMedia)
+          : (this.noItems = "No perfect sale data found.");
       } catch (error) {
         // Handle error
-        console.error("Error editing TrainingMedia:", error);
+        console.error("Error editing perfect sale data:", error);
 
         // Display an error message
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while editing the training media",
+          text: "An error occurred while editing the perfect sale data",
         });
       }
     },
@@ -450,13 +472,19 @@ export default {
       // Open the POWERPOINT file in a new window or tab
       window.open(PowerPointUrl, "_blank");
     },
-    view(itemId) {
-      console.log(itemId);
+    scriptData(Script, id) {
+      console.log("View media with ID:", Script.id);
+      console.log("Route ID:", Script.id);
+      // perform the necessary actions with Script and id
+      this.$router.push({
+        name: "script-media",
+        params: { id: Script.id, title: Script.title },
+      });
     },
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
-        text: "You will not be able to recover this training media!",
+        text: "You will not be able to recover this perfect sale data!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
@@ -467,31 +495,31 @@ export default {
           try {
             // Make an API request to delete the item
             const response = await API.delete(
-              `${endpoints.trainings.deleteTrainingMedia}/${itemId}`
+              `${endpoints.perfectSales.deletePerfectSaleMedia}/${itemId}`
             );
 
             if (response.status === 200) {
               Swal.fire(
                 "Deleted!",
-                "TrainingMedia has been deleted.",
+                "Perfect sale data has been deleted.",
                 "success"
               );
 
               // Fetch updated training media data
-              const training_id = this.$route.params.id;
-              await this.fetchTrainingMedia(training_id);
+              const perfect_sale_id = this.$route.params.id;
+              await this.fetchPerfectSaleData(perfect_sale_id);
 
               // Update the component's data with the latest data
               this.items = [];
-              this.getTrainingMedia.length > 0
-                ? this.setItems(this.getTrainingMedia)
-                : (this.noItems = "No TrainingMedia Found.");
+              this.getPerfectSaleMedia.length > 0
+                ? this.setItems(this.getPerfectSaleMedia)
+                : (this.noItems = "No perfect sale data found.");
 
               // Navigate back to the same page
               // this.$router.go();
             } else {
               // Handle other status codes or error conditions
-              console.error("Error deleting training media:", response);
+              console.error("Error deleting perfect sale data:", response);
               Swal.fire(
                 "Error!",
                 "An error occurred during deletion.",
@@ -514,10 +542,11 @@ export default {
   },
   async mounted() {
     const id = this.$route.params.id;
-    await this.fetchTrainingMedia(id);
-    this.getTrainingMedia.length > 0
-      ? this.setItems(this.getTrainingMedia)
-      : (this.noItems = "No TrainingMedia Found.");
+    console.log("perfect sale id", id);
+    await this.fetchPerfectSaleData(id);
+    this.getPerfectSaleMedia.length > 0
+      ? this.setItems(this.getPerfectSaleMedia)
+      : (this.noItems = "No perfect sale data found.");
   },
   //   async fetchDataById(id) {
   //     try {×

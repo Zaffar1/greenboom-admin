@@ -20,12 +20,16 @@ export default new Vuex.Store({
     trainingTitle: {},
     trainingMedia: [],
     msdSheets: [],
+    catalogs: [],
     products: [],
     salesTips: [],
     allJobs: [],
     videos: [],
     VideosCatVideos: [],
     allVideos: [],
+    perfectSales: [],
+    perfectSaleMedia: [],
+    scriptMedia: [],
 
     imageUrl:
       process.env.NODE_ENV === "production"
@@ -49,9 +53,13 @@ export default new Vuex.Store({
     getTrainings: (state) => state.trainings,
     getTrainingMedia: (state) => state.trainingMedia,
     getMsdSheets: (state) => state.msdSheets,
+    getCatalogs: (state) => state.catalogs,
     getVideos: (state) => state.videos,
     getVideosCatVideos: (state) => state.VideosCatVideos,
     getAllVideos: (state) => state.allVideos,
+    getPerfectSales: (state) => state.perfectSales,
+    getPerfectSaleMedia: (state) => state.perfectSaleMedia,
+    getScriptMedia: (state) => state.scriptMedia,
     getSalesTips: (state) => state.salesTips,
     getProducts: (state) => state.products,
     getUserImage: (state, getters) => {
@@ -175,7 +183,7 @@ export default new Vuex.Store({
     fetchTrainingMedia: async ({ commit }, id) => {
       try {
         let response = await API.get(`${endpoints.trainings.fetchMedia}/${id}`);
-        commit("setTrainingMedia", response.data.training_media);
+        commit("setTrainingMedia", response.data.data);
         console.log(response);
         return true;
       } catch (error) {
@@ -187,6 +195,16 @@ export default new Vuex.Store({
         let response = await API.get(endpoints.msdSheets.fetchMsdSheetList);
         commit("setMsdSheets", response.data.all_msds);
         console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    fetchCatalogList: async ({ commit }) => {
+      try {
+        let response = await API.get(endpoints.catalogs.fetchCatalogsList);
+        commit("setCatalogs", response.data.all_catalogs);
+        console.log("response data", response);
         return true;
       } catch (error) {
         return error.response;
@@ -236,6 +254,51 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+    fetchPerfectSales: async ({ commit }) => {
+      try {
+        let response = await API.get(endpoints.perfectSales.fetchAll);
+        commit("setPerfectSales", response.data.all_data);
+        // console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    fetchPerfectSaleId: async ({ commit }, id) => {
+      try {
+        let response = await API.delete(
+          `${endpoints.perfectSales.deletePerfectSale}/${id}`
+        );
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    fetchPerfectSaleData: async ({ commit }, id) => {
+      try {
+        let response = await API.get(
+          `${endpoints.perfectSales.fetchPerfectMedia}/${id}`
+        );
+        commit("setPerfectSaleMedia", response.data.data);
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    fetchScriptData: async ({ commit }, id) => {
+      try {
+        let response = await API.get(
+          `${endpoints.perfectSales.fetchScriptMedia}/${id}`
+        );
+        commit("setScriptMedia", response.data.data);
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
     fetchSalesTips: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.salesTips.fetchAllSalesTips);
@@ -277,10 +340,16 @@ export default new Vuex.Store({
     setTrainingMedia: (state, trainingMedia) =>
       (state.trainingMedia = trainingMedia),
     setMsdSheets: (state, msdSheets) => (state.msdSheets = msdSheets),
+    setCatalogs: (state, catalogs) => (state.catalogs = catalogs),
     setVideos: (state, videos) => (state.videos = videos),
     setVideoCatVideos: (state, VideosCatVideos) =>
       (state.VideosCatVideos = VideosCatVideos),
     setAllVideos: (state, allVideos) => (state.allVideos = allVideos),
+    setPerfectSales: (state, perfectSales) =>
+      (state.perfectSales = perfectSales),
+    setPerfectSaleMedia: (state, perfectSaleMedia) =>
+      (state.perfectSaleMedia = perfectSaleMedia),
+    setScriptMedia: (state, scriptMedia) => (state.scriptMedia = scriptMedia),
     setSalesTips: (state, salesTips) => (state.salesTips = salesTips),
     setProducts: (state, products) => (state.products = products),
     setJobs: (state, jobs) => (state.allJobs = jobs),

@@ -1,22 +1,26 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">Training List</h3>
+      <h3 class="page-title">Perfect Sales Call List</h3>
       <!-- <router-link :to="{ name: 'add-training' }"> -->
-      <!-- <b-button @click="addTrainingModal" variant="success" class="mr-2 orange-button">
-        <i class="mdi mdi-plus"></i> Add Training
-      </b-button> -->
+      <b-button
+        @click="addTrainingModal"
+        variant="success"
+        class="mr-2 orange-button"
+      >
+        <i class="mdi mdi-plus"></i> Add Perfect Sale
+      </b-button>
       <!-- </router-link> -->
       <!-- <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <a href="javascript:void(0);">Table</a>
-              </li>
-              <li class="breadcrumb-item active" aria-current="page">
-                Advanced Table
-              </li>
-            </ol>
-          </nav> -->
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                  <a href="javascript:void(0);">Table</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                  Advanced Table
+                </li>
+              </ol>
+            </nav> -->
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -27,7 +31,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search Training"
+                placeholder="Search Perfect Sale Call"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -72,10 +76,10 @@
                 <!-- Actions -->
 
                 <!-- <i
-                  @click="view(data.item.id)"
-                  :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i> -->
+                    @click="view(data.item.id)"
+                    :ref="'btn' + data.index"
+                    class="mr-2 mdi mdi-eye text-muted icon-sm"
+                  ></i> -->
                 <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
@@ -89,9 +93,9 @@
                 ></i>
                 <span v-html="data.value"></span>
               </template>
-              <template #cell(TrainingMedia)="data">
+              <template #cell(PerfectSaleMedia)="data">
                 <button
-                  @click="viewMedia(data.item.TrainingMedia)"
+                  @click="viewMedia(data.item.PerfectSaleMedia)"
                   class="btn btn-primary orange-button"
                 >
                   <i
@@ -119,7 +123,7 @@
       <span @click="closeModal" class="close">&times;</span>
       <video :src="videoSource" controls></video>
     </div>
-    <b-modal v-model="addModel" title="Add Training" hide-footer>
+    <b-modal v-model="addModel" title="Add Perfect Sale" hide-footer>
       <form @submit.prevent="submitAddForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -136,7 +140,7 @@
       </form>
     </b-modal>
     <!-- Modal for editing video -->
-    <b-modal v-model="showEditModal" title="Edit Training" hide-footer>
+    <b-modal v-model="showEditModal" title="Edit Perfect Sale" hide-footer>
       <form @submit.prevent="submitEditForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -188,7 +192,7 @@ export default {
         { key: "title", sortable: true },
         { key: "status", sortable: true },
         { key: "created_at", sortable: true },
-        { key: "TrainingMedia", sortable: true },
+        { key: "PerfectSaleMedia", sortable: true },
         { key: "action", sortable: true },
       ],
       items: [],
@@ -196,13 +200,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getTrainings", "getDefaultImage", "getImageUrl"]),
+    ...mapGetters(["getPerfectSales", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
   },
   methods: {
-    ...mapActions(["fetchTrainings", "fetchTrainingId"]),
+    ...mapActions(["fetchPerfectSales", "fetchPerfectSaleId"]),
     generateViewButton(id) {
       return `<button @click="viewMedia(${id})">View</button>`;
     },
@@ -212,7 +216,7 @@ export default {
         let baseUrl = "http://localhost:8000/";
         obj.id = element.id;
         obj.title = element.title;
-        obj.TrainingMedia = {
+        obj.PerfectSaleMedia = {
           id: element.id,
           title: element.title,
         };
@@ -244,7 +248,7 @@ export default {
 
       try {
         const result = await API.post(
-          endpoints.trainings.addTraining,
+          endpoints.perfectSales.addPerfectSale,
           addFormData
         );
 
@@ -252,15 +256,15 @@ export default {
           this.addModel = false; // Close the modal after success
 
           // Fetch updated training data
-          await this.fetchTrainings();
+          await this.fetchPerfectSales();
 
           // Update the component's data with the latest data
           this.items = [];
-          this.getTrainings.length > 0
-            ? this.setItems(this.getTrainings)
-            : (this.noItems = "No Training Found.");
+          this.getPerfectSales.length > 0
+            ? this.setItems(this.getPerfectSales)
+            : (this.noItems = "No Perfect Sale Found.");
           console.log("submit data", this.items);
-          Swal.fire("Success!", "Training successfully added.", "success");
+          Swal.fire("Success!", "Perfect Sale successfully added.", "success");
         }
       } catch (error) {
         // Handle error
@@ -273,13 +277,13 @@ export default {
       }
     },
 
-    viewMedia(trainingMedia, id) {
-      console.log("View media with ID:", trainingMedia.id);
-      console.log("Route ID:", trainingMedia.id);
-      // perform the necessary actions with trainingMedia and id
+    viewMedia(PerfectSaleMedia, id) {
+      console.log("View media with ID:", PerfectSaleMedia.id);
+      console.log("Route ID:", PerfectSaleMedia.id);
+      // perform the necessary actions with PerfectSaleMedia and id
       this.$router.push({
-        name: "training-media",
-        params: { id: trainingMedia.id, title: trainingMedia.title },
+        name: "perfect-sale-media",
+        params: { id: PerfectSaleMedia.id, title: PerfectSaleMedia.title },
       });
     },
 
@@ -300,7 +304,7 @@ export default {
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
-      editedFormData.append("description", this.editedDescription);
+      // editedFormData.append("description", this.editedDescription);
       if (this.editedFile) {
         editedFormData.append("file", this.editedFile);
       }
@@ -309,26 +313,26 @@ export default {
       editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
 
       try {
-        await API.post(endpoints.trainings.editTraining, editedFormData);
+        await API.post(endpoints.perfectSales.editPerfectSale, editedFormData);
 
         // Handle success
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Training edited successfully",
+          text: "Perfect Sale edited successfully",
         }).then(() => {
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
         });
 
         this.showEditModal = false; // Close the modal after success
-        await this.fetchTrainings();
+        await this.fetchPerfectSales();
 
         // Update the component's data with the latest data
         this.items = [];
-        this.getTrainings.length > 0
-          ? this.setItems(this.getTrainings)
-          : (this.noItems = "No Training Found.");
+        this.getPerfectSales.length > 0
+          ? this.setItems(this.getPerfectSales)
+          : (this.noItems = "No Perfect Sale Found.");
       } catch (error) {
         // Handle error
         console.error("Error editing training:", error);
@@ -346,7 +350,7 @@ export default {
       console.log(itemId);
       const result = await Swal.fire({
         title: "Are you sure?",
-        text: "You will not be able to recover this training!",
+        text: "You will not be able to recover this perfect sale!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
@@ -357,18 +361,18 @@ export default {
       if (result.isConfirmed) {
         try {
           // Perform the deletion operation
-          await this.fetchTrainingId(itemId);
+          await this.fetchPerfectSaleId(itemId);
 
           // If the deletion is successful, fetch updated data
-          await this.fetchTrainings();
+          await this.fetchPerfectSales();
 
           // Update the component's data with the latest data
           this.items = [];
-          this.getTrainings.length > 0
-            ? this.setItems(this.getTrainings)
-            : (this.noItems = "No Training Found.");
+          this.getPerfectSales.length > 0
+            ? this.setItems(this.getPerfectSales)
+            : (this.noItems = "No Perfect Sale Found.");
 
-          Swal.fire("Deleted!", "Training has been deleted.", "success");
+          Swal.fire("Deleted!", "Perfect sale has been deleted.", "success");
           // Redirect to the desired route
           // this.$router.push("/user/training-list");
         } catch (error) {
@@ -382,7 +386,7 @@ export default {
       try {
         // Note the use of await here
         let result = await API.post(
-          `${endpoints.trainings.trainingStatus}/${item.id}`
+          `${endpoints.perfectSales.perfectSalesStatus}/${item.id}`
         );
 
         // Check the result or handle the response as needed
@@ -423,12 +427,12 @@ export default {
     // },
   },
   async mounted() {
-    await this.fetchTrainings();
-    // console.log("mounted all training", this.getTrainings.length);
-    console.log("mounted all training", this.getTrainings);
-    this.getTrainings.length > 0
-      ? this.setItems(this.getTrainings)
-      : (this.noItems = "No Training Found.");
+    await this.fetchPerfectSales();
+    // console.log("mounted all training", this.getPerfectSales.length);
+    console.log("mounted all training", this.getPerfectSales);
+    this.getPerfectSales.length > 0
+      ? this.setItems(this.getPerfectSales)
+      : (this.noItems = "No Perfect Sale Found.");
   },
 };
 </script>

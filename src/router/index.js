@@ -195,6 +195,44 @@ export default new Router({
       ],
     },
     {
+      path: "/perfectSales",
+      component: layout,
+      children: [
+        {
+          path: "perfectSales-list",
+          name: "perfectSales-list",
+          component: () =>
+            import("@/pages/application-pages/perfectSales/perfect-sale-list"),
+        },
+      ],
+    },
+    {
+      path: "/perfectSale",
+      component: layout,
+      children: [
+        {
+          path: "perfect-sale-media/:id/:title",
+          name: "perfect-sale-media",
+          component: () =>
+            import(
+              "@/pages/application-pages/perfectSales/perfect-sale-media-list"
+            ),
+        },
+      ],
+    },
+    {
+      path: "/scripts",
+      component: layout,
+      children: [
+        {
+          path: "script-media/:id/:title",
+          name: "script-media",
+          component: () =>
+            import("@/pages/application-pages/perfectSales/script-media-list"),
+        },
+      ],
+    },
+    {
       path: "/benDuffy",
       component: layout,
       children: [
@@ -215,6 +253,18 @@ export default new Router({
           name: "sales-tips-list",
           component: () =>
             import("@/pages/application-pages/salesTips/sales-tips-list"),
+        },
+      ],
+    },
+    {
+      path: "/catalogs",
+      component: layout,
+      children: [
+        {
+          path: "catalog-list",
+          name: "catalog-list",
+          component: () =>
+            import("@/pages/application-pages/catalogs/catalog-list"),
         },
       ],
     },

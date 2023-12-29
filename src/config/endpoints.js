@@ -56,6 +56,20 @@ export const endpoints = {
     fetchProducts: `admin/all-products`, // GET
   },
 
+  perfectSales: {
+    fetchAll: "admin/all-perfect-sale",
+    addPerfectSale: "admin/add-perfect-sale",
+    editPerfectSale: "admin/update-perfect-sale",
+    deletePerfectSale: "admin/delete-perfectSale",
+    perfectSalesStatus: "admin/perfectSale-status",
+    fetchPerfectMedia: "admin/perfect-sale-media",
+    addPerfectSaleMedia: "admin/add-perfect-sale-media",
+    editPerfectSaleMedia: "admin/update-perfect-sale-media",
+    deletePerfectSaleMedia: "admin/delete-perfectSaleMedia",
+    perfectSaleMediaStatus: "admin/perfectSaleMedia-status",
+    fetchScriptMedia: "admin/script-media",
+  },
+
   salesTips: {
     fetchAllSalesTips: "admin/all-sales-tips",
     addSalesTip: "admin/add-sales-tip",
@@ -64,6 +78,13 @@ export const endpoints = {
     deleteSalesTip: "admin/delete-sales-tip",
   },
 
+  catalogs: {
+    fetchCatalogsList: `admin/all-brouchers`, // GET
+    addCatalog: "admin/add-catalog",
+    editCatalog: "admin/update-catalog",
+    deleteCatalog: "admin/delete-catalog",
+    catalogStatus: "admin/catalog-status",
+  },
   // job: {
   //     fetchAll: `job/fetch`, // GET
   // }
