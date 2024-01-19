@@ -258,6 +258,7 @@ export default {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
         let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -531,6 +532,11 @@ export default {
 };
 </script>
 <style scoped>
+.btn-success:not(.btn-light):focus,
+.btn-success:not(.btn-light):active {
+  background: red;
+  border-color: orange;
+}
 .modal video {
   width: 100%;
   height: 100%;

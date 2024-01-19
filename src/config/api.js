@@ -2,6 +2,7 @@ import axios from "axios";
 import store from "../store";
 
 const baseURL = "https://virtualrealitycreators.com/green-boom/api/";
+// const baseURL = "http://18.224.159.123/green-boom/api/";
 // process.env.NODE_ENV === "production"
 // ? "https://virtualrealitycreators.com/green-boom/api/v1" + "/"
 // : "http://localhost:8000/api" + "/";

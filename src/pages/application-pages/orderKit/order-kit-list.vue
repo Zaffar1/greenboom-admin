@@ -1,24 +1,14 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">Welcome Video List</h3>
+      <h3 class="page-title">Order Kit List</h3>
       <b-button
-        @click="addWelcomeModal"
+        @click="addCatalogModal"
         variant="success"
         class="mr-2 orange-button"
       >
-        <i class="mdi mdi-plus"></i> Add Welcome Video
+        <i class="mdi mdi-plus"></i> Add Order a kit
       </b-button>
-      <!-- <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="javascript:void(0);">Table</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-              Advanced Table
-            </li>
-          </ol>
-        </nav> -->
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -29,7 +19,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search Welcome Video"
+                placeholder="Search Order a kit"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -48,10 +38,10 @@
               striped
               hover
             >
-              <template #cell(name)="data">
+              <template #cell(image)="data">
                 <!-- name & profile -->
-                <!-- <img :src="data.item.profile" class="mr-2" alt="image" /> -->
-                {{ data.item.title }}
+                <img :src="data.item.image" class="mr-2" alt="image" />
+                
               </template>
 
               <!-- when no item found -->
@@ -67,17 +57,15 @@
                   :value="data.item.status == 'Active'"
                 />
               </template>
-              <template v-slot:cell(file)="data">
-                <span v-html="data.value"></span>
-              </template>
+
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
                 <!-- <i
-                  @click="view(data.item.id)"
-                  :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-eye text-muted icon-sm"
-                ></i> -->
+                      @click="view(data.item.id)"
+                      :ref="'btn' + data.index"
+                      class="mr-2 mdi mdi-eye text-muted icon-sm"
+                    ></i> -->
                 <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
@@ -90,14 +78,6 @@
                   class="mr-2 mdi mdi-delete text-danger icon-sm"
                 ></i>
                 <span v-html="data.value"></span>
-              </template>
-              <template v-slot:cell(Media)="data">
-                <button
-                  @click="openModal(data.item.file)"
-                  class="btn btn-primary orange-button"
-                >
-                  <i class="mdi mdi-play"></i> Play Video
-                </button>
               </template>
             </b-table>
             <b-pagination
@@ -112,26 +92,14 @@
         </div>
       </div>
     </div>
-    <!-- <button @click="openModal">Open Modal</button> -->
+    <!-- <div v-if="isModalOpen" class="modal">
+          <span @click="closeModal" class="close">&times;</span>
+          <video :src="videoSource" controls></video>
+          <p v-if="!videoSource">No video source provided</p>
+        </div> -->
 
-    <div v-if="isModalOpen" class="modal">
-      <span @click="closeModal" class="close">&times;</span>
-      <video :src="videoSource" controls></video>
-    </div>
-    <!-- v-if="currentVideo" -->
-    <!-- <b-modal title="Video Player" @hidden="resetModal" id="video-modal">
-      <video width="100%" controls>
-        <source :src="currentVideo" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-    </b-modal> -->
-
-    <!-- Add Welcome Video -->
-    <b-modal
-      v-model="addWelcomeVideoModel"
-      title="Add Welcome Video"
-      hide-footer
-    >
+    <!-- Add Catalog -->
+    <b-modal v-model="addCatalogModel" title="Add order kit" hide-footer>
       <form @submit.prevent="submitAddForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -164,8 +132,8 @@
       </form>
     </b-modal>
 
-    <!-- Modal for editing video -->
-    <b-modal v-model="showEditModal" title="Edit Welcome Video" hide-footer>
+    <!-- Edit Msd Sheet -->
+    <b-modal v-model="showEditModal" title="Edit Msd Sheet" hide-footer>
       <form @submit.prevent="submitEditForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -189,7 +157,7 @@
             placeholder="Choose a file..."
           ></b-form-file>
         </b-form-group>
-        <!-- You can add more fields as needed -->
+        <!-- You can edit more fields as needed -->
 
         <b-button type="submit" variant="success">Save Changes</b-button>
       </form>
@@ -223,27 +191,25 @@ export default {
       sortDesc: false,
       sortByFormatted: true,
       filterByFormatted: true,
+      filter: "",
+      sortable: true,
+      addCatalogModel: false,
       showEditModal: false,
-      editedTitle: "",
-      editedDescription: "",
-      editedFile: null,
-      // Add a property to store the current edited item
-      editedItem: null,
-      addWelcomeVideoModel: false,
       addTitle: "",
       addDescription: "",
       addFile: null,
-      addTitle: "",
-      filter: "",
-      sortable: true,
+      // Add a property to store the current edited item
+      // addItem: null,
+      editedTitle: "",
+      editedDescription: "",
+      editedFile: null,
       fields: [
+        { key: "image", sortable: true },
         { key: "title", sortable: true },
+        { key: "short_description", sortable: true },
         { key: "description", sortable: true },
-        // { key: 'phone', sortable: true },
         { key: "status", sortable: true },
-        // { key: "file", sortable: true },
         { key: "created_at", sortable: true },
-        { key: "Media", sortable: true },
         { key: "action", sortable: true },
       ],
       items: [],
@@ -251,13 +217,20 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["getWelcomeVideos", "getDefaultImage", "getImageUrl"]),
+    ...mapGetters(["getOrderKitList", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
   },
+  created() {
+    // Access the ID from the route parameters
+    const id = this.$route.params.id;
+
+    // Call the fetchDataById method with the ID
+    this.fetchDataById(id);
+  },
   methods: {
-    ...mapActions(["fetchWelcomeVideos", "fetchWelcomeVideoId"]),
+    ...mapActions(["fetchOrderKitList"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
@@ -266,30 +239,42 @@ export default {
         // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
-        obj.description = element.description;
-        obj.file = baseUrl.concat(element.file);
-        // obj.button = `<button @click="playVideo('${obj.file}')">Play Video</button>`;
+        obj.image = baseUrl.concat(element.image); // Assuming element.file is the correct property for the file path
+        obj.description = element.description; // Assuming element.file_type is the correct property for the file type
+        obj.short_description = element.short_description;
         // obj.status = `<label class="badge ${
         //   element.status === "Active" ? "badge-success" : "badge-danger"
         // }">${element.status}</label>`;
+        obj.type = element.file_type;
         obj.status = element.status;
-        // obj.status_id = element.status?.id;
+        obj.role_id = element.role?.id;
+        obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
         );
         this.items.push(obj);
       });
-
-      console.log("mister", this.items);
+    },
+    openModal(videoUrl) {
+      console.log(videoUrl);
+      this.videoSource = videoUrl;
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
+    openPdf(pdfUrl) {
+      // Open the PDF file in a new window or tab
+      window.open(pdfUrl, "_blank");
     },
 
-    addWelcomeModal(item) {
+    addCatalogModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
       this.addTitle = item.title;
       this.addDescription = item.description;
       this.addFile = null;
-      this.addWelcomeVideoModel = true;
+      this.addCatalogModel = true;
     },
 
     async submitAddForm() {
@@ -301,33 +286,33 @@ export default {
           addFormData.append("file", this.addFile);
         }
         const result = await API.post(
-          endpoints.welcomeVideos.addWelcomeVideo,
+          endpoints.catalogs.addCatalog,
           addFormData
         );
 
         if (result.status === 200) {
-          this.addWelcomeVideoModel = false; // Close the modal after success
+          this.addCatalogModel = false; // Close the modal after success
 
           // Clear the items array before adding new data
           this.items = [];
 
-          // Fetch updated training media data
-          await this.fetchWelcomeVideos();
+          // Fetch updated msd sheet data
+          await this.fetchOrderKitList();
 
           // Update the component's data with the latest data
-          this.getWelcomeVideos.length > 0
-            ? this.setItems(this.getWelcomeVideos)
-            : (this.noItems = "No Welcome Video Found.");
+          this.getOrderKitList.length > 0
+            ? this.setItems(this.getOrderKitList)
+            : (this.noItems = "order kits Found.");
 
-          Swal.fire("Success!", "Welcome video successfully added.", "success");
+          Swal.fire("Success!", "order kit successfully added.", "success");
         }
       } catch (error) {
         // Handle error
-        console.error("Error adding welcome video:", error);
+        console.error("Error adding order kit:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding welcome video",
+          text: "An error occurred while adding order kit",
         });
       }
     },
@@ -350,57 +335,56 @@ export default {
       }
 
       // Add an identifier for the edited item (e.g., item ID) to the form data
-      editedFormData.append("video_id", this.editedItem.id); // Change "itemId" to "video_id"
+      editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
 
       try {
-        await API.post(
-          endpoints.welcomeVideos.editWelcomeVideo,
-          editedFormData
-        );
+        await API.post(endpoints.msdSheets.editMsdSheet, editedFormData);
 
         // Handle success
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Video edited successfully",
+          text: "order kit edited successfully",
         }).then(() => {
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
         });
 
         this.showEditModal = false; // Close the modal after success
-        await this.fetchWelcomeVideos();
+        await this.fetchOrderKitList();
 
         // Update the component's data with the latest data
         this.items = [];
-        this.getWelcomeVideos.length > 0
-          ? this.setItems(this.getWelcomeVideos)
-          : (this.noItems = "No Video Found.");
+        this.getOrderKitList.length > 0
+          ? this.setItems(this.getOrderKitList)
+          : (this.noItems = "No order kit found.");
       } catch (error) {
         // Handle error
-        console.error("Error editing video:", error);
+        console.error("Error editing order kit:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while editing the video",
+          text: "An error occurred while editing the order kit",
         });
       }
     },
+
     async changeStatus(item) {
       try {
         // Note the use of await here
         let result = await API.post(
-          `${endpoints.welcomeVideos.videoStatus}/${item.id}`
+          `${endpoints.msdSheets.msdSheetStatus}/${item.id}`
         );
 
         // Check the result or handle the response as needed
         if (result.status === 200) {
           // Toggle the status locally in the items array
-          const updatedItems = this.items.map((video) => {
-            if (video.id === item.id) {
-              video.status = video.status === "Active" ? "InActive" : "Active";
+          const updatedItems = this.items.map((catalog) => {
+            if (catalog.id === item.id) {
+              catalog.status =
+                catalog.status === "Active" ? "InActive" : "Active";
             }
-            return video;
+            return catalog;
           });
 
           // Update the items array with the new data
@@ -418,70 +402,66 @@ export default {
         Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
-    openModal(videoUrl) {
-      this.videoSource = videoUrl;
-      this.isModalOpen = true;
-    },
-    closeModal() {
-      this.isModalOpen = false;
-    },
+
     view(itemId) {
       console.log(itemId);
     },
-    async deleteItem(itemId) {
-      console.log(itemId);
-
-      const result = await Swal.fire({
+    deleteItem(itemId) {
+      Swal.fire({
         title: "Are you sure?",
-        text: "You will not be able to recover this video!",
+        text: "You will not be able to recover this catalog!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
         cancelButtonText: "Cancel",
         reverseButtons: true,
-      });
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            // Make an API request to delete the item
+            const response = await API.delete(
+              `${endpoints.catalogs.deleteCatalog}/${itemId}`
+            );
 
-      if (result.isConfirmed) {
-        try {
-          // Perform the deletion operation
-          await this.fetchWelcomeVideoId(itemId);
+            if (response.status === 200) {
+              Swal.fire("Deleted!", "order kit has been deleted.", "success");
 
-          // If the deletion is successful, fetch updated data
-          await this.fetchWelcomeVideos();
+              // Fetch updated msds sheet data
+              await this.fetchOrderKitList();
 
-          // Update the component's data with the latest data
-          this.items = [];
-          this.getWelcomeVideos.length > 0
-            ? this.setItems(this.getWelcomeVideos)
-            : (this.noItems = "No Video Found.");
+              // Update the component's data with the latest data
+              this.items = [];
+              this.getOrderKitList.length > 0
+                ? this.setItems(this.getOrderKitList)
+                : (this.noItems = "No order kit found.");
 
-          // Show success message
-          Swal.fire("Deleted!", "The video has been deleted.", "success");
-        } catch (error) {
-          // Handle any errors during deletion or data fetching
-          console.error("Error deleting item or fetching data:", error);
-          Swal.fire("Error!", "An error occurred during deletion.", "error");
+              // Navigate back to the same page
+              // this.$router.go();
+            } else {
+              // Handle other status codes or error conditions
+              console.error("Error deleting order kit:", response);
+              Swal.fire(
+                "Error!",
+                "An error occurred during deletion.",
+                "error"
+              );
+            }
+          } catch (error) {
+            // Handle any errors during deletion
+            console.error("Error deleting order kit:", error);
+            Swal.fire("Error!", "An error occurred during deletion.", "error");
+          }
         }
-      }
+      });
     },
-
-    // openVideoModal(videoUrl) {
-    //   console.log("Opening video modal with URL:", videoUrl);
-    //   this.currentVideo = videoUrl;
-    //   this.$bvModal.show("video-modal");
-    //   console.log("Video modal shown", this.currentVideo);
-    // },
-
-    // resetModal() {
-    //   this.currentVideo = null;
-    // },
   },
   async mounted() {
-    await this.fetchWelcomeVideos();
-    console.log("all welcome videos", this.getWelcomeVideos.length);
-    this.getWelcomeVideos.length > 0
-      ? this.setItems(this.getWelcomeVideos)
-      : (this.noItems = "No Video Found.");
+    // const id = this.$route.params.id;
+    await this.fetchOrderKitList();
+    console.log("order_kit", this.fetchOrderKitList);
+    this.getOrderKitList.length > 0
+      ? this.setItems(this.getOrderKitList)
+      : (this.noItems = "No order kit found.");
   },
 };
 </script>
@@ -505,7 +485,7 @@ export default {
   transform: translate(-50%, -50%);
   padding: 20px;
   background-color: white;
-  z-index: 1000;
+  z-index: 1;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -516,7 +496,7 @@ export default {
   cursor: pointer;
 }
 
-.btn-primary {
+.btn-secondary {
   background-color: #6c757d; /* Change the background color as needed */
   color: #fff; /* Change the text color as needed */
   border: 1px solid #6c757d; /* Change the border color as needed */
@@ -526,10 +506,9 @@ export default {
 }
 
 /* Example styles for the icon */
-.btn-primary i {
+.btn-secondary i {
   margin-right: 5px; /* Adjust margin as needed */
 }
-
 .orange-button {
   background-color: red;
   border-color: orange;

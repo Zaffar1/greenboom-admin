@@ -2,7 +2,11 @@
   <section class="tables">
     <div class="page-header">
       <h3 class="page-title">Msds Sheets List</h3>
-      <b-button @click="addMsdSheetModal" variant="success" class="mr-2">
+      <b-button
+        @click="addMsdSheetModal"
+        variant="success"
+        class="mr-2 orange-button"
+      >
         <i class="mdi mdi-plus"></i> Add Msds Sheet
       </b-button>
     </div>
@@ -79,7 +83,7 @@
                 <div>
                   <button
                     @click="openPdf(data.item.file)"
-                    class="btn btn-secondary"
+                    class="btn btn-secondary orange-button"
                   >
                     <i class="mdi mdi-file-pdf"></i>Open Pdf
                   </button>
@@ -132,7 +136,9 @@
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button type="submit" variant="success orange-button"
+          >Save Changes</b-button
+        >
       </form>
     </b-modal>
 
@@ -240,6 +246,7 @@ export default {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
         let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -249,7 +256,7 @@ export default {
         // }">${element.status}</label>`;
         obj.type = element.file_type;
         obj.status = element.status;
-        obj.role_id = element.role?.id;
+        // obj.role_id = element.role?.id;
         obj.status_id = element.status?.id;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
@@ -467,6 +474,11 @@ export default {
 };
 </script>
 <style scoped>
+.btn-success:not(.btn-light):focus,
+.btn-success:not(.btn-light):active {
+  background: red;
+  border-color: orange;
+}
 .modal video {
   width: 100%;
   height: 100%;
@@ -504,5 +516,11 @@ export default {
 /* Example styles for the icon */
 .btn-secondary i {
   margin-right: 5px; /* Adjust margin as needed */
+}
+
+.orange-button {
+  background-color: red;
+  border-color: orange;
+  color: white;
 }
 </style>

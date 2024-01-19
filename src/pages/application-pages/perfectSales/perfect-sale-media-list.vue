@@ -3,12 +3,24 @@
     <div class="page-header">
       <h3 class="page-title">Data of ( {{ this.$route.params.title }} )</h3>
       <div>
+        <!-- Conditionally show "Add Script Data" button -->
         <b-button
+          v-if="this.$route.params.title === 'Scripts'"
+          @click="addScriptModal"
+          variant="success"
+          class="mr-2 orange-button"
+        >
+          <i class="mdi mdi-plus"></i>Add Data
+        </b-button>
+        <b-button
+          v-else
           @click="addTrainingModal"
           variant="success"
           class="mr-2 orange-button"
-          ><i class="mdi mdi-plus"></i>Add Data</b-button
         >
+          <i class="mdi mdi-plus"></i>Add Data
+        </b-button>
+
         <button @click="goBack" class="btn btn-primary orange-button">
           <i class="mdi mdi-arrow-left"></i> Go Back
         </button>
@@ -88,7 +100,7 @@
                   <button
                     v-if="data.item.type === 'video'"
                     @click="openModal(data.item.file)"
-                    class="btn btn-primary"
+                    class="btn btn-primary orange-button"
                   >
                     <i class="mdi mdi-play"></i> Play Video
                   </button>
@@ -147,23 +159,51 @@
       <p v-if="!videoSource">No video source provided</p>
     </div>
 
-    <b-modal v-model="addMediaModel" title="Add Perfect Sale Media" hide-footer>
-      <form @submit.prevent="submitAddForm">
+    <div>
+      <b-modal
+        v-model="addMediaModel"
+        title="Add Perfect Sale Media"
+        hide-footer
+      >
+        <form @submit.prevent="submitAddForm">
+          <b-form-group label="Title" label-for="editInputTitle">
+            <b-form-input
+              v-model="addTitle"
+              id="editInputTitle"
+              required
+            ></b-form-input>
+          </b-form-group>
+
+          <!-- Add a condition to check if the route title is not equal to 'scripts' -->
+          <!-- If true, show the 'Upload file' field -->
+          <b-form-group label="Upload file" label-for="editInputFile">
+            <b-form-file
+              v-model="addFile"
+              id="editInputFile"
+              :state="Boolean(addFile)"
+              placeholder="Choose a file..."
+              required
+            ></b-form-file>
+          </b-form-group>
+
+          <b-button type="submit" variant="success" class="orange-button"
+            >Save Changes</b-button
+          >
+        </form>
+      </b-modal>
+    </div>
+    <b-modal
+      v-model="addScriptModel"
+      title="Add Perfect Sale Media"
+      hide-footer
+    >
+      <form @submit.prevent="submitAddScriptForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
             v-model="addTitle"
             id="editInputTitle"
             required
           ></b-form-input>
-        </b-form-group>
-        <b-form-group label="Upload file" label-for="editInputFile">
-          <b-form-file
-            v-model="addFile"
-            id="editInputFile"
-            :state="Boolean(addFile)"
-            placeholder="Choose a file..."
-            required
-          ></b-form-file>
         </b-form-group>
 
         <b-button type="submit" variant="success" class="orange-button"
@@ -221,6 +261,10 @@ export default {
     isScriptsTitle() {
       return this.$route.params.title === "scripts";
     },
+    ...mapGetters(["getPerfectSaleMedia", "getDefaultImage", "getImageUrl"]),
+    rows() {
+      return this.items.length;
+    },
   },
   data: function () {
     return {
@@ -236,6 +280,7 @@ export default {
       filter: "",
       sortable: true,
       addMediaModel: false,
+      addScriptModel: false,
       addTitle: "",
       addFile: null,
       showEditModal: false,
@@ -245,7 +290,9 @@ export default {
       editedItem: null,
       fields: [
         { key: "title", sortable: true },
-        { key: "type", sortable: true },
+        ...(this.isScriptsTitle
+          ? []
+          : [{ key: "type", sortable: true, label: "Type" }]),
         { key: "status", sortable: true },
         { key: "created_at", sortable: true },
         { key: "Media", sortable: true },
@@ -255,12 +302,12 @@ export default {
       noItems: null,
     };
   },
-  computed: {
-    ...mapGetters(["getPerfectSaleMedia", "getDefaultImage", "getImageUrl"]),
-    rows() {
-      return this.items.length;
-    },
-  },
+  // computed: {
+  //   ...mapGetters(["getPerfectSaleMedia", "getDefaultImage", "getImageUrl"]),
+  //   rows() {
+  //     return this.items.length;
+  //   },
+  // },
   created() {
     // Access the ID from the route parameters
     const id = this.$route.params.id;
@@ -276,6 +323,7 @@ export default {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
         let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -338,6 +386,12 @@ export default {
       this.addFile = null;
       this.addMediaModel = true;
     },
+    addScriptModal(item) {
+      // Set initial values when opening the modal
+      this.addItem = item;
+      this.addTitle = item.title;
+      this.addScriptModel = true;
+    },
 
     openEditModal(item) {
       // Set initial values when opening the modal
@@ -367,7 +421,57 @@ export default {
 
         if (result.status === 200) {
           this.addMediaModel = false; // Close the modal after success
+          this.addScriptModel = false;
+          // Clear the items array before adding new data
+          this.items = [];
 
+          // Fetch updated training media data
+          const perfect_sale_id = this.$route.params.id;
+          await this.fetchPerfectSaleData(perfect_sale_id);
+
+          // Update the component's data with the latest data
+          this.getPerfectSaleMedia.length > 0
+            ? this.setItems(this.getPerfectSaleMedia)
+            : (this.noItems = "No perfect sale data found.");
+
+          Swal.fire(
+            "Success!",
+            "Training media successfully added.",
+            "success"
+          );
+        }
+      } catch (error) {
+        // Handle error
+        console.error("Error adding training media:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding training media",
+        });
+      }
+    },
+
+    async submitAddScriptForm() {
+      const addFormData = new FormData();
+      addFormData.append("title", this.addTitle);
+
+      try {
+        const addFormData = new FormData();
+        const perfect_sale_id = this.$route.params.id;
+        console.log("perfect sale after add", perfect_sale_id);
+        addFormData.append("title", this.addTitle);
+        addFormData.append("perfect_sale_id", perfect_sale_id);
+        if (this.addFile) {
+          addFormData.append("file", this.addFile);
+        }
+        const result = await API.post(
+          endpoints.perfectSales.addScript,
+          addFormData
+        );
+
+        if (result.status === 200) {
+          this.addMediaModel = false; // Close the modal after success
+          this.addScriptModel = false;
           // Clear the items array before adding new data
           this.items = [];
 
@@ -560,6 +664,11 @@ export default {
 };
 </script>
 <style scoped>
+.btn-success:not(.btn-light):focus,
+.btn-success:not(.btn-light):active {
+  background: red;
+  border-color: orange;
+}
 .modal video {
   width: 100%;
   height: 100%;

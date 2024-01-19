@@ -1,7 +1,9 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">Script Data of ( {{ this.$route.params.title }} )</h3>
+      <h3 class="page-title">
+        Script Data of ( {{ this.$route.params.title }} )
+      </h3>
       <div>
         <b-button
           @click="addTrainingModal"
@@ -147,7 +149,7 @@
       <p v-if="!videoSource">No video source provided</p>
     </div>
 
-    <b-modal v-model="addMediaModel" title="Add Perfect Sale Media" hide-footer>
+    <b-modal v-model="addMediaModel" title="Add Script Data" hide-footer>
       <form @submit.prevent="submitAddForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -155,6 +157,14 @@
             id="editInputTitle"
             required
           ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Select Type" label-for="selectOption">
+          <b-form-select
+            v-model="selectedOption"
+            id="selectOption"
+            :options="selectOptions"
+            required
+          ></b-form-select>
         </b-form-group>
         <b-form-group label="Upload file" label-for="editInputFile">
           <b-form-file
@@ -243,6 +253,15 @@ export default {
       editedFile: null,
       // Add a property to store the current edited item
       editedItem: null,
+      selectedOption: null, // Add a data property for the selected option
+      selectOptions: [
+        // Define the options for the select field
+        { value: "email", text: "Email" },
+        { value: "call", text: "Call" },
+        { value: "voicemail", text: "VoiceMail" },
+        { value: "sms", text: "Sms" },
+        // Add more options as needed
+      ],
       fields: [
         { key: "title", sortable: true },
         { key: "type", sortable: true },
@@ -276,6 +295,7 @@ export default {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
         let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -353,15 +373,17 @@ export default {
 
       try {
         const addFormData = new FormData();
-        const perfect_sale_id = this.$route.params.id;
-        console.log("perfect sale after add", perfect_sale_id);
+        const script_id = this.$route.params.id;
+        console.log("script data after add", script_id);
         addFormData.append("title", this.addTitle);
-        addFormData.append("perfect_sale_id", perfect_sale_id);
+        addFormData.append("script_id", script_id);
+        addFormData.append("icon_type", this.selectedOption);
+
         if (this.addFile) {
           addFormData.append("file", this.addFile);
         }
         const result = await API.post(
-          endpoints.perfectSales.addPerfectSaleMedia,
+          endpoints.perfectSales.addScriptMedia,
           addFormData
         );
 
@@ -372,27 +394,23 @@ export default {
           this.items = [];
 
           // Fetch updated training media data
-          const perfect_sale_id = this.$route.params.id;
-          await this.fetchScriptData(perfect_sale_id);
+          const script_id = this.$route.params.id;
+          await this.fetchScriptData(script_id);
 
           // Update the component's data with the latest data
           this.getScriptMedia.length > 0
             ? this.setItems(this.getScriptMedia)
             : (this.noItems = "No script data found.");
 
-          Swal.fire(
-            "Success!",
-            "Training media successfully added.",
-            "success"
-          );
+          Swal.fire("Success!", "Script data successfully added.", "success");
         }
       } catch (error) {
         // Handle error
-        console.error("Error adding training media:", error);
+        console.error("Error adding script data:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding training media",
+          text: "An error occurred while adding data",
         });
       }
     },
@@ -400,7 +418,7 @@ export default {
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
-      editedFormData.append("perfect_sale_id", this.$route.params.id);
+      editedFormData.append("script_id", this.$route.params.id);
       if (this.editedFile) {
         editedFormData.append("file", this.editedFile);
       }
@@ -411,16 +429,13 @@ export default {
       console.log("params id", this.$route.params.id);
       try {
         // Attempt to make the API request
-        await API.post(
-          endpoints.perfectSales.editPerfectSaleMedia,
-          editedFormData
-        );
+        await API.post(endpoints.perfectSales.editScriptData, editedFormData);
 
         // Handle success
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Perfect sale data edited successfully",
+          text: "Script data edited successfully",
         }).then(() => {
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
@@ -430,8 +445,8 @@ export default {
         this.showEditModal = false;
 
         // Fetch updated training media data
-        const perfect_sale_id = this.$route.params.id;
-        await this.fetchScriptData(perfect_sale_id);
+        const script_id = this.$route.params.id;
+        await this.fetchScriptData(script_id);
 
         // Update the component's data with the latest data
         this.items = [];
@@ -484,7 +499,7 @@ export default {
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
-        text: "You will not be able to recover this perfect sale data!",
+        text: "You will not be able to recover this script data!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
@@ -495,19 +510,15 @@ export default {
           try {
             // Make an API request to delete the item
             const response = await API.delete(
-              `${endpoints.perfectSales.deletePerfectSaleMedia}/${itemId}`
+              `${endpoints.perfectSales.deleteScriptData}/${itemId}`
             );
 
             if (response.status === 200) {
-              Swal.fire(
-                "Deleted!",
-                "Perfect sale data has been deleted.",
-                "success"
-              );
+              Swal.fire("Deleted!", "Script data has been deleted.", "success");
 
               // Fetch updated training media data
-              const perfect_sale_id = this.$route.params.id;
-              await this.fetchScriptData(perfect_sale_id);
+              const script_id = this.$route.params.id;
+              await this.fetchScriptData(script_id);
 
               // Update the component's data with the latest data
               this.items = [];
@@ -519,7 +530,7 @@ export default {
               // this.$router.go();
             } else {
               // Handle other status codes or error conditions
-              console.error("Error deleting perfect sale data:", response);
+              console.error("Error deleting script data:", response);
               Swal.fire(
                 "Error!",
                 "An error occurred during deletion.",

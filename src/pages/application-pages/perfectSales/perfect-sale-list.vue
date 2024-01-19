@@ -1,7 +1,7 @@
 <template>
   <section class="tables">
     <div class="page-header">
-      <h3 class="page-title">Perfect Sales Call List</h3>
+      <h3 class="page-title">Perfect Sales Pitch List</h3>
       <!-- <router-link :to="{ name: 'add-training' }"> -->
       <b-button
         @click="addTrainingModal"
@@ -437,6 +437,11 @@ export default {
 };
 </script>
 <style scoped>
+.btn-success:not(.btn-light):focus,
+.btn-success:not(.btn-light):active {
+  background: red;
+  border-color: orange;
+}
 .modal video {
   width: 100%;
   height: 100%;

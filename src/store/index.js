@@ -21,6 +21,7 @@ export default new Vuex.Store({
     trainingMedia: [],
     msdSheets: [],
     catalogs: [],
+    orderkit: [],
     products: [],
     salesTips: [],
     allJobs: [],
@@ -30,6 +31,9 @@ export default new Vuex.Store({
     perfectSales: [],
     perfectSaleMedia: [],
     scriptMedia: [],
+    productData: [],
+    productDataDetail: [],
+    productDetail: [],
 
     imageUrl:
       process.env.NODE_ENV === "production"
@@ -54,12 +58,16 @@ export default new Vuex.Store({
     getTrainingMedia: (state) => state.trainingMedia,
     getMsdSheets: (state) => state.msdSheets,
     getCatalogs: (state) => state.catalogs,
+    getOrderKitList: (state) => state.orderkit,
     getVideos: (state) => state.videos,
     getVideosCatVideos: (state) => state.VideosCatVideos,
     getAllVideos: (state) => state.allVideos,
     getPerfectSales: (state) => state.perfectSales,
     getPerfectSaleMedia: (state) => state.perfectSaleMedia,
     getScriptMedia: (state) => state.scriptMedia,
+    getProductData: (state) => state.productData,
+    getProductDetail: (state) => state.productDetail,
+    getProductDataDetail: (state) => state.productDataDetail,
     getSalesTips: (state) => state.salesTips,
     getProducts: (state) => state.products,
     getUserImage: (state, getters) => {
@@ -210,6 +218,16 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+    fetchOrderKitList: async ({ commit }) => {
+      try {
+        let response = await API.get(endpoints.orderKit.fetchAllOrderKit);
+        commit("setOrderKitList", response.data.order_kit);
+        console.log("response data", response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
     fetchVideoCat: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.videos.fetchAllVideoCat);
@@ -223,7 +241,7 @@ export default new Vuex.Store({
     deleteVideo: async ({ commit }, id) => {
       try {
         let response = await API.delete(
-          `${endpoints.videos.deleteVideoCat}/${id}`
+          `${endpoints.videos.deleteVideo}/${id}`
         );
         i;
         console.log(response);
@@ -299,6 +317,30 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+    fetchProductData: async ({ commit }, id) => {
+      try {
+        let response = await API.get(
+          `${endpoints.products.fetchProductData}/${id}`
+        );
+        commit("setProductData", response.data.data);
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+    fetchProductDataDetail: async ({ commit }, id) => {
+      try {
+        let response = await API.get(
+          `${endpoints.products.fetchProductDataDetail}/${id}`
+        );
+        commit("setProductDataDetail", response.data.detail);
+        console.log("product detail mister", response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
     fetchSalesTips: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.salesTips.fetchAllSalesTips);
@@ -319,6 +361,20 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    deleteProduct: async ({ commit }, id) => {
+      try {
+        let response = await API.delete(
+          `${endpoints.products.deleteProduct}/${id}`
+        );
+        i;
+        console.log(response);
+        return true;
+      } catch (error) {
+        return error.response;
+      }
+    },
+
     fetchJobs: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.job.fetchAll);
@@ -341,6 +397,7 @@ export default new Vuex.Store({
       (state.trainingMedia = trainingMedia),
     setMsdSheets: (state, msdSheets) => (state.msdSheets = msdSheets),
     setCatalogs: (state, catalogs) => (state.catalogs = catalogs),
+    setOrderKitList: (state, orderkit) => (state.orderkit = orderkit),
     setVideos: (state, videos) => (state.videos = videos),
     setVideoCatVideos: (state, VideosCatVideos) =>
       (state.VideosCatVideos = VideosCatVideos),
@@ -352,6 +409,12 @@ export default new Vuex.Store({
     setScriptMedia: (state, scriptMedia) => (state.scriptMedia = scriptMedia),
     setSalesTips: (state, salesTips) => (state.salesTips = salesTips),
     setProducts: (state, products) => (state.products = products),
+    setProductData: (state, productData) => (state.productData = productData),
+    setProductDetail(state, data) {
+      state.productDetail = data;
+    },
+    setProductDataDetail: (state, productDataDetail) =>
+      (state.productDataDetail = productDataDetail),
     setJobs: (state, jobs) => (state.allJobs = jobs),
     setUserLogin: (state, data) => {
       state.currentUser = data.user;

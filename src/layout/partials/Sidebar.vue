@@ -50,7 +50,7 @@
         <li class="nav-item">
           <!-- <span class="nav-link" v-b-toggle="'job'"> -->
           <router-link class="nav-link" to="/user/welcome-videos">
-            <span class="menu-title">Welcome Videos</span>
+            <span class="menu-title">Welcome Video</span>
             <!-- <i class="menu-arrow"></i> -->
             <!-- <i class="fas fa-film"></i> -->
           </router-link>
@@ -126,9 +126,9 @@
         <li class="nav-item">
           <!-- <span class="nav-link" v-b-toggle="'faqs'"> -->
           <router-link class="nav-link" to="/perfectSales/perfectSales-list">
-            <span class="menu-title">Perfect Sales Call</span>
-            <i class="menu-arrow"></i>
-            <i class="fas fa-film"></i>
+            <span class="menu-title">Perfect Sales Pitch</span>
+            <!-- <i class="menu-arrow"></i>
+            <i class="fas fa-film"></i> -->
           </router-link>
           <!-- </span> -->
           <!-- <b-collapse accordion="sidebar-accordion" id="faqs"> -->
@@ -159,7 +159,7 @@
         <li class="nav-item">
           <!-- <span class="nav-link" v-b-toggle="'catalog'"> -->
           <router-link class="nav-link" to="/catalogs/catalog-list">
-            <span class="menu-title">Catalog & Brouchers</span>
+            <span class="menu-title">Catalogs & Brouchers</span>
             <!-- <i class="menu-arrow"></i>
             <i class="fas fa-film"></i> -->
           </router-link>
@@ -193,6 +193,11 @@
             </ul>
           </b-collapse> -->
         </li>
+        <!-- <li class="nav-item">
+          <router-link class="nav-link" to="/order/order-kit-list">
+            <span class="menu-title">Order a kit</span>
+          </router-link>
+        </li> -->
 
         <!-- <li class="nav-item">
           <span class="nav-link" v-b-toggle="'apps'">

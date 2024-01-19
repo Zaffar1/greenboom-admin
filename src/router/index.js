@@ -12,10 +12,10 @@ export default new Router({
   linkExactActiveClass: "active",
   scrollBehavior: () => ({ y: 0 }),
   mode: "history",
-  base: "/",
+  base: "/greenboom-portal/",
   routes: [
     {
-      path: "/",
+      path: "/greenboom-portal/",
       beforeEnter: authGuard,
       name: "base",
     },
@@ -233,6 +233,30 @@ export default new Router({
       ],
     },
     {
+      path: "/products",
+      component: layout,
+      children: [
+        {
+          path: "product-data/:id/:data",
+          name: "product-data",
+          component: () =>
+            import("@/pages/application-pages/products/product-data-list"),
+        },
+      ],
+    },
+    {
+      path: "/products",
+      component: layout,
+      children: [
+        {
+          path: "product-detail/:id/:size",
+          name: "product-detail",
+          component: () =>
+            import("@/pages/application-pages/products/product-detail"),
+        },
+      ],
+    },
+    {
       path: "/benDuffy",
       component: layout,
       children: [
@@ -280,7 +304,18 @@ export default new Router({
         },
       ],
     },
-
+    {
+      path: "/order",
+      component: layout,
+      children: [
+        {
+          path: "order-kit-list",
+          name: "order-kit-list",
+          component: () =>
+            import("@/pages/application-pages/orderKit/order-kit-list"),
+        },
+      ],
+    },
     {
       path: "/job",
       component: layout,

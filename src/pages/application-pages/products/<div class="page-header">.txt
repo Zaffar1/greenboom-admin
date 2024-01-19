@@ -1,0 +1,83 @@
+    <div class="page-header">
+      <h3 class="page-title">
+        Product Data of ( {{ this.storedProductData.ProductName }} )
+      </h3>
+    </div>
+
+    <template>
+      <section class="tables">
+        <div></div>
+      </section>
+    </template>
+    <script>
+    import Vue from "vue";
+    import SortedTablePlugin from "vue-sorted-table";
+    import { mapActions, mapGetters } from "vuex";
+    import moment from "moment";
+    import Swal from "sweetalert2";
+    import API from "../../../config/api";
+    import { endpoints } from "../../../config/endpoints";
+    
+    Vue.use(SortedTablePlugin, {
+      ascIcon: '<i class="mdi mdi-arrow-down"></i>',
+      descIcon: '<i class="mdi mdi-arrow-up"></i>',
+    });
+    
+    export default {
+      computed: {},
+      data: function () {
+        return {
+          storedProductData: JSON.parse(localStorage.getItem("productDataDetail")),
+          items: [],
+          noItems: null,
+        };
+      },
+      computed: {
+        ...mapGetters(["getProductDataDetail", "getDefaultImage", "getImageUrl"]),
+        rows() {
+          return this.items.length;
+        },
+      },
+      created() {
+        // Access the ID from the route parameters
+        // const id = this.$route.params.id;
+        // const title = this.$route.params.title;
+        // console.log(this.$route.params.title);
+        // Call the fetchDataById method with the ID
+        // this.fetchDataById(id);
+      },
+      methods: {
+        ...mapActions(["fetchProductDataDetail"]),
+        setItems(data) {
+          data.forEach((element) => {
+            let obj = {};
+            // let baseUrl = "http://localhost:8000/";
+            let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+            obj.id = element.id;
+            obj.created_at = moment(element.created_at).format(
+              "dddd, MMMM Do YYYY"
+            );
+            this.items.push(obj);
+          });
+        },
+    
+        goBack() {
+          // Use Vue Router to navigate back to the previous page
+          this.$router.go(-1); // This will go back one step in the history
+          // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
+        },
+      },
+      async mounted() {
+        const storedProductData = JSON.parse(
+          localStorage.getItem("productDataDetail")
+        );
+        const id = this.$route.params.id;
+        await this.fetchProductDataDetail(id);
+        this.getProductDataDetail.length > 0
+          ? this.setItems(this.getProductDataDetail)
+          : (this.noItems = "No product data found.");
+      },
+    };
+    </script>
+    <style scoped></style>
+    

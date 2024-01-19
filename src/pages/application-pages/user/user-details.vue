@@ -1,36 +1,39 @@
 <template>
-  <div class="user-details-container">
-    <div class="user-details">
-      <h2>User Details</h2>
-      <button @click="goBack">Go Back</button>
-      <div class="user-info">
-        <table>
-          <tr>
-            <td><strong>Name:</strong></td>
-            <td>{{ user.name }}</td>
-          </tr>
-          <tr>
-            <td><strong>Last Name:</strong></td>
-            <td>{{ user.last_name }}</td>
-          </tr>
-          <tr>
-            <td><strong>Email:</strong></td>
-            <td>{{ user.email }}</td>
-          </tr>
-          <tr>
-            <td><strong>Type:</strong></td>
-            <td>{{ user.type }}</td>
-          </tr>
-          <tr>
-            <td><strong>Status:</strong></td>
-            <td>{{ user.status }}</td>
-          </tr>
-          <tr>
-            <td><strong>Register Date:</strong></td>
-            <td>{{ user.created_at | moment("dddd, MMMM Do YYYY") }}</td>
-          </tr>
-          <!-- Add more rows for additional details -->
-        </table>
+  <div>
+    <div class="user-details-container">
+      <div class="user-details">
+        <h2>User Details</h2>
+        <div class="user-info">
+          <button @click="goBack" class="orange-button right-button">
+            Go Back
+          </button>
+          <table>
+            <tr>
+              <td><strong>Name:</strong></td>
+              <td>{{ user.name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Last Name:</strong></td>
+              <td>{{ user.last_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Email:</strong></td>
+              <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+              <td><strong>Type:</strong></td>
+              <td>{{ user.type }}</td>
+            </tr>
+            <tr>
+              <td><strong>Status:</strong></td>
+              <td>{{ user.status }}</td>
+            </tr>
+            <tr>
+              <td><strong>Register Date:</strong></td>
+              <td>{{ user.created_at | moment("dddd, MMMM Do YYYY") }}</td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -60,14 +63,9 @@ export default {
 <style scoped>
 .user-details-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  /* min-height: 30vh; */
-  min-height: auto;
 }
 
 .user-details {
-  max-width: 500px;
   width: 100%;
   background-color: #ffffff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -77,7 +75,7 @@ export default {
 
 h2 {
   color: #333;
-  background-color: #4caf50;
+  background-color: red;
   color: white;
   padding: 15px;
   margin: 0;
@@ -88,16 +86,33 @@ h2 {
   padding: 20px;
 }
 
-.user-info p {
-  margin: 10px 0;
-  font-size: 16px;
+.user-info table {
+  width: 100%;
+  border-collapse: collapse;
 }
-td {
-  padding: 10px;
+
+.user-info tr {
   border-bottom: 1px solid #ddd;
 }
-td:first-child {
+
+.user-info td {
+  padding: 10px;
+}
+
+.user-info td:first-child {
   font-weight: bold;
   width: 30%;
+}
+
+.orange-button {
+  background-color: red;
+  border-color: orange;
+  color: white;
+  float: right; /* Align to the right */
+  margin-top: -40px; /* Adjust the margin to position it correctly */
+}
+
+.right-button {
+  float: right;
 }
 </style>

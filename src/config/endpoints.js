@@ -47,13 +47,20 @@ export const endpoints = {
     editVideoCat: "admin/update-category",
     addVideo: "admin/add-video",
     fetchVideoCatVideos: "admin/video-cat-videos",
-    editVideoCatVideo: "admin/update-video",
+    editVideo: "admin/update-video",
     deleteVideo: "admin/delete-video",
     videoStatus: "admin/video-status",
     fetchAllVideos: "admin/all-videos",
   },
   products: {
     fetchProducts: `admin/all-products`, // GET
+    addProduct: "admin/add-product", //POST
+    deleteProduct: "admin/delete-product", // Delete
+    addProductData: "admin/add-product-data", //POST
+    fetchProductData: "admin/productData", /// GET
+    deleteProductData: "admin/delete-product-data", /// Delete
+    productStatus: "admin/product-status", //// POST
+    fetchProductDataDetail: "admin/productDetails",
   },
 
   perfectSales: {
@@ -68,6 +75,10 @@ export const endpoints = {
     deletePerfectSaleMedia: "admin/delete-perfectSaleMedia",
     perfectSaleMediaStatus: "admin/perfectSaleMedia-status",
     fetchScriptMedia: "admin/script-media",
+    addScriptMedia: "admin/add-script-data",
+    editScriptData: "admin/update-script-data",
+    deleteScriptData: "admin/delete-scriptData",
+    addScript: "admin/add-script",
   },
 
   salesTips: {
@@ -85,6 +96,11 @@ export const endpoints = {
     deleteCatalog: "admin/delete-catalog",
     catalogStatus: "admin/catalog-status",
   },
+
+  orderKit: {
+    fetchAllOrderKit: "admin/all-order-kit",
+  },
+
   // job: {
   //     fetchAll: `job/fetch`, // GET
   // }
