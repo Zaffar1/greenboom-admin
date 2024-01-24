@@ -15,7 +15,8 @@ export default new Router({
   base: "/greenboom-portal/",
   routes: [
     {
-      path: "/greenboom-portal/",
+      path: "/",
+      // path: "/greenboom-portal/",
       beforeEnter: authGuard,
       name: "base",
     },

@@ -66,7 +66,9 @@
                 <router-link
                   :to="{ name: 'user-details', params: { id: data.item.id } }"
                 >
-                  <i class="mr-2 mdi mdi-eye text-muted icon-sm"></i>
+                  <i
+                    class="mr-2 mdi mdi-eye orange-button icon-sm p-2 rounded"
+                  ></i>
                 </router-link>
                 <!-- <i
                   @click="view(data.item.id)"
@@ -79,11 +81,11 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
                 ></i> -->
-                <i
+                <!-- <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
-                  class="mr-2 mdi mdi-delete text-danger icon-sm"
-                ></i>
+                  class="mr-2 mdi orange-button mdi-delete icon-sm p-2 rounded"
+                ></i> -->
                 <span v-html="data.value"></span>
               </template>
             </b-table>
@@ -222,7 +224,7 @@ export default {
           // Toggle the status locally in the items array
           const updatedItems = this.items.map((user) => {
             if (user.id === item.id) {
-              user.status = user.status === "Active" ? "InActive" : "Active";
+              user.status = user.status === "Active" ? "Inactive" : "Active";
             }
             return user;
           });
@@ -230,8 +232,13 @@ export default {
           // Update the items array with the new data
           this.items = updatedItems;
 
-          // Show success message
-          Swal.fire("Success!", "Status successfully changed.", "success");
+          // Show success message based on the new status
+          const successMessage =
+            item.status === "Active"
+              ? "User successfully unblocked."
+              : "User successfully blocked.";
+
+          Swal.fire("Success!", successMessage, "success");
         } else {
           // Handle other status codes or error conditions
           console.error("Error updating user status:", result);
@@ -251,3 +258,10 @@ export default {
   },
 };
 </script>
+<style scoped>
+.orange-button {
+  background-color: #ff002d;
+  /* border-color: orange; */
+  color: white;
+}
+</style>

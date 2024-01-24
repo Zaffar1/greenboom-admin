@@ -153,7 +153,7 @@
         >
           <i
             v-b-tooltip.html.top
-            title="Account Settings"
+            title="Account Details"
             variant="primary"
             class="mdi mdi-account-settings"
           ></i>

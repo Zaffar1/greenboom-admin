@@ -2,8 +2,11 @@
   <section class="tables">
     <div class="card">
       <div class="card-header">
-        <h1 class="card-title">{{ this.detail.product_name }}</h1>
-        <div class="text-right">
+        <div
+          class="text-right d-flex flex-wrap align-items-center justify-content-between p-2"
+        >
+          <!-- <h1 class="card-title">{{ this.detail.product_name }}</h1> -->
+          <h1 style="text-align: left">{{ this.detail.product_name }}</h1>
           <button @click="goBack" class="btn btn-primary orange-button">
             <i class="mdi mdi-arrow-left"></i> Go Back
           </button>
@@ -22,153 +25,214 @@
             </div>
           </div>
           <div class="col-md-8">
-            <h1>{{ this.detail.product_name }} Detail</h1>
-            <br />
+            <h1 class="card-title">{{ this.detail.product_name }} Detail</h1>
+
             <label><b>Size :</b></label>
             {{ this.$route.params.size }}
             <br />
-            <div
-              v-if="this.small?.size[0]?.added_remediation_material == 'yes'"
-            >
-              <label><b>Sku Rem : </b></label>
-              {{ this.small?.title[0]?.sku_rem }}
-              <br />
-              <label><b>Title : </b></label>
-              {{ this.small?.title[0]?.title_remediation }}
-              <br />
-            </div>
-            <label><b>Description : </b></label>
-            {{ this.detail.description }}
-            <br />
-            <label><b>Title : </b></label>
-            {{ this.detail.title }}
-            <br />
-            <div v-if="this.small?.size[0]?.dimensions != null">
-              <label><b>Dimensions :</b></label>
-              {{ this.small?.size[0]?.dimensions }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.absorbency_bag != null">
-              <label><b>Absorbency/Bag :</b></label>
-              {{ this.small?.size[0]?.absorbency_bag }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.absorbency_kit != null">
-              <label><b>Absorbency/Kit :</b></label>
-              {{ this.small?.size[0]?.absorbency_kit }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.absorbency_drum != null">
-              <label><b>Absorbency/Drum :</b></label>
-              {{ this.small?.size[0]?.absorbency_drum }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.absorbency_boom != null">
-              <label><b>Absorbency/Boom :</b></label>
-              {{ this.small?.size[0]?.absorbency_boom }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.absorbency_pillow != null">
-              <label><b>Absorbency/Pillow :</b></label>
-              {{ this.small?.size[0]?.absorbency_pillow }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.absorbency_mat != null">
-              <label><b>Absorbency/Mat :</b></label>
-              {{ this.small?.size[0]?.absorbency_mat }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.absorbency_sock != null">
-              <label><b>Absorbency/Sock :</b></label>
-              {{ this.small?.size[0]?.absorbency_sock }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.added_remediation_material != null">
-              <label><b>Added Remediation Material :</b></label>
-              {{ this.small?.size[0]?.added_remediation_material }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.qty_case != null">
-              <label><b>Qty/Case :</b></label>
-              {{ this.small?.size[0]?.qty_case }}
-              <br />
-            </div>
-            <div v-if="this.small?.size[0]?.capacity != null">
-              <label><b>Capacity :</b></label>
-              {{ this.small?.size[0]?.capacity }}
-              <br />
-            </div>
             <div v-if="this.$route.params.size === 'Small'">
-              <!-- <h3>Small Data</h3> -->
-              <label><b>Product Dimensions(LHW) :</b> </label>
-              {{ small?.dimension[0]?.["product_dimensions(LHW)1"] }}
-              <br />
-              <label><b>Product Dimensions(LHW) :</b> </label>
-              {{ small?.dimension[0]?.["product_dimensions(LHW)2"] }}
-              <br />
-              <label><b>Packaging Dimensions(LHW) :</b> </label>
-              {{ small?.dimension[0]?.["packaging_dimensions(LHW)1"] }}
-              <br />
-              <label><b>Packaging Dimensions(LHW) :</b> </label>
-              {{ small?.dimension[0]?.["packaging_dimensions(LHW)2"] }}
-              <br />
-              <label><b>Weight Product :</b> </label>
-              {{ small?.dimension[0]?.weight_product }}
-              <br />
-            </div>
-            <div v-else-if="this.$route.params.size === 'Medium'">
               <div
-                v-if="this.medium?.size[0]?.added_remediation_material == 'yes'"
+                v-if="this.small?.size[0]?.added_remediation_material == 'yes'"
               >
-                <label><b>Sku Rem :</b> </label>
-                {{ this.medium?.title[0]?.sku_rem }}
+                <label><b>Sku Rem : </b></label>
+                {{ this.small?.title[0]?.sku_rem }}
                 <br />
-                <label><b>Title Rem:</b> </label>
-                {{ this.medium?.title[0]?.title_remediation }}
+                <label><b>Title : </b></label>
+                {{ this.small?.title[0]?.title_remediation }}
                 <br />
               </div>
-              <!-- <label><b>Description : </b></label>
+              <label><b>Description : </b></label>
               {{ this.detail.description }}
               <br />
               <label><b>Title : </b></label>
               {{ this.detail.title }}
-              <br /> -->
+              <br />
+              <div v-if="this.small?.size[0]?.dimensions != null">
+                <label><b>Dimensions :</b></label>
+                {{ this.small?.size[0]?.dimensions }}
+                <br />
+              </div>
+              <div v-else-if="this.small?.size[0]?.absorbency_bag != null">
+                <label><b>Absorbency/Bag :</b></label>
+                {{ this.small?.size[0]?.absorbency_bag }}
+                <br />
+              </div>
+              <div v-else-if="this.small?.size[0]?.absorbency_kit != null">
+                <label><b>Absorbency/Kit :</b></label>
+                {{ this.small?.size[0]?.absorbency_kit }}
+                <br />
+              </div>
+              <div v-else-if="this.small?.size[0]?.absorbency_drum != null">
+                <label><b>Absorbency/Drum :</b></label>
+                {{ this.small?.size[0]?.absorbency_drum }}
+                <br />
+              </div>
+              <div v-else-if="this.small?.size[0]?.absorbency_boom != null">
+                <label><b>Absorbency/Boom :</b></label>
+                {{ this.small?.size[0]?.absorbency_boom }}
+                <br />
+              </div>
+              <div v-else-if="this.small?.size[0]?.absorbency_pillow != null">
+                <label><b>Absorbency/Pillow :</b></label>
+                {{ this.small?.size[0]?.absorbency_pillow }}
+                <br />
+              </div>
+              <div v-else-if="this.small?.size[0]?.absorbency_mat != null">
+                <label><b>Absorbency/Mat :</b></label>
+                {{ this.small?.size[0]?.absorbency_mat }}
+                <br />
+              </div>
+              <div v-else-if="this.small?.size[0]?.absorbency_sock != null">
+                <label><b>Absorbency/Sock :</b></label>
+                {{ this.small?.size[0]?.absorbency_sock }}
+                <br />
+              </div>
+              <div
+                v-if="this.small?.size[0]?.added_remediation_material != null"
+              >
+                <label><b>Added Remediation Material :</b></label>
+                {{ this.small?.size[0]?.added_remediation_material }}
+                <br />
+              </div>
+              <div
+                v-if="
+                  (this.small &&
+                    this.small.size &&
+                    this.small.size[0] &&
+                    this.small.size[0].capacity !== null) ||
+                  this.small.size[0].capacity !== 'undefined'
+                "
+              >
+                <label><b>Capacity :</b></label>
+                {{ this.small.size[0].capacity }}
+                <br />
+              </div>
+              <div v-if="this.small?.size[0]?.qty_case != null">
+                <label><b>Qty/Case :</b></label>
+                {{ this.small?.size[0]?.qty_case }}
+                <br />
+              </div>
+              <div v-if="this.small?.size[0]?.sku_num != null">
+                <label><b>Sku :</b></label>
+                {{ this.small?.size[0]?.sku_num }}
+                <br />
+              </div>
+              <!-- <div v-if="this.$route.params.size === 'Small'"> -->
+              <!-- <h3>Small Data</h3> -->
+              <div
+                v-if="
+                  small?.dimension[0]?.['product_dimensions(LHW)1'] !== null
+                "
+              >
+                <label><b>Product Dimensions(LHW) :</b> </label>
+                {{ small?.dimension[0]?.["product_dimensions(LHW)1"] }}
+                <br />
+              </div>
+              <div
+                v-if="
+                  small?.dimension[0]?.['product_dimensions(LHW)2'] !== null
+                "
+              >
+                <label><b>Product Dimensions(LHW) :</b> </label>
+                {{ small?.dimension[0]?.["product_dimensions(LHW)2"] }}
+                <br />
+              </div>
+              <div
+                v-if="
+                  small?.dimension[0]?.['packaging_dimensions(LHW)1'] !== null
+                "
+              >
+                <label><b>Packaging Dimensions(LHW) :</b> </label>
+                {{ small?.dimension[0]?.["packaging_dimensions(LHW)1"] }}
+                <br />
+              </div>
+              <div
+                v-if="
+                  small?.dimension[0]?.['packaging_dimensions(LHW)2'] !== null
+                "
+              >
+                <label><b>Packaging Dimensions(LHW) :</b> </label>
+                {{ small?.dimension[0]?.["packaging_dimensions(LHW)2"] }}
+                <br />
+              </div>
+              <div v-if="small?.dimension[0]?.weight_product !== null">
+                <label><b>Weight Product :</b> </label>
+                {{ small?.dimension[0]?.weight_product }}
+                <br />
+              </div>
+              <!-- </div> -->
+              <div v-if="small?.dimension[0]?.total_weight_product != null">
+                <label><b>Total Weight Product :</b> </label>
+                {{ small?.dimension[0]?.total_weight_product }}
+                <br />
+              </div>
+              <div v-if="small?.dimension[0]?.total_weight_case != null">
+                <label><b>Total Weight Case :</b> </label>
+                {{ small?.dimension[0]?.total_weight_case }}
+                <br />
+              </div>
+              <div
+                v-if="
+                  small?.dimension[0]?.total_weight_kit !== null ||
+                  small?.dimension[0]?.total_weight_kit !== 'undefined'
+                "
+              >
+                <label><b>Total Weight Kit :</b> </label>
+                {{ small?.dimension[0]?.total_weight_kit }}
+                <br />
+              </div>
+            </div>
+            <div v-else-if="this.$route.params.size === 'Medium'">
+              <!-- <div
+                v-if="this.medium?.size[0]?.added_remediation_material == 'yes'"
+              > -->
+              <div v-if="this.medium?.title[0]?.sku_rem !== null">
+                <label><b>Sku Rem :</b> </label>
+                {{ this.medium?.title[0]?.sku_rem }}
+                <br />
+              </div>
+              <div v-if="this.medium?.title[0]?.title_remediation !== null">
+                <label><b>Title Rem:</b> </label>
+                {{ this.medium?.title[0]?.title_remediation }}
+                <br />
+              </div>
+              <!-- </div> -->
               <div v-if="this.medium?.size[0]?.dimensions != null">
                 <label><b>Dimensions :</b></label>
                 {{ this.medium?.size[0]?.dimensions }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.absorbency_bag != null">
+              <div v-else-if="this.medium?.size[0]?.absorbency_bag != null">
                 <label><b>Absorbency/Bag :</b></label>
                 {{ this.medium?.size[0]?.absorbency_bag }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.absorbency_kit != null">
+              <div v-else-if="this.medium?.size[0]?.absorbency_kit != null">
                 <label><b>Absorbency/Kit :</b></label>
                 {{ this.medium?.size[0]?.absorbency_kit }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.absorbency_drum != null">
+              <div v-else-if="this.medium?.size[0]?.absorbency_drum != null">
                 <label><b>Absorbency/Drum :</b></label>
                 {{ this.medium?.size[0]?.absorbency_drum }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.absorbency_boom != null">
+              <div v-else-if="this.medium?.size[0]?.absorbency_boom != null">
                 <label><b>Absorbency/Boom :</b></label>
                 {{ this.medium?.size[0]?.absorbency_boom }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.absorbency_pillow != null">
+              <div v-else-if="this.medium?.size[0]?.absorbency_pillow != null">
                 <label><b>Absorbency/Pillow :</b></label>
                 {{ this.medium?.size[0]?.absorbency_pillow }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.absorbency_mat != null">
+              <div v-else-if="this.medium?.size[0]?.absorbency_mat != null">
                 <label><b>Absorbency/Mat :</b></label>
                 {{ this.medium?.size[0]?.absorbency_mat }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.absorbency_sock != null">
+              <div v-else-if="this.medium?.size[0]?.absorbency_sock != null">
                 <label><b>Absorbency/Sock :</b></label>
                 {{ this.medium?.size[0]?.absorbency_sock }}
                 <br />
@@ -185,29 +249,84 @@
                 {{ this.medium?.size[0]?.qty_case }}
                 <br />
               </div>
-              <div v-if="this.medium?.size[0]?.capacity != null">
-                <label><b>Capacity :</b></label>
-                {{ this.medium?.size[0]?.capacity }}
+              <div v-if="this.medium?.size[0]?.sku_num != null">
+                <label><b>Sku :</b></label>
+                {{ this.medium?.size[0]?.sku_num }}
                 <br />
               </div>
-              <div v-if="this.$route.params.size === 'Medium'">
-                <!-- <h3>medium Data</h3> -->
+              <div
+                v-if="
+                  (this.medium &&
+                    this.medium.size &&
+                    this.medium.size[0] &&
+                    this.medium.size[0].capacity !== null) ||
+                  this.medium.size[0].capacity !== 'undefined'
+                "
+              >
+                <label><b>Capacity :</b></label>
+                {{ this.medium.size[0].capacity }}
+                <br />
+              </div>
+              <!-- <div v-if="this.$route.params.size === 'Medium'"> -->
+              <!-- <h3>medium Data</h3> -->
+              <div
+                v-if="
+                  medium?.dimension[0]?.['product_dimensions(LHW)1'] !== null
+                "
+              >
                 <label><b>Product Dimensions(LHW) :</b> </label>
                 {{ medium?.dimension[0]?.["product_dimensions(LHW)1"] }}
                 <br />
+              </div>
+              <div
+                v-if="
+                  medium?.dimension[0]?.['product_dimensions(LHW)2'] !== null
+                "
+              >
                 <label><b>Product Dimensions(LHW) :</b> </label>
                 {{ medium?.dimension[0]?.["product_dimensions(LHW)2"] }}
                 <br />
+              </div>
+              <div
+                v-if="
+                  medium?.dimension[0]?.['packaging_dimensions(LHW)1'] !== null
+                "
+              >
                 <label><b>Packaging Dimensions(LHW) :</b> </label>
                 {{ medium?.dimension[0]?.["packaging_dimensions(LHW)1"] }}
                 <br />
+              </div>
+              <div
+                v-if="
+                  medium?.dimension[0]?.['packaging_dimensions(LHW)2'] !== null
+                "
+              >
                 <label><b>Packaging Dimensions(LHW) :</b> </label>
                 {{ medium?.dimension[0]?.["packaging_dimensions(LHW)2"] }}
                 <br />
+              </div>
+              <div v-if="medium?.dimension[0]?.weight_product !== null">
                 <label><b>Weight Product :</b> </label>
                 {{ medium?.dimension[0]?.weight_product }}
                 <br />
               </div>
+              <!-- </div> -->
+              <div v-if="medium?.dimension[0]?.total_weight_product != null">
+                <label><b>Total Weight Product :</b> </label>
+                {{ medium?.dimension[0]?.total_weight_product }}
+                <br />
+              </div>
+              <div v-if="medium?.dimension[0]?.total_weight_case != null">
+                <label><b>Total Weight Case :</b> </label>
+                {{ medium?.dimension[0]?.total_weight_case }}
+                <br />
+              </div>
+              <div v-if="medium?.dimension[0]?.total_weight_kit != null">
+                <label><b>Total Weight Kit :</b> </label>
+                {{ medium?.dimension[0]?.total_weight_kit }}
+                <br />
+              </div>
+              <!-- </div> -->
             </div>
 
             <div v-else-if="this.$route.params.size === 'Large'">
@@ -232,37 +351,37 @@
                 {{ this.large?.size[0]?.dimensions }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.absorbency_bag != null">
+              <div v-else-if="this.large?.size[0]?.absorbency_bag != null">
                 <label><b>Absorbency/Bag :</b></label>
                 {{ this.large?.size[0]?.absorbency_bag }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.absorbency_kit != null">
+              <div v-else-if="this.large?.size[0]?.absorbency_kit != null">
                 <label><b>Absorbency/Kit :</b></label>
                 {{ this.large?.size[0]?.absorbency_kit }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.absorbency_drum != null">
+              <div v-else-if="this.large?.size[0]?.absorbency_drum != null">
                 <label><b>Absorbency/Drum :</b></label>
                 {{ this.large?.size[0]?.absorbency_drum }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.absorbency_boom != null">
+              <div v-else-if="this.large?.size[0]?.absorbency_boom != null">
                 <label><b>Absorbency/Boom :</b></label>
                 {{ this.large?.size[0]?.absorbency_boom }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.absorbency_pillow != null">
+              <div v-else-if="this.large?.size[0]?.absorbency_pillow != null">
                 <label><b>Absorbency/Pillow :</b></label>
                 {{ this.large?.size[0]?.absorbency_pillow }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.absorbency_mat != null">
+              <div v-else-if="this.large?.size[0]?.absorbency_mat != null">
                 <label><b>Absorbency/Mat :</b></label>
                 {{ this.large?.size[0]?.absorbency_mat }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.absorbency_sock != null">
+              <div v-else-if="this.large?.size[0]?.absorbency_sock != null">
                 <label><b>Absorbency/Sock :</b></label>
                 {{ this.large?.size[0]?.absorbency_sock }}
                 <br />
@@ -274,53 +393,92 @@
                 {{ this.large?.size[0]?.added_remediation_material }}
                 <br />
               </div>
+              <div
+                v-if="
+                  (this.large &&
+                    this.large.size &&
+                    this.large.size[0] &&
+                    this.large.size[0].capacity !== null) ||
+                  this.large.size[0].capacity !== 'undefined'
+                "
+              >
+                <label><b>Capacity :</b></label>
+                {{ this.large.size[0].capacity }}
+                <br />
+              </div>
               <div v-if="this.large?.size[0]?.qty_case != null">
                 <label><b>Qty/Case :</b></label>
                 {{ this.large?.size[0]?.qty_case }}
                 <br />
               </div>
-              <div v-if="this.large?.size[0]?.capacity != null">
-                <label><b>Capacity :</b></label>
-                {{ this.large?.size[0]?.capacity }}
+              <div v-if="this.large?.size[0]?.sku_num != null">
+                <label><b>Sku :</b></label>
+                {{ this.large?.size[0]?.sku_num }}
                 <br />
               </div>
-              <div v-if="this.$route.params.size === 'Large'">
-                <!-- <h3>large Data</h3> -->
+              <!-- <div v-if="this.$route.params.size === 'Large'"> -->
+              <!-- <h3>large Data</h3> -->
+              <div
+                v-if="
+                  large?.dimension[0]?.['product_dimensions(LHW)1'] !== null
+                "
+              >
                 <label><b>Product Dimensions(LHW) :</b> </label>
                 {{ large?.dimension[0]?.["product_dimensions(LHW)1"] }}
                 <br />
+              </div>
+              <div
+                v-if="
+                  large?.dimension[0]?.['product_dimensions(LHW)2'] !== null
+                "
+              >
                 <label><b>Product Dimensions(LHW) :</b> </label>
                 {{ large?.dimension[0]?.["product_dimensions(LHW)2"] }}
                 <br />
+              </div>
+              <div
+                v-if="
+                  large?.dimension[0]?.['packaging_dimensions(LHW)1'] !== null
+                "
+              >
                 <label><b>Packaging Dimensions(LHW) :</b> </label>
                 {{ large?.dimension[0]?.["packaging_dimensions(LHW)1"] }}
                 <br />
+              </div>
+              <div
+                v-if="
+                  large?.dimension[0]?.['packaging_dimensions(LHW)2'] !== null
+                "
+              >
                 <label><b>Packaging Dimensions(LHW) :</b> </label>
                 {{ large?.dimension[0]?.["packaging_dimensions(LHW)2"] }}
                 <br />
+              </div>
+              <div v-if="large?.dimension[0]?.weight_product !== null">
                 <label><b>Weight Product :</b> </label>
                 {{ large?.dimension[0]?.weight_product }}
+                <br />
+              </div>
+              <!-- </div> -->
+              <div v-if="large?.dimension[0]?.total_weight_product !== null">
+                <label><b>Total Weight Product :</b> </label>
+                {{ large?.dimension[0]?.total_weight_product }}
+                <br />
+              </div>
+              <div v-if="large?.dimension[0]?.total_weight_case !== null">
+                <label><b>Total Weight Case :</b> </label>
+                {{ large?.dimension[0]?.total_weight_case }}
+                <br />
+              </div>
+              <div v-if="large?.dimension[0]?.total_weight_kit !== null">
+                <label><b>Total Weight Kit :</b> </label>
+                {{ large?.dimension[0]?.total_weight_kit }}
                 <br />
               </div>
             </div>
 
             <div v-else>
               <h3>No Data Found for Size: {{ size }}</h3>
-            </div>
-            <div v-if="this.small?.dimension[0]?.total_weight_product != null">
-              <label><b>Total Weight Product :</b> </label>
-              {{ small?.dimension[0]?.total_weight_product }}
-              <br />
-            </div>
-            <div v-if="this.small?.dimension[0]?.total_weight_case != null">
-              <label><b>Total Weight Case :</b> </label>
-              {{ small?.dimension[0]?.total_weight_case }}
-              <br />
-            </div>
-            <div v-if="this.small?.dimension[0]?.total_weight_kit != null">
-              <label><b>Total Weight Kit :</b> </label>
-              {{ small?.dimension[0]?.total_weight_kit }}
-              <br />
             </div>
           </div>
         </div>
@@ -442,16 +600,22 @@ h1 {
   color: #333;
   background-color: red;
   color: white;
-  padding: 15px;
+  /* padding: 15px; */
   margin: 0;
   border-radius: 8px 8px 0 0;
 }
 .card-title {
-  color: white;
+  color: #ff002d;
   font-size: x-large;
+  background-color: transparent !important;
+  padding: 0;
+  padding: 10px 0;
+  font-weight: 500;
+  font-size: 26px;
+  margin: 0;
 }
 .card-header {
-  background-color: red;
+  background-color: #ff002d;
   color: white;
 }
 </style>

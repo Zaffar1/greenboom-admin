@@ -82,16 +82,16 @@
                     :ref="'btn' + data.index"
                     class="mr-2 mdi mdi-eye text-muted icon-sm"
                   ></i> -->
-                <i
+                <!-- <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
-                ></i>
+                ></i> -->
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
-                  class="mr-2 mdi mdi-delete text-danger icon-sm"
+                  class="mr-2 mdi orange-button mdi-delete icon-sm p-2 rounded"
                 ></i>
                 <span v-html="data.value"></span>
               </template>
@@ -666,7 +666,7 @@ export default {
 <style scoped>
 .btn-success:not(.btn-light):focus,
 .btn-success:not(.btn-light):active {
-  background: red;
+  background: #ff002d;
   border-color: orange;
 }
 .modal video {
@@ -722,7 +722,7 @@ export default {
 }
 
 .orange-button {
-  background-color: red;
+  background-color: #ff002d;
   border-color: orange;
   color: white;
 }

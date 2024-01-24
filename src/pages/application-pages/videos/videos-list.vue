@@ -94,7 +94,7 @@
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
-                  class="mr-2 mdi mdi-delete text-danger icon-sm"
+                  class="mr-2 mdi orange-button mdi-delete icon-sm p-2 rounded"
                 ></i>
                 <span v-html="data.value"></span>
               </template>

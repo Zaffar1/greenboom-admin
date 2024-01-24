@@ -78,16 +78,18 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
                 ></i> -->
-                <i
+                <!--  Edit  -->
+                <!-- <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
-                ></i>
+                ></i> -->
+                <!-- End edit -->
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
-                  class="mr-2 mdi mdi-delete text-danger icon-sm"
+                  class="mr-2 mdi orange-button mdi-delete icon-sm p-2 rounded"
                 ></i>
                 <span v-html="data.value"></span>
               </template>
@@ -153,14 +155,22 @@
             id="editInputFile"
             :state="Boolean(addFile)"
             placeholder="Choose a file..."
+            accept=".mp4, .mov, .avi"
+            @change="handleFileChange"
             required
+            ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success orange-button"
+          :disabled="isLoadingAddButton"
         >
+          <span v-if="isLoadingAddButton">Uploading...</span>
+          <span v-else>Upload</span>
+        </b-button>
       </form>
     </b-modal>
 
@@ -215,6 +225,7 @@ Vue.use(SortedTablePlugin, {
 export default {
   data: function () {
     return {
+      isLoadingAddButton: false,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -291,9 +302,31 @@ export default {
       this.addFile = null;
       this.addWelcomeVideoModel = true;
     },
+    handleFileChange() {
+      const allowedFormats = [
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+      ];
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
 
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid video file (mp4, mov, avi).",
+          });
+        }
+      }
+    },
     async submitAddForm() {
       try {
+        this.isLoadingAddButton = true;
         const addFormData = new FormData();
         addFormData.append("title", this.addTitle);
         addFormData.append("description", this.addDescription);
@@ -329,6 +362,8 @@ export default {
           title: "Error",
           text: "An error occurred while adding welcome video",
         });
+      } finally {
+        this.isLoadingAddButton = false; // Disable loading state
       }
     },
 
@@ -488,7 +523,7 @@ export default {
 <style scoped>
 .btn-success:not(.btn-light):focus,
 .btn-success:not(.btn-light):active {
-  background: red;
+  background: #ff002d;
   border-color: orange;
 }
 .modal video {
@@ -531,7 +566,7 @@ export default {
 }
 
 .orange-button {
-  background-color: red;
+  background-color: #ff002d;
   border-color: orange;
   color: white;
 }

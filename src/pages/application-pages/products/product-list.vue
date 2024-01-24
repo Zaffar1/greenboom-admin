@@ -29,7 +29,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search User"
+                placeholder="Search Product"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -104,7 +104,7 @@
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
-                  class="mr-2 mdi mdi-delete text-danger icon-sm"
+                  class="mr-2 mdi orange-button mdi-delete icon-sm p-2 rounded"
                 ></i>
                 <span v-html="data.value"></span>
               </template>
@@ -114,12 +114,9 @@
               <template #cell(ProductData)="data">
                 <button
                   @click="viewMedia(data.item)"
-                  class="btn btn-primary orange-button"
+                  class="btn btn-secondary orange-button"
                 >
-                  <i
-                    class="mr-2 mdi mdi-eye text-muted icon-sm orange-button"
-                  ></i
-                  >View
+                  <i class="mr-2 mdi mdi-eye icon-sm orange-button"></i>View
                 </button>
               </template>
             </b-table>
@@ -517,7 +514,7 @@ export default {
 <style scoped>
 .btn-success:not(.btn-light):focus,
 .btn-success:not(.btn-light):active {
-  background: red;
+  background: #ff002d;
   border-color: orange;
 }
 .modal video {
@@ -546,7 +543,7 @@ export default {
 }
 
 .orange-button {
-  background-color: red;
+  background-color: #ff002d;
   border-color: orange;
   color: white;
 }

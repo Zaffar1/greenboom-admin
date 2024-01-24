@@ -2,11 +2,13 @@
   <div>
     <div class="user-details-container">
       <div class="user-details">
-        <h2>User Details</h2>
-        <div class="user-info">
-          <button @click="goBack" class="orange-button right-button">
-            Go Back
+        <div class="card-header">
+          <h2>User Details</h2>
+          <button @click="goBack" class="btn btn-primary orange-button">
+            <i class="mdi mdi-arrow-left"></i> Go Back
           </button>
+        </div>
+        <div class="user-info">
           <table>
             <tr>
               <td><strong>Name:</strong></td>
@@ -73,13 +75,15 @@ export default {
   overflow: hidden;
 }
 
-h2 {
-  color: #333;
+.card-header {
   background-color: red;
   color: white;
   padding: 15px;
   margin: 0;
   border-radius: 8px 8px 0 0;
+}
+.card-header h2 {
+  margin: 0;
 }
 
 .user-info {

@@ -16,13 +16,13 @@
                 getCurrentUser.type
               }}</span>
             </div>
-            <i
+            <!-- <i
               class="mdi mdi-bookmark-check text-success nav-profile-badge"
-            ></i>
+            ></i> -->
           </a>
         </li>
 
-        <li class="nav-item" v-on:click="collapseAll">
+        <li class="nav-item">
           <router-link class="nav-link" to="/">
             <span class="menu-title">Dashboard</span>
             <i class="mdi mdi-home menu-icon"></i>
@@ -53,6 +53,7 @@
             <span class="menu-title">Welcome Video</span>
             <!-- <i class="menu-arrow"></i> -->
             <!-- <i class="fas fa-film"></i> -->
+            <i class="mdi mdi-video menu-icon"></i>
           </router-link>
           <!-- </span> -->
           <!-- <b-collapse accordion="sidebar-accordion" id="job">
@@ -70,6 +71,8 @@
           <!-- <span class="nav-link" v-b-toggle="'training'"> -->
           <router-link class="nav-link" to="/user/training-list">
             <span class="menu-title">Training</span>
+            <i class="mdi mdi-book menu-icon"></i>
+            <!-- <i class="mdi mdi-school menu-icon"></i> -->
             <!-- <i class="menu-arrow"></i> -->
             <!-- <i class="fas fa-film"></i> -->
           </router-link>
@@ -89,6 +92,7 @@
           <!-- <span class="nav-link" v-b-toggle="'sheets'"> -->
           <router-link class="nav-link" to="/user/msds-sheets-list">
             <span class="menu-title">MSDS Sheets</span>
+            <i class="mdi mdi-file-document menu-icon"></i>
             <!-- <i class="menu-arrow"></i> -->
             <!-- <i class="fas fa-film"></i> -->
           </router-link>
@@ -110,6 +114,7 @@
             <span class="menu-title">Video</span>
             <!-- <i class="menu-arrow"></i>
             <i class="fas fa-film"></i> -->
+            <i class="mdi mdi-video menu-icon"></i>
           </router-link>
           <!-- </span> -->
           <!-- <b-collapse accordion="sidebar-accordion" id="video">
@@ -127,6 +132,7 @@
           <!-- <span class="nav-link" v-b-toggle="'faqs'"> -->
           <router-link class="nav-link" to="/perfectSales/perfectSales-list">
             <span class="menu-title">Perfect Sales Pitch</span>
+            <i class="mdi mdi-bullhorn menu-icon"></i>
             <!-- <i class="menu-arrow"></i>
             <i class="fas fa-film"></i> -->
           </router-link>
@@ -162,9 +168,10 @@
             <span class="menu-title">Catalogs & Brouchers</span>
             <!-- <i class="menu-arrow"></i>
             <i class="fas fa-film"></i> -->
+            <i class="mdi mdi-book-multiple menu-icon"></i>
           </router-link>
           <!-- </span> -->
-          <b-collapse accordion="sidebar-accordion" id="catalog">
+          <!-- <b-collapse accordion="sidebar-accordion" id="catalog">
             <ul class="nav flex-column sub-menu">
               <li class="nav-item">
                 <router-link class="nav-link" to="/catalogs/catalog-list"
@@ -172,13 +179,14 @@
                 >
               </li>
             </ul>
-          </b-collapse>
+          </b-collapse> -->
         </li>
 
         <li class="nav-item">
           <!-- <span class="nav-link" v-b-toggle="'product'"> -->
           <router-link class="nav-link" to="/user/product-list">
             <span class="menu-title">Products</span>
+            <i class="mdi mdi-package-variant-closed menu-icon"></i>
             <!-- <i class="menu-arrow"></i>
             <i class="fas fa-film"></i> -->
             <!-- </span> -->
@@ -626,7 +634,7 @@ export default {
   },
   watch: {
     $route() {
-      document.querySelector("#sidebar").classList.toggle("active");
+      document.querySelector("#sidebar ul li a").classList.toggle("active");
     },
   },
 };

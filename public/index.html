@@ -1,15 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.jpg">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="<%= BASE_URL %>untitled.png" />
     <title>GreenBoom Portal</title>
+    <style>
+      .btn-secondary:not(.btn-light):focus,
+      .btn-secondary:not(.btn-light):active,
+      .btn-primary:not(.btn-light):focus,
+      .custom-wizard .wizard__body__actions a:not(.btn-light):focus,
+      .btn-primary:not(.btn-light):active,
+      .custom-wizard .wizard__body__actions a:not(.btn-light):active,
+      .btn-success:not(.btn-light):focus,
+      .btn-success:not(.btn-light):active,
+      div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
+        background: #ff002d !important;
+        border-color: #000000;
+        color: white !important;
+        outline: none;
+        box-shadow: none !important;
+        opacity: 0.8;
+      }
+      .btn-secondary {
+        background-color: #6c757d;
+        color: #fff;
+        border: 1px solid #6c757d;
+        padding: 10px 15px !important;
+        border-radius: 5px !important;
+        cursor: pointer;
+      }
+      .pagination .page-item.active .page-link,
+      .pagination .page-item:active .page-link,
+      .pagination .page-item:focus .page-link,
+      .pagination .page-item:hover .page-link {
+        background: #ff002d !important;
+        border-color: #ff002d !important;
+        color: #ffffff;
+      }
+      .page-link:focus {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+      .sidebar .nav .nav-item .nav-link.active .menu-title,
+      .sidebar .nav .nav-item .nav-link.active i {
+        color: #ff002d !important;
+      }
+    </style>
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but purple-vue-pro-new doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong
+        >We're sorry but purple-vue-pro-new doesn't work properly without
+        JavaScript enabled. Please enable it to continue.</strong
+      >
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->

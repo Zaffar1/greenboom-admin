@@ -3,9 +3,9 @@
     <div class="page-header">
       <h3 class="page-title">Training List</h3>
       <!-- <router-link :to="{ name: 'add-training' }"> -->
-      <!-- <b-button @click="addTrainingModal" variant="success" class="mr-2 orange-button">
+      <b-button @click="addTrainingModal" class="mr-2 orange-button">
         <i class="mdi mdi-plus"></i> Add Training
-      </b-button> -->
+      </b-button>
       <!-- </router-link> -->
       <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -76,28 +76,25 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
                 ></i> -->
-                <i
+                <!-- <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil text-muted icon-sm"
-                ></i>
+                  class="mr-2 mdi mdi-pencil btn orange-button icon-sm"
+                ></i> -->
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
-                  class="mr-2 mdi mdi-delete text-danger icon-sm"
+                  class="mr-2 mdi orange-button mdi-delete icon-sm p-2 rounded"
                 ></i>
                 <span v-html="data.value"></span>
               </template>
               <template #cell(TrainingMedia)="data">
                 <button
                   @click="viewMedia(data.item.TrainingMedia)"
-                  class="btn btn-primary orange-button"
+                  class="btn btn-secondary orange-button"
                 >
-                  <i
-                    class="mr-2 mdi mdi-eye text-muted icon-sm orange-button"
-                  ></i
-                  >View
+                  <i class="mr-2 mdi mdi-eye icon-sm orange-button"></i>View
                 </button>
               </template>
             </b-table>
@@ -477,7 +474,7 @@ export default {
 }
 
 .orange-button {
-  background-color: red;
+  background-color: #ff002d;
   border-color: orange;
   color: white;
 }

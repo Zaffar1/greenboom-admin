@@ -8,18 +8,19 @@
             <div class="col-xl-4 col-lg-6 mx-auto">
               <div class="auth-form-light text-left p-5">
                 <div class="brand-logo">
-                  <!-- <img src="../../assets/images/supportsnap-logo2.png"> -->
-                  <h1
+                  <img
+                    src="/untitled.png"
+                    alt="Green Boom Logo"
                     style="
-                      text-align: center;
-                      color: cadetblue;
-                      font-family: Arial, Helvetica, sans-serif;
+                      width: 100%;
+                      max-width: 200px;
+                      border-radius: 10px;
+                      display: block;
+                      margin: 0 auto;
                     "
-                  >
-                    Green Boom
-                  </h1>
+                  />
                 </div>
-                <h4>Hello! let's get started</h4>
+                <h4 style="color: #ff1d2d">Hello! Let's get started</h4>
                 <h6 class="font-weight-light">Log in to continue.</h6>
                 <form @submit.prevent="login" class="pt-3">
                   <div class="form-group">
@@ -44,7 +45,13 @@
                   </div>
                   <div class="mt-3">
                     <button
-                      class="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+                      class="btn btn-block btn-lg"
+                      style="
+                        background-color: #ff1d2d;
+                        color: white;
+                        border: 1px solid #ff1d2d;
+                        border-radius: 5px;
+                      "
                     >
                       LOG IN
                     </button>
@@ -52,19 +59,17 @@
                 </form>
                 <br />
                 <button
-                  class="btn btn-block btn-gradient-secondary"
+                  class="btn btn-block forgot_button"
                   @click="forgotPassword"
+                  
                 >
-                  <!-- <a href="">Forgot Password</a> -->
                   Forgot Password
                 </button>
               </div>
             </div>
           </div>
         </div>
-        <!-- content-wrapper ends -->
       </div>
-      <!-- page-body-wrapper ends -->
     </div>
   </section>
 </template>
@@ -109,3 +114,19 @@ export default {
   async mounted() {},
 };
 </script>
+<style scoped>
+button.btn.btn-block.btn-lg:hover {
+  background-color: #fff !important;
+  color: #ff1d2d !important;
+}
+
+
+button.btn.btn-block.forgot_button {
+    border: 1px solid #ff002d;
+    color: #ff002d;
+}
+button.btn.btn-block.forgot_button:hover {
+    background-color: #ff002d;
+    color: #fff;
+}
+</style>
