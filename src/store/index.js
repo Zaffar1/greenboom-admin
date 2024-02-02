@@ -221,7 +221,7 @@ export default new Vuex.Store({
     fetchOrderKitList: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.orderKit.fetchAllOrderKit);
-        commit("setOrderKitList", response.data.order_kit);
+        commit("setOrderKitList", response.data.kit_data);
         console.log("response data", response);
         return true;
       } catch (error) {
@@ -311,7 +311,7 @@ export default new Vuex.Store({
           `${endpoints.perfectSales.fetchScriptMedia}/${id}`
         );
         commit("setScriptMedia", response.data.data);
-        console.log(response);
+        console.log("scriptmedia", response);
         return true;
       } catch (error) {
         return error.response;

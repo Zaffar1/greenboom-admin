@@ -98,7 +98,13 @@ export const endpoints = {
   },
 
   orderKit: {
-    fetchAllOrderKit: "admin/all-order-kit",
+    fetchAllOrderKit: "admin/customer-kit-list",
+    // fetchAllOrderKit: "admin/all-order-kit",
+    deleteKitData: "admin/delete-kit",
+    fetchKitDetail: "admin/kit-detail",
+  },
+  faqs: {
+    addFaq: "admin/add-faq",
   },
 
   // job: {

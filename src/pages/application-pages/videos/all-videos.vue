@@ -149,14 +149,22 @@
             id="editInputFile"
             :state="Boolean(addFile)"
             placeholder="Choose a file..."
+            accept=".mp4, .mov, .avi"
+            @change="handleFileChange"
             required
+            ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success orange-button"
+          :disabled="isLoadingAddButton"
         >
+          <span v-if="isLoadingAddButton">Uploading...</span>
+          <span v-else>Upload</span>
+        </b-button>
       </form>
     </b-modal>
 
@@ -211,6 +219,7 @@ Vue.use(SortedTablePlugin, {
 export default {
   data: function () {
     return {
+      isLoadingAddButton: false,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -286,9 +295,36 @@ export default {
       this.addFile = null;
       this.addVideoModel = true;
     },
+    resetFileInput() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef.$el.querySelector("input[type=file]").value = "";
+    },
+    handleFileChange() {
+      const allowedFormats = [
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+      ];
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
 
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid video file (mp4, mov, avi).",
+          });
+        }
+      }
+    },
     async submitAddForm() {
       try {
+        this.isLoadingAddButton = true;
         const addFormData = new FormData();
         addFormData.append("title", this.addTitle);
         addFormData.append("description", this.addDescription);
@@ -299,7 +335,7 @@ export default {
 
         if (result.status === 200) {
           this.addVideoModel = false; // Close the modal after success
-
+          this.isLoadingAddButton = false;
           // Clear the items array before adding new data
           this.items = [];
 
@@ -319,8 +355,10 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding video",
+          text: "Unknown fomat to add welcome video",
         });
+      } finally {
+        this.isLoadingAddButton = false; // Disable loading state
       }
     },
 

@@ -1,12 +1,12 @@
 <template>
   <div>
+    <button @click="goBack" class="btn btn-primary orange-button">
+      <i class="mdi mdi-arrow-left"></i> Go Back
+    </button>
     <div class="user-details-container">
       <div class="user-details">
         <div class="card-header">
           <h2>User Details</h2>
-          <button @click="goBack" class="btn btn-primary orange-button">
-            <i class="mdi mdi-arrow-left"></i> Go Back
-          </button>
         </div>
         <div class="user-info">
           <table>
@@ -54,9 +54,7 @@ export default {
   },
   methods: {
     goBack() {
-      // Use Vue Router to navigate back to the previous page
-      this.$router.go(-1); // This will go back one step in the history
-      // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
+      this.$router.go(-1);
     },
   },
 };
@@ -65,10 +63,12 @@ export default {
 <style scoped>
 .user-details-container {
   display: flex;
+  justify-content: center; /* Center the user details card */
+  margin-top: 20px; /* Add margin for better spacing */
 }
 
 .user-details {
-  width: 100%;
+  width: 70%; /* Adjust the width as needed */
   background-color: #ffffff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -79,9 +79,9 @@ export default {
   background-color: red;
   color: white;
   padding: 15px;
-  margin: 0;
   border-radius: 8px 8px 0 0;
 }
+
 .card-header h2 {
   margin: 0;
 }
@@ -112,11 +112,7 @@ export default {
   background-color: red;
   border-color: orange;
   color: white;
-  float: right; /* Align to the right */
-  margin-top: -40px; /* Adjust the margin to position it correctly */
-}
-
-.right-button {
-  float: right;
+  margin-top: 20px; /* Add margin for better spacing */
+  margin-left: 10px;
 }
 </style>

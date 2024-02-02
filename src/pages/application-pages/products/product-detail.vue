@@ -1,15 +1,12 @@
 <template>
-  <section class="tables">
+  <section class="product-details">
+    <button @click="goBack" class="btn btn-primary orange-button">
+      <i class="mdi mdi-arrow-left"></i> Go Back
+    </button>
     <div class="card">
       <div class="card-header">
-        <div
-          class="text-right d-flex flex-wrap align-items-center justify-content-between p-2"
-        >
-          <!-- <h1 class="card-title">{{ this.detail.product_name }}</h1> -->
-          <h1 style="text-align: left">{{ this.detail.product_name }}</h1>
-          <button @click="goBack" class="btn btn-primary orange-button">
-            <i class="mdi mdi-arrow-left"></i> Go Back
-          </button>
+        <div class="header-content">
+          <h1>{{ detail.product_name }} Detail</h1>
         </div>
       </div>
       <div class="card-body">
@@ -487,25 +484,6 @@
   </section>
 </template>
 
-<style scoped>
-.card {
-  border: 1px solid #e2e2e2;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 20px;
-}
-
-.card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e2e2e2;
-  padding: 10px;
-}
-
-.card-body {
-  padding: 20px;
-}
-</style>
-
 <script>
 import Vue from "vue";
 import SortedTablePlugin from "vue-sorted-table";
@@ -604,6 +582,9 @@ h1 {
   margin: 0;
   border-radius: 8px 8px 0 0;
 }
+.card-body {
+  padding: 20px;
+}
 .card-title {
   color: #ff002d;
   font-size: x-large;
@@ -617,5 +598,11 @@ h1 {
 .card-header {
   background-color: #ff002d;
   color: white;
+}
+.card {
+  border: 1px solid #e2e2e2;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 20px;
 }
 </style>

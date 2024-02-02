@@ -1,5 +1,8 @@
 <template>
   <section class="tables">
+    <button @click="goBack" class="btn btn-primary orange-button">
+      <i class="mdi mdi-arrow-left"></i> Go Back
+    </button>
     <div class="page-header">
       <h3 class="page-title">
         Product Data of ( {{ this.storedProductData.ProductName }} )
@@ -13,14 +16,14 @@
           class="mr-2 orange-button"
           ><i class="mdi mdi-plus"></i>Add Product Data</b-button
         >
-        <button @click="goBack" class="btn btn-primary orange-button">
-          <i class="mdi mdi-arrow-left"></i> Go Back
-        </button>
       </div>
     </div>
     <div>
       <h3>Description:</h3>
-      <p v-html="breakLineAfterWords(storedProductData.description, 15)"></p>
+      {{ this.storedProductData.description }}
+      <p
+        v-html="breakLineAfterWords(this.storedProductData.description, 15)"
+      ></p>
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -31,7 +34,9 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                :placeholder="'Search ' + this.$route.params.data + ' Data'"
+                :placeholder="
+                  'Search ' + this.storedProductData.ProductName + ' Data'
+                "
                 id="user-search"
                 style="padding: 10px"
               ></b-input>

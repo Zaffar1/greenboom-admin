@@ -302,6 +302,10 @@ export default {
       this.addFile = null;
       this.addWelcomeVideoModel = true;
     },
+    resetFileInput() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef.$el.querySelector("input[type=file]").value = "";
+    },
     handleFileChange() {
       const allowedFormats = [
         "video/mp4",
@@ -316,6 +320,7 @@ export default {
         if (!allowedFormats.includes(selectedFile.type)) {
           // Clear the file input and show an error message
           this.addFile = null;
+          this.resetFileInput();
           Swal.fire({
             icon: "error",
             title: "Invalid File Format",
@@ -360,7 +365,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding welcome video",
+          text: "Unknown fomat to add welcome video",
         });
       } finally {
         this.isLoadingAddButton = false; // Disable loading state

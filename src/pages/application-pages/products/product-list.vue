@@ -172,9 +172,9 @@
             required
           ></b-form-select>
         </b-form-group>
-        <b-form-group label="Description1" label-for="editInputTitle">
+        <b-form-group label="Description" label-for="editInputTitle">
           <b-form-input
-            v-model="addDescription1"
+            v-model="addDescription"
             id="editInputTitle"
             required
             placeholder="Type Description"
@@ -261,7 +261,7 @@ export default {
       addProductModel: false,
       addTitle: "",
       addFile: "",
-      addDescription1: "",
+      addDescription: "",
       addDescription2: "",
       addDescription3: "",
       addDescription4: "",
@@ -321,7 +321,7 @@ export default {
         obj.image = baseUrl + element.file;
         obj.ProductName = element.product_name;
         obj.title = element.title;
-        obj.description = element.description1;
+        obj.description = element.description;
         obj.price = element.price;
         obj.product_type = element.product_type;
         obj.file = baseUrl.concat(element.file);
@@ -446,7 +446,7 @@ export default {
       this.addProductName = item.product_name;
       this.addUsage = item.usage;
       this.addTitle = item.title;
-      this.addDescription1 = item.description1;
+      this.addDescription = item.description;
       this.addDescription2 = item.description2;
       this.addDescription3 = item.description3;
       this.addDescription4 = item.description4;
@@ -461,7 +461,7 @@ export default {
         addFormData.append("product_name", this.addProductName);
         addFormData.append("usage", this.addUsage);
         addFormData.append("title", this.addTitle);
-        addFormData.append("description1", this.addDescription1);
+        addFormData.append("description", this.addDescription);
         addFormData.append("description2", this.addDescription2);
         addFormData.append("description3", this.addDescription3);
         addFormData.append("description4", this.addDescription4);

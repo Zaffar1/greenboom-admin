@@ -1,5 +1,8 @@
 <template>
   <section class="tables">
+    <button @click="goBack" class="btn btn-primary orange-button">
+      <i class="mdi mdi-arrow-left"></i> Go Back
+    </button>
     <div class="page-header">
       <h3 class="page-title">Data of ( {{ this.$route.params.title }} )</h3>
       <div>
@@ -13,6 +16,14 @@
           <i class="mdi mdi-plus"></i>Add Data
         </b-button>
         <b-button
+          v-else-if="this.$route.params.title === 'Videos'"
+          @click="addVideoModal"
+          variant="success"
+          class="mr-2 orange-button"
+        >
+          <i class="mdi mdi-plus"></i>Add Video
+        </b-button>
+        <b-button
           v-else
           @click="addTrainingModal"
           variant="success"
@@ -20,10 +31,6 @@
         >
           <i class="mdi mdi-plus"></i>Add Data
         </b-button>
-
-        <button @click="goBack" class="btn btn-primary orange-button">
-          <i class="mdi mdi-arrow-left"></i> Go Back
-        </button>
       </div>
     </div>
     <div class="row">
@@ -128,7 +135,13 @@
                   >
                     <i class="mdi mdi-file-word"></i> Open Word
                   </button>
-
+                  <button
+                    v-else-if="['excel'].includes(data.item.type)"
+                    @click="openExcel(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-excel"></i> Open Excel
+                  </button>
                   <button
                     v-else-if="['ppt'].includes(data.item.type)"
                     @click="openPowerPoint(data.item.file)"
@@ -182,13 +195,58 @@
               id="editInputFile"
               :state="Boolean(addFile)"
               placeholder="Choose a file..."
+              accept=".pdf, .mp4, .mov, .avi, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+              @change="handleFileChange"
               required
+              ref="fileInputRef"
             ></b-form-file>
           </b-form-group>
 
-          <b-button type="submit" variant="success" class="orange-button"
-            >Save Changes</b-button
+          <b-button
+            type="submit"
+            variant="success orange-button"
+            :disabled="isLoadingAddButton"
           >
+            <span v-if="isLoadingAddButton">Uploading...</span>
+            <span v-else>Upload</span>
+          </b-button>
+        </form>
+      </b-modal>
+    </div>
+    <div>
+      <b-modal v-model="addVideoModel" title="Add Video" hide-footer>
+        <form @submit.prevent="submitVideoForm">
+          <b-form-group label="Title" label-for="editInputTitle">
+            <b-form-input
+              v-model="addTitle"
+              id="editInputTitle"
+              required
+            ></b-form-input>
+          </b-form-group>
+
+          <!-- Add a condition to check if the route title is not equal to 'scripts' -->
+          <!-- If true, show the 'Upload file' field -->
+          <b-form-group label="Upload file" label-for="editInputFile">
+            <b-form-file
+              v-model="addFile"
+              id="editInputFile"
+              :state="Boolean(addFile)"
+              placeholder="Choose a file..."
+              accept=".mp4, .mov, .avi"
+              @change="handleVideoFileChange"
+              required
+              ref="fileInputRef"
+            ></b-form-file>
+          </b-form-group>
+
+          <b-button
+            type="submit"
+            variant="success orange-button"
+            :disabled="isLoadingAddButton"
+          >
+            <span v-if="isLoadingAddButton">Uploading...</span>
+            <span v-else>Upload</span>
+          </b-button>
         </form>
       </b-modal>
     </div>
@@ -206,9 +264,14 @@
           ></b-form-input>
         </b-form-group>
 
-        <b-button type="submit" variant="success" class="orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
         >
+          {{ isLoading ? "Adding..." : "Add" }}
+        </b-button>
       </form>
     </b-modal>
 
@@ -261,6 +324,9 @@ export default {
     isScriptsTitle() {
       return this.$route.params.title === "scripts";
     },
+    isVideosTitle() {
+      return this.$route.params.title === "videos";
+    },
     ...mapGetters(["getPerfectSaleMedia", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
@@ -268,7 +334,10 @@ export default {
   },
   data: function () {
     return {
+      isLoading: false,
+      isLoadingAddButton: false,
       isScriptsTitle: true,
+      isVideosTitle: true,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -281,6 +350,7 @@ export default {
       sortable: true,
       addMediaModel: false,
       addScriptModel: false,
+      addVideoModel: false,
       addTitle: "",
       addFile: null,
       showEditModal: false,
@@ -386,11 +456,19 @@ export default {
       this.addFile = null;
       this.addMediaModel = true;
     },
+    addVideoModal(item) {
+      // Set initial values when opening the modal
+      this.addItem = item;
+      this.addTitle = item.title;
+      this.addFile = null;
+      this.addVideoModel = true;
+    },
     addScriptModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
       this.addTitle = item.title;
       this.addScriptModel = true;
+      this.isLoading = false;
     },
 
     openEditModal(item) {
@@ -400,8 +478,69 @@ export default {
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
     },
+    handleFileChange() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "video/mp4", // MP4
+        "video/quicktime", // MOV
+        "video/x-msvideo", // AVI
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
 
-    async submitAddForm() {
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, mp4, mov, avi, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+    handleVideoFileChange() {
+      const allowedFormats = [
+        "video/mp4", // MP4
+        "video/quicktime", // MOV
+        "video/x-msvideo", // AVI
+      ];
+
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (mp4, mov, avi).",
+          });
+        }
+      }
+    },
+    resetFileInput() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+    async submitVideoForm() {
+      this.isLoadingAddButton = true;
       const addFormData = new FormData();
       addFormData.append("title", this.addTitle);
 
@@ -421,11 +560,13 @@ export default {
 
         if (result.status === 200) {
           this.addMediaModel = false; // Close the modal after success
-          this.addScriptModel = false;
+          this.isLoadingAddButton = false;
+          this.addVideoModel = false;
+
           // Clear the items array before adding new data
           this.items = [];
 
-          // Fetch updated training media data
+          // Fetch updated perfect sale pitch media data
           const perfect_sale_id = this.$route.params.id;
           await this.fetchPerfectSaleData(perfect_sale_id);
 
@@ -436,22 +577,75 @@ export default {
 
           Swal.fire(
             "Success!",
-            "Training media successfully added.",
+            "Perfect sale pitch media successfully added.",
             "success"
           );
         }
       } catch (error) {
         // Handle error
-        console.error("Error adding training media:", error);
+        console.error("Error adding perfect sale pitch media:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding training media",
+          text: "An error occurred while adding perfect sale pitch media",
+        });
+      }
+    },
+    async submitAddForm() {
+      this.isLoadingAddButton = true;
+      const addFormData = new FormData();
+      addFormData.append("title", this.addTitle);
+
+      try {
+        const addFormData = new FormData();
+        const perfect_sale_id = this.$route.params.id;
+        console.log("perfect sale after add", perfect_sale_id);
+        addFormData.append("title", this.addTitle);
+        addFormData.append("perfect_sale_id", perfect_sale_id);
+        if (this.addFile) {
+          addFormData.append("file", this.addFile);
+        }
+        const result = await API.post(
+          endpoints.perfectSales.addPerfectSaleMedia,
+          addFormData
+        );
+
+        if (result.status === 200) {
+          this.addMediaModel = false; // Close the modal after success
+          this.isLoadingAddButton = false;
+          this.addScriptModel = false;
+
+          // Clear the items array before adding new data
+          this.items = [];
+
+          // Fetch updated perfect sale pitch media data
+          const perfect_sale_id = this.$route.params.id;
+          await this.fetchPerfectSaleData(perfect_sale_id);
+
+          // Update the component's data with the latest data
+          this.getPerfectSaleMedia.length > 0
+            ? this.setItems(this.getPerfectSaleMedia)
+            : (this.noItems = "No perfect sale data found.");
+
+          Swal.fire(
+            "Success!",
+            "Perfect sale pitch media successfully added.",
+            "success"
+          );
+        }
+      } catch (error) {
+        // Handle error
+        console.error("Error adding perfect sale pitch media:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding perfect sale pitch media",
         });
       }
     },
 
     async submitAddScriptForm() {
+      this.isLoading = true;
       const addFormData = new FormData();
       addFormData.append("title", this.addTitle);
 
@@ -472,10 +666,11 @@ export default {
         if (result.status === 200) {
           this.addMediaModel = false; // Close the modal after success
           this.addScriptModel = false;
+          this.isLoading = false;
           // Clear the items array before adding new data
           this.items = [];
 
-          // Fetch updated training media data
+          // Fetch updated perfect sale pitch media data
           const perfect_sale_id = this.$route.params.id;
           await this.fetchPerfectSaleData(perfect_sale_id);
 
@@ -486,17 +681,17 @@ export default {
 
           Swal.fire(
             "Success!",
-            "Training media successfully added.",
+            "Perfect sale pitch media successfully added.",
             "success"
           );
         }
       } catch (error) {
         // Handle error
-        console.error("Error adding training media:", error);
+        console.error("Error adding perfect sale pitch media:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding training media",
+          text: "An error occurred while adding perfect sale pitch media",
         });
       }
     },
@@ -533,7 +728,7 @@ export default {
         // Close the modal after success
         this.showEditModal = false;
 
-        // Fetch updated training media data
+        // Fetch updated perfect sale pitch media data
         const perfect_sale_id = this.$route.params.id;
         await this.fetchPerfectSaleData(perfect_sale_id);
 
@@ -572,6 +767,10 @@ export default {
       // Open the WORD file in a new window or tab
       window.open(wordUrl, "_blank");
     },
+    openExcel(excelUrl) {
+      // Open the EXCEL file in a new window or tab
+      window.open(excelUrl, "_blank");
+    },
     openPowerPoint(PowerPointUrl) {
       // Open the POWERPOINT file in a new window or tab
       window.open(PowerPointUrl, "_blank");
@@ -588,7 +787,7 @@ export default {
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
-        text: "You will not be able to recover this perfect sale data!",
+        text: "You will not be able to recover this perfect sale pitch media!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
@@ -605,11 +804,11 @@ export default {
             if (response.status === 200) {
               Swal.fire(
                 "Deleted!",
-                "Perfect sale data has been deleted.",
+                "Perfect sale media has been deleted.",
                 "success"
               );
 
-              // Fetch updated training media data
+              // Fetch updated perfect sale pitch media data
               const perfect_sale_id = this.$route.params.id;
               await this.fetchPerfectSaleData(perfect_sale_id);
 
@@ -623,7 +822,7 @@ export default {
               // this.$router.go();
             } else {
               // Handle other status codes or error conditions
-              console.error("Error deleting perfect sale data:", response);
+              console.error("Error deleting perfect sale media:", response);
               Swal.fire(
                 "Error!",
                 "An error occurred during deletion.",
@@ -632,7 +831,7 @@ export default {
             }
           } catch (error) {
             // Handle any errors during deletion
-            console.error("Error deleting training media:", error);
+            console.error("Error deleting perfect sale pitch media:", error);
             Swal.fire("Error!", "An error occurred during deletion.", "error");
           }
         }

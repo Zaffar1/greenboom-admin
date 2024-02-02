@@ -1,19 +1,19 @@
 <template>
   <section class="tables">
+    <button @click="goBack" class="btn btn-primary orange-button">
+      <i class="mdi mdi-arrow-left"></i> Go Back
+    </button>
     <div class="page-header">
       <h3 class="page-title">
         Script Data of ( {{ this.$route.params.title }} )
       </h3>
       <div>
         <b-button
-          @click="addTrainingModal"
+          @click="addScriptModal"
           variant="success"
           class="mr-2 orange-button"
           ><i class="mdi mdi-plus"></i>Add Script Data</b-button
         >
-        <button @click="goBack" class="btn btn-primary orange-button">
-          <i class="mdi mdi-arrow-left"></i> Go Back
-        </button>
       </div>
     </div>
     <div class="row">
@@ -81,7 +81,7 @@
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
-                  class="mr-2 mdi mdi-delete btn orange-button icon-sm"
+                  class="mr-2 mdi orange-button mdi-delete icon-sm p-2 rounded"
                 ></i>
                 <span v-html="data.value"></span>
               </template>
@@ -96,7 +96,13 @@
                   </button>
 
                   <button
-                    v-else-if="isScriptsTitle && data.item.type !== 'pdf'"
+                    v-else-if="
+                      isScriptsTitle &&
+                      data.item.type !== 'pdf' &&
+                      data.item.type !== 'word' &&
+                      data.item.type !== 'excel' &&
+                      data.item.type !== 'ppt'
+                    "
                     @click="scriptData(data.item.Script)"
                     class="btn btn-secondary orange-button"
                   >
@@ -104,7 +110,7 @@
                   </button>
 
                   <button
-                    v-else-if="data.item.type === 'pdf'"
+                    v-if="data.item.type === 'pdf'"
                     @click="openPdf(data.item.file)"
                     class="btn btn-secondary orange-button"
                   >
@@ -112,7 +118,15 @@
                   </button>
 
                   <button
-                    v-else-if="['word'].includes(data.item.type)"
+                    v-if="['excel'].includes(data.item.type)"
+                    @click="openExcel(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-excel"></i> Open Excel
+                  </button>
+
+                  <button
+                    v-if="['word'].includes(data.item.type)"
                     @click="openWord(data.item.file)"
                     class="btn btn-secondary orange-button"
                   >
@@ -120,14 +134,16 @@
                   </button>
 
                   <button
-                    v-else-if="['ppt'].includes(data.item.type)"
+                    v-if="['ppt'].includes(data.item.type)"
                     @click="openPowerPoint(data.item.file)"
                     class="btn btn-primary orange-button"
                   >
                     <i class="mdi mdi-file-powerpoint"></i> Open PowerPoint
                   </button>
 
-                  <span v-else> Unsupported file type </span>
+                  <!-- <span v-else>
+                    Unsupported file type: {{ data.item.type }}</span
+                  > -->
                 </div>
               </template>
             </b-table>
@@ -172,13 +188,21 @@
             id="editInputFile"
             :state="Boolean(addFile)"
             placeholder="Choose a file..."
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFileChange"
             required
+            ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
 
-        <b-button type="submit" variant="success" class="orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
         >
+          {{ isLoading ? "Uploading..." : "Upload" }}
+        </b-button>
       </form>
     </b-modal>
 
@@ -235,6 +259,7 @@ export default {
   data: function () {
     return {
       isScriptsTitle: true,
+      isLoading: false,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -351,12 +376,13 @@ export default {
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
-    addTrainingModal(item) {
+    addScriptModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
       this.addTitle = item.title;
       this.addFile = null;
       this.addMediaModel = true;
+      this.isLoading = false;
     },
 
     openEditModal(item) {
@@ -366,8 +392,42 @@ export default {
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
     },
+    handleFileChange() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
 
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, mp4, mov, avi, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+    resetFileInput() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
     async submitAddForm() {
+      this.isLoading = true;
       const addFormData = new FormData();
       addFormData.append("title", this.addTitle);
 
@@ -389,7 +449,7 @@ export default {
 
         if (result.status === 200) {
           this.addMediaModel = false; // Close the modal after success
-
+          this.isLoading = false;
           // Clear the items array before adding new data
           this.items = [];
 
@@ -478,6 +538,10 @@ export default {
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
+    },
+    openExcel(excelUrl) {
+      // Open the EXCEL file in a new window or tab
+      window.open(excelUrl, "_blank");
     },
     openWord(wordUrl) {
       // Open the WORD file in a new window or tab

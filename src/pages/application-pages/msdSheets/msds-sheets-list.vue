@@ -131,14 +131,22 @@
             id="editInputFile"
             :state="Boolean(addFile)"
             placeholder="Choose a file..."
+            accept=".pdf, .mp4, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFileChange"
             required
+            ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
         >
+          {{ isLoading ? "Uploading..." : "Upload" }}
+        </b-button>
       </form>
     </b-modal>
 
@@ -193,6 +201,7 @@ Vue.use(SortedTablePlugin, {
 export default {
   data: function () {
     return {
+      isLoading: false,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -284,10 +293,45 @@ export default {
       this.addDescription = item.description;
       this.addFile = null;
       this.addMsdModel = true;
+      this.isLoading = false;
     },
+    handleFileChange() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
 
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+    resetFileInput() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
     async submitAddForm() {
       try {
+        this.isLoading = true;
         const addFormData = new FormData();
         addFormData.append("title", this.addTitle);
         addFormData.append("description", this.addDescription);
@@ -301,7 +345,7 @@ export default {
 
         if (result.status === 200) {
           this.addMsdModel = false; // Close the modal after success
-
+          this.isLoading = false;
           // Clear the items array before adding new data
           this.items = [];
 

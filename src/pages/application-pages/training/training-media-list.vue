@@ -1,19 +1,31 @@
 <template>
   <section class="tables">
+    <button @click="goBack" class="btn btn-primary orange-button">
+      <i class="mdi mdi-arrow-left"></i> Go Back
+    </button>
     <div class="page-header">
       <h3 class="page-title">
-        Training Media of ( {{ this.$route.params.title }} )
+        Training Media of ({{ this.$route.params.title }})
       </h3>
       <div>
+        <!-- Conditionally render the appropriate button -->
         <b-button
+          v-if="this.$route.params.title === 'FAQs'"
+          @click="addFaqModal"
+          variant="success"
+          class="mr-2 orange-button"
+        >
+          <i class="mdi mdi-plus"></i>Add FAQ
+        </b-button>
+
+        <b-button
+          v-else
           @click="addTrainingModal"
           variant="success"
           class="mr-2 orange-button"
-          ><i class="mdi mdi-plus"></i>Add Training Media</b-button
         >
-        <button @click="goBack" class="btn btn-primary orange-button">
-          <i class="mdi mdi-arrow-left"></i> Go Back
-        </button>
+          <i class="mdi mdi-plus"></i>Add Training Media
+        </b-button>
       </div>
     </div>
     <div class="row">
@@ -109,7 +121,13 @@
                   >
                     <i class="mdi mdi-file-word"></i> Open Word
                   </button>
-
+                  <button
+                    v-else-if="['excel'].includes(data.item.type)"
+                    @click="openExcel(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-excel"></i> Open Excel
+                  </button>
                   <button
                     v-else-if="['ppt'].includes(data.item.type)"
                     @click="openPowerPoint(data.item.file)"
@@ -154,14 +172,46 @@
             id="editInputFile"
             :state="Boolean(addFile)"
             placeholder="Choose a file..."
+            accept=".pdf, .mp4, .mov, .avi, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFileChange"
             required
+            ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
 
-        <b-button type="submit" variant="success" class="orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
         >
+          {{ isLoading ? "Uploading..." : "Upload" }}
+        </b-button>
       </form>
+      <!-- <button @click="logContent">Log Content</button> -->
+    </b-modal>
+
+    <b-modal v-model="addFaqModel" title="Add Faq" hide-footer>
+      <form @submit.prevent="submitAddFaqForm">
+        <b-form-group label="Add Faqs" label-for="editInputHtml">
+          <div>
+            <quill-editor
+              v-model="editorContent"
+              :options="editorOptions"
+            ></quill-editor>
+          </div>
+        </b-form-group>
+
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
+        >
+          {{ isLoading ? "Adding..." : "Add" }}
+        </b-button>
+      </form>
+      <!-- <button @click="logContent">Log Content</button> -->
     </b-modal>
 
     <!-- Modal for training media -->
@@ -198,6 +248,7 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import API from "../../../config/api";
 import { endpoints } from "../../../config/endpoints";
+import { quillEditor } from "vue-quill-editor";
 
 Vue.use(SortedTablePlugin, {
   ascIcon: '<i class="mdi mdi-arrow-down"></i>',
@@ -205,8 +256,18 @@ Vue.use(SortedTablePlugin, {
 });
 
 export default {
+  components: {
+    quillEditor,
+  },
   data: function () {
     return {
+      editorContent: "",
+      editorOptions: {
+        // Customize Quill editor options here
+        placeholder: "Enter your text...",
+        theme: "snow", // Choose between "snow" (default) or "bubble"
+      },
+      isLoading: false,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -218,6 +279,7 @@ export default {
       filter: "",
       sortable: true,
       addMediaModel: false,
+      addFaqModel: false,
       addTitle: "",
       addFile: null,
       showEditModal: false,
@@ -275,6 +337,9 @@ export default {
         this.items.push(obj);
       });
     },
+    logContent() {
+      console.log("Editor Content:", this.editorContent);
+    },
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -319,9 +384,17 @@ export default {
       this.addItem = item;
       this.addTitle = item.title;
       this.addFile = null;
+      // this.editorContent = item.editorContent;
       this.addMediaModel = true;
+      this.isLoading = false;
     },
-
+    addFaqModal(item) {
+      // Set initial values when opening the modal
+      this.addItem = item;
+      this.editorContent = item.editorContent;
+      this.addFaqModel = true;
+      this.isLoading = false;
+    },
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -329,8 +402,87 @@ export default {
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
     },
+    handleFileChange() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "video/mp4", // MP4
+        "video/quicktime", // MOV
+        "video/x-msvideo", // AVI
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
 
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, mp4, mov, avi, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+    resetFileInput() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+    async submitAddFaqForm() {
+      this.isLoading = true;
+      const addFormData = new FormData();
+
+      try {
+        const addFormData = new FormData();
+        addFormData.append("faq_text", this.editorContent);
+
+        const result = await API.post(
+          endpoints.faqs.addFaq,
+          addFormData
+        );
+
+        if (result.status === 200) {
+          this.addFaqModel = false; // Close the modal after success
+          this.isLoading = false;
+          // Clear the items array before adding new data
+          this.items = [];
+
+          // Fetch updated training media data
+          const training_id = this.$route.params.id;
+          await this.fetchTrainingMedia(training_id);
+
+          // Update the component's data with the latest data
+          this.getTrainingMedia.length > 0
+            ? this.setItems(this.getTrainingMedia)
+            : (this.noItems = "No TrainingMedia Found.");
+
+          Swal.fire("Success!", "Faq successfully added.", "success");
+        }
+      } catch (error) {
+        this.isLoading = false;
+        // this.addFaqModel = false;
+        // Handle error
+        console.error("Error adding faq:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding faq",
+        });
+      }
+    },
     async submitAddForm() {
+      this.isLoading = true;
       const addFormData = new FormData();
       addFormData.append("title", this.addTitle);
 
@@ -339,6 +491,7 @@ export default {
         const training_id = this.$route.params.id;
         addFormData.append("title", this.addTitle);
         addFormData.append("training_id", training_id);
+        addFormData.append("faq_text", this.editorContent);
         if (this.addFile) {
           addFormData.append("file", this.addFile);
         }
@@ -349,7 +502,7 @@ export default {
 
         if (result.status === 200) {
           this.addMediaModel = false; // Close the modal after success
-
+          this.isLoading = false;
           // Clear the items array before adding new data
           this.items = [];
 
@@ -446,6 +599,10 @@ export default {
     openWord(wordUrl) {
       // Open the WORD file in a new window or tab
       window.open(wordUrl, "_blank");
+    },
+    openExcel(excelUrl) {
+      // Open the EXCEL file in a new window or tab
+      window.open(excelUrl, "_blank");
     },
     openPowerPoint(PowerPointUrl) {
       // Open the POWERPOINT file in a new window or tab

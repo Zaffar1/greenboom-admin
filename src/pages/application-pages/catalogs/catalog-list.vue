@@ -81,12 +81,42 @@
               </template>
               <template v-slot:cell(Media)="data">
                 <div>
-                  <button
+                  <!-- <button
                     @click="openPdf(data.item.file)"
                     class="btn btn-secondary orange-button"
                   >
                     <i class="mdi mdi-file-pdf"></i>Open Pdf
+                  </button> -->
+                  <button
+                    v-if="data.item.type === 'pdf'"
+                    @click="openPdf(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-pdf"></i> Open PDF
                   </button>
+                  <button
+                    v-else-if="['excel'].includes(data.item.type)"
+                    @click="openExcel(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-excel"></i> Open Excel
+                  </button>
+                  <button
+                    v-else-if="['word'].includes(data.item.type)"
+                    @click="openWord(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-word"></i> Open Word
+                  </button>
+
+                  <button
+                    v-else-if="['ppt'].includes(data.item.type)"
+                    @click="openPowerPoint(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-powerpoint"></i> Open PowerPoint
+                  </button>
+                  <span v-else> Unsupported file type </span>
                 </div>
               </template>
             </b-table>
@@ -135,14 +165,22 @@
             id="editInputFile"
             :state="Boolean(addFile)"
             placeholder="Choose a file..."
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFileChange"
             required
+            ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
         >
+          {{ isLoading ? "Uploading..." : "Upload" }}
+        </b-button>
       </form>
     </b-modal>
 
@@ -197,6 +235,7 @@ Vue.use(SortedTablePlugin, {
 export default {
   data: function () {
     return {
+      isLoading: false,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -280,7 +319,18 @@ export default {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
-
+    openExcel(excelUrl) {
+      // Open the EXCEL file in a new window or tab
+      window.open(excelUrl, "_blank");
+    },
+    openWord(wordUrl) {
+      // Open the WORD file in a new window or tab
+      window.open(wordUrl, "_blank");
+    },
+    openPowerPoint(PowerPointUrl) {
+      // Open the POWERPOINT file in a new window or tab
+      window.open(PowerPointUrl, "_blank");
+    },
     addCatalogModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -288,10 +338,45 @@ export default {
       this.addDescription = item.description;
       this.addFile = null;
       this.addCatalogModel = true;
+      this.isLoading = false;
     },
+    handleFileChange() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
 
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+    resetFileInput() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
     async submitAddForm() {
       try {
+        this.isLoading = true;
         const addFormData = new FormData();
         addFormData.append("title", this.addTitle);
         addFormData.append("description", this.addDescription);
@@ -305,7 +390,7 @@ export default {
 
         if (result.status === 200) {
           this.addCatalogModel = false; // Close the modal after success
-
+          this.isLoading = false;
           // Clear the items array before adding new data
           this.items = [];
 

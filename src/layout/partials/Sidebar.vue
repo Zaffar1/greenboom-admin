@@ -23,7 +23,7 @@
         </li>
 
         <li class="nav-item">
-          <router-link class="nav-link" to="/">
+          <router-link class="nav-link" to="/dashboard">
             <span class="menu-title">Dashboard</span>
             <i class="mdi mdi-home menu-icon"></i>
           </router-link>
@@ -201,11 +201,11 @@
             </ul>
           </b-collapse> -->
         </li>
-        <!-- <li class="nav-item">
+        <li class="nav-item">
           <router-link class="nav-link" to="/order/order-kit-list">
             <span class="menu-title">Order a kit</span>
           </router-link>
-        </li> -->
+        </li>
 
         <!-- <li class="nav-item">
           <span class="nav-link" v-b-toggle="'apps'">

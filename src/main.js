@@ -17,6 +17,10 @@ import ToggleButton from "vue-js-toggle-button";
 // primevue components
 import ToastService from "primevue/toastservice";
 
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+
 Vue.use(BootstrapVue);
 Vue.use(VueSweetalert2);
 Vue.use(require("vue-moment"));

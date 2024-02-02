@@ -2,13 +2,13 @@
   <section class="tables">
     <div class="page-header">
       <h3 class="page-title">Order Kit List</h3>
-      <b-button
+      <!-- <b-button
         @click="addCatalogModal"
         variant="success"
         class="mr-2 orange-button"
       >
         <i class="mdi mdi-plus"></i> Add Order a kit
-      </b-button>
+      </b-button> -->
     </div>
     <div class="row">
       <div class="col-lg-12 grid-margin stretch-card">
@@ -41,7 +41,6 @@
               <template #cell(image)="data">
                 <!-- name & profile -->
                 <img :src="data.item.image" class="mr-2" alt="image" />
-                
               </template>
 
               <!-- when no item found -->
@@ -50,33 +49,32 @@
               </template>
 
               <!-- status -->
-              <template v-slot:cell(status)="data">
-                <!-- <span v-html="data.value"></span> -->
+              <!-- <template v-slot:cell(status)="data">
                 <toggle-button
                   @change="changeStatus(data.item)"
                   :value="data.item.status == 'Active'"
                 />
-              </template>
+              </template> -->
 
               <template v-slot:cell(action)="data">
                 <!-- Actions -->
 
-                <!-- <i
-                      @click="view(data.item.id)"
-                      :ref="'btn' + data.index"
-                      class="mr-2 mdi mdi-eye text-muted icon-sm"
-                    ></i> -->
                 <i
+                  @click="view(data.item.id)"
+                  :ref="'btn' + data.index"
+                  class="mr-2 mdi mdi-eye text-muted icon-sm"
+                ></i>
+                <!-- <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-pencil text-muted icon-sm"
-                ></i>
-                <i
+                ></i> -->
+                <!-- <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
                   class="mr-2 mdi mdi-delete text-danger icon-sm"
-                ></i>
+                ></i> -->
                 <span v-html="data.value"></span>
               </template>
             </b-table>
@@ -204,12 +202,12 @@ export default {
       editedDescription: "",
       editedFile: null,
       fields: [
-        { key: "image", sortable: true },
-        { key: "title", sortable: true },
-        { key: "short_description", sortable: true },
-        { key: "description", sortable: true },
-        { key: "status", sortable: true },
-        { key: "created_at", sortable: true },
+        // { key: "image", sortable: true },
+        { key: "first_name", sortable: true },
+        { key: "last_name", sortable: true },
+        { key: "email", sortable: true },
+        // { key: "status", sortable: true },
+        { key: "order_kit", sortable: true },
         { key: "action", sortable: true },
       ],
       items: [],
@@ -238,17 +236,12 @@ export default {
         let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
-        obj.title = element.title;
-        obj.image = baseUrl.concat(element.image); // Assuming element.file is the correct property for the file path
-        obj.description = element.description; // Assuming element.file_type is the correct property for the file type
-        obj.short_description = element.short_description;
-        // obj.status = `<label class="badge ${
-        //   element.status === "Active" ? "badge-success" : "badge-danger"
-        // }">${element.status}</label>`;
-        obj.type = element.file_type;
-        obj.status = element.status;
-        obj.role_id = element.role?.id;
-        obj.status_id = element.status?.id;
+        obj.first_name = element.first_name;
+        obj.last_name = element.last_name;
+        obj.email = element.email;
+        obj.order_kit = element.order_kit?.title;
+        // obj.image = baseUrl.concat(element.image); // Assuming element.file is the correct property for the file path
+        // obj.status = element.status;
         obj.created_at = moment(element.created_at).format(
           "dddd, MMMM Do YYYY"
         );
@@ -369,47 +362,17 @@ export default {
       }
     },
 
-    async changeStatus(item) {
-      try {
-        // Note the use of await here
-        let result = await API.post(
-          `${endpoints.msdSheets.msdSheetStatus}/${item.id}`
-        );
-
-        // Check the result or handle the response as needed
-        if (result.status === 200) {
-          // Toggle the status locally in the items array
-          const updatedItems = this.items.map((catalog) => {
-            if (catalog.id === item.id) {
-              catalog.status =
-                catalog.status === "Active" ? "InActive" : "Active";
-            }
-            return catalog;
-          });
-
-          // Update the items array with the new data
-          this.items = updatedItems;
-
-          // Show success message
-          Swal.fire("Success!", "Status successfully changed.", "success");
-        } else {
-          // Handle other status codes or error conditions
-          console.error("Error updating user status:", result);
-        }
-      } catch (error) {
-        // Handle any errors during deletion or data fetching
-        console.error("Error updating user status:", error);
-        Swal.fire("Error!", "An error occurred during status update.", "error");
-      }
-    },
-
     view(itemId) {
       console.log(itemId);
+      this.$router.push({
+        name: "order-kit-detail",
+        params: { id: itemId },
+      });
     },
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
-        text: "You will not be able to recover this catalog!",
+        text: "You will not be able to recover this order kit data!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it!",
@@ -420,11 +383,11 @@ export default {
           try {
             // Make an API request to delete the item
             const response = await API.delete(
-              `${endpoints.catalogs.deleteCatalog}/${itemId}`
+              `${endpoints.orderKit.deleteKitData}/${itemId}`
             );
 
             if (response.status === 200) {
-              Swal.fire("Deleted!", "order kit has been deleted.", "success");
+              Swal.fire("Deleted!", "Order kit has been deleted.", "success");
 
               // Fetch updated msds sheet data
               await this.fetchOrderKitList();

@@ -98,10 +98,7 @@
                   @click="viewMedia(data.item.PerfectSaleMedia)"
                   class="btn btn-secondary orange-button"
                 >
-                  <i
-                    class="mr-2 mdi mdi-eye icon-sm orange-button"
-                  ></i
-                  >View
+                  <i class="mr-2 mdi mdi-eye icon-sm orange-button"></i>View
                 </button>
               </template>
             </b-table>
@@ -134,9 +131,14 @@
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success" class="orange-button"
-          >Save Changes</b-button
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
         >
+          {{ isLoading ? "Adding..." : "Add" }}
+        </b-button>
       </form>
     </b-modal>
     <!-- Modal for editing video -->
@@ -172,6 +174,7 @@ Vue.use(SortedTablePlugin, {
 export default {
   data: function () {
     return {
+      isLoading: false,
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
@@ -240,9 +243,11 @@ export default {
       this.addItem = item;
       this.addTitle = item.title;
       this.addModel = true;
+      this.isLoading = false;
     },
 
     async submitAddForm() {
+      this.isLoading = true;
       const addFormData = new FormData();
       addFormData.append("title", this.addTitle);
 
@@ -254,7 +259,7 @@ export default {
 
         if (result.status === 200) {
           this.addModel = false; // Close the modal after success
-
+          this.isLoading = false;
           // Fetch updated training data
           await this.fetchPerfectSales();
 

@@ -318,6 +318,18 @@ export default new Router({
       ],
     },
     {
+      path: "/order",
+      component: layout,
+      children: [
+        {
+          path: "order-kit-detail/:id",
+          name: "order-kit-detail",
+          component: () =>
+            import("@/pages/application-pages/orderKit/order-kit-detail"),
+        },
+      ],
+    },
+    {
       path: "/job",
       component: layout,
       children: [
