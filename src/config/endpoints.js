@@ -11,7 +11,9 @@ export const endpoints = {
     fetchUserDetail: "admin/user-detail",
     deleteUser: "admin/block-user",
     userStatus: "admin/user-status",
+    editUser: "admin/update-user",
   },
+  dashboard: "admin/dashboard",
   welcomeVideos: {
     fetchAll: `admin/all-welcome-videos`, // GET
     deleteMedia: `admin/delete-welcome-video`,

@@ -8,7 +8,7 @@
         </span>
         Dashboard
       </h3>
-      <nav aria-label="breadcrumb">
+      <!-- <nav aria-label="breadcrumb">
         <ul class="breadcrumb">
           <li class="breadcrumb-item active" aria-current="page">
             <span></span>Overview
@@ -17,19 +17,59 @@
             ></i>
           </li>
         </ul>
-      </nav>
+      </nav> -->
     </div>
     <div class="row">
       <div class="col-md-4 grid-margin stretch-card">
         <div class="card aligner-wrapper">
           <div class="card-body">
             <div
-              class="absolute left top bottom h-100 v-strock-2 bg-success"
+              class="absolute left top bottom h-100 v-strock-2 bg-danger"
             ></div>
             <p class="text-muted mb-2">Total Users</p>
             <div class="d-xl-flex align-items-center">
               <h1 class="font-weight-medium mb-2">
                 {{ this.getUsers.length }}
+              </h1>
+              <!-- <h5 class="font-weight-medium text-success ml-2">−14.2%</h5> -->
+            </div>
+            <!-- <div class="d-flex align-items-center">
+              <div class="bg-success dot-indicator"></div>
+              <p class="text-muted mb-0 ml-2">This month unpaid invoices $567</p>
+            </div> -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 grid-margin stretch-card">
+        <div class="card aligner-wrapper">
+          <div class="card-body">
+            <div
+              class="absolute left top bottom h-100 v-strock-2 bg-danger"
+            ></div>
+            <p class="text-muted mb-2">Total Products</p>
+            <div class="d-xl-flex align-items-center">
+              <h1 class="font-weight-medium mb-2">
+                {{ this.dashboard.products }}
+              </h1>
+              <!-- <h5 class="font-weight-medium text-success ml-2">−14.2%</h5> -->
+            </div>
+            <!-- <div class="d-flex align-items-center">
+              <div class="bg-success dot-indicator"></div>
+              <p class="text-muted mb-0 ml-2">This month unpaid invoices $567</p>
+            </div> -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 grid-margin stretch-card">
+        <div class="card aligner-wrapper">
+          <div class="card-body">
+            <div
+              class="absolute left top bottom h-100 v-strock-2 bg-danger"
+            ></div>
+            <p class="text-muted mb-2">Total Order kit users</p>
+            <div class="d-xl-flex align-items-center">
+              <h1 class="font-weight-medium mb-2">
+                {{ this.dashboard.order_kit }}
               </h1>
               <!-- <h5 class="font-weight-medium text-success ml-2">−14.2%</h5> -->
             </div>
@@ -83,6 +123,8 @@ import DatePicker from "vue2-datepicker";
 import unPaidInvoices from "../../components/charts/widgets/unPaidInvoices";
 
 import { mapActions, mapGetters } from "vuex";
+import API from "../../config/api";
+import { endpoints } from "../../config/endpoints";
 
 export default {
   name: "dashboard",
@@ -96,6 +138,7 @@ export default {
   data() {
     return {
       time1: null,
+      dashboard: {},
     };
   },
   computed: {
@@ -107,6 +150,9 @@ export default {
   async mounted() {
     await this.fetchUsers();
     await this.fetchJobs();
+    const response = await API.get(endpoints.dashboard);
+    this.dashboard = response.data;
+    console.log("data", this.dashboard);
   },
 };
 </script>

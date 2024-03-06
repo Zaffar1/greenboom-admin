@@ -62,7 +62,7 @@
                 <i
                   @click="view(data.item.id)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-eye text-muted icon-sm"
+                  class="mr-2 mdi mdi-eye orange-button icon-sm p-2 rounded"
                 ></i>
                 <!-- <i
                   v-b-modal.modallg
@@ -248,19 +248,34 @@ export default {
         this.items.push(obj);
       });
     },
+    /**
+     * Opens a modal window to display a video.
+     * @param {string} videoUrl - The URL of the video to be displayed.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+    /**
+     * Closes the modal window.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
+    /**
+     * Opens a PDF file in a new window or tab.
+     * @param {string} pdfUrl - The URL of the PDF file to be opened.
+     */
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
-
+    /**
+     * Opens the modal for adding a new catalog.
+     * Sets initial values when opening the modal.
+     * @param {Object} item - The catalog item to be added.
+     */
     addCatalogModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -269,7 +284,11 @@ export default {
       this.addFile = null;
       this.addCatalogModel = true;
     },
-
+    /**
+     * Submits the form for adding a new catalog.
+     * Sends a POST request to add the catalog.
+     * Handles success and error cases accordingly.
+     */
     async submitAddForm() {
       try {
         const addFormData = new FormData();
@@ -309,7 +328,11 @@ export default {
         });
       }
     },
-
+    /**
+     * Opens the modal for editing a catalog.
+     * Sets initial values when opening the modal.
+     * @param {Object} item - The catalog item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -318,7 +341,11 @@ export default {
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
     },
-
+    /**
+     * Submits the form for editing a catalog.
+     * Sends a POST request to edit the catalog.
+     * Handles success and error cases accordingly.
+     */
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
@@ -361,7 +388,10 @@ export default {
         });
       }
     },
-
+    /**
+     * Redirects to the detail page of a specific order kit.
+     * @param {number} itemId - The ID of the order kit to view.
+     */
     view(itemId) {
       console.log(itemId);
       this.$router.push({
@@ -369,6 +399,12 @@ export default {
         params: { id: itemId },
       });
     },
+    /**
+     * Deletes an order kit item.
+     * Displays a confirmation dialog before deletion.
+     * Handles success and error cases accordingly.
+     * @param {number} itemId - The ID of the order kit to delete.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -418,6 +454,10 @@ export default {
       });
     },
   },
+  /**
+   * Fetches the list of order kits from the API.
+   * Updates the component's data with the fetched order kits.
+   */
   async mounted() {
     // const id = this.$route.params.id;
     await this.fetchOrderKitList();

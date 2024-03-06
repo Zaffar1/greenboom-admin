@@ -76,12 +76,12 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
                 ></i> -->
-                <!-- <i
+                <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil btn orange-button icon-sm"
-                ></i> -->
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -94,7 +94,7 @@
                   @click="viewMedia(data.item.TrainingMedia)"
                   class="btn btn-secondary orange-button"
                 >
-                  <i class="mr-2 mdi mdi-eye icon-sm orange-button"></i>View
+                  <i class="mr-2 mdi mdi-eye icon-sm"></i>View
                 </button>
               </template>
             </b-table>
@@ -133,7 +133,7 @@
           class="orange-button"
           :disabled="isLoading"
         >
-          {{ isLoading ? "Adding..." : "Add Training" }}
+          {{ isLoading ? "Adding..." : "Add" }}
         </b-button>
       </form>
     </b-modal>
@@ -147,7 +147,10 @@
             required
           ></b-form-input>
         </b-form-group>
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button type="submit" variant="success" class="orange-button">
+          <span v-if="isLoading">Updating...</span>
+          <span v-else>Update</span></b-button
+        >
       </form>
     </b-modal>
     <div></div>
@@ -234,6 +237,10 @@ export default {
       console.log("mister", this.items);
     },
 
+    /**
+     * Opens a modal for adding a training.
+     * @param {Object} item - The item to be added.
+     */
     addTrainingModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -242,6 +249,9 @@ export default {
       this.isLoading = false;
     },
 
+    /**
+     * Asynchronously submits the add form for a training.
+     */
     async submitAddForm() {
       this.isLoading = true; // Set loading state to true
 
@@ -284,6 +294,11 @@ export default {
       }
     },
 
+    /**
+     * Logs information about viewing media.
+     * @param {Object} trainingMedia - The training media object.
+     * @param {string} id - The ID of the training media.
+     */
     viewMedia(trainingMedia, id) {
       console.log("View media with ID:", trainingMedia.id);
       console.log("Route ID:", trainingMedia.id);
@@ -302,13 +317,23 @@ export default {
       this.isModalOpen = false;
     },
 
+    /**
+     * Opens a modal for editing a training.
+     * @param {Object} item - The item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
       this.editedTitle = item.title;
       this.showEditModal = true;
+      this.isLoading = false;
     },
+
+    /**
+     * Asynchronously submits the edit form for a training.
+     */
     async submitEditForm() {
+      this.isLoading = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("description", this.editedDescription);
@@ -350,9 +375,19 @@ export default {
         });
       }
     },
+
+    /**
+     * Logs the itemId to the console.
+     * @param {string} itemId - The ID of the item to view.
+     */
     view(itemId) {
       console.log(itemId);
     },
+
+    /**
+     * Asynchronously deletes a training item.
+     * @param {string} itemId - The ID of the training item to delete.
+     */
     async deleteItem(itemId) {
       console.log(itemId);
       const result = await Swal.fire({
@@ -389,6 +424,11 @@ export default {
         }
       }
     },
+
+    /**
+     * Asynchronously changes the status of a training item.
+     * @param {Object} item - The training item to change status for.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -433,6 +473,10 @@ export default {
     //   this.currentVideo = null;
     // },
   },
+
+  /**
+   * Asynchronously fetches trainings data upon component mounting.
+   */
   async mounted() {
     await this.fetchTrainings();
     // console.log("mounted all training", this.getTrainings.length);
@@ -491,5 +535,6 @@ export default {
   background-color: #ff002d;
   border-color: orange;
   color: white;
+  padding: 10px 15px;
 }
 </style>

@@ -5,7 +5,7 @@
       <b-button
         @click="addWelcomeModal"
         variant="success"
-        class="mr-2 orange-button"
+        class="mr-2 orange-button btn-secondary"
       >
         <i class="mdi mdi-plus"></i> Add Video
       </b-button>
@@ -78,12 +78,12 @@
                     :ref="'btn' + data.index"
                     class="mr-2 mdi mdi-eye text-muted icon-sm"
                   ></i> -->
-                <!-- <i
+                <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil btn orange-button icon-sm"
-                ></i> -->
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -116,7 +116,7 @@
 
     <div v-if="isModalOpen" class="modal">
       <span @click="closeModal" class="close">&times;</span>
-      <video :src="videoSource" controls></video>
+      <video :src="videoSource" controls autoplay></video>
     </div>
     <!-- v-if="currentVideo" -->
     <!-- <b-modal title="Video Player" @hidden="resetModal" id="video-modal">
@@ -143,6 +143,18 @@
             required
           ></b-form-input>
         </b-form-group>
+        <b-form-group label="Upload thumbnail" label-for="editInputFile">
+          <b-form-file
+            v-model="addThumbnail"
+            id="editInputthumbnail"
+            :state="Boolean(addThumbnail)"
+            placeholder="Choose a file..."
+            accept=".png, .jpg, .jpeg"
+            @change="handleFileChange2"
+            ref="fileInputRef2"
+            required
+          ></b-form-file>
+        </b-form-group>
         <b-form-group label="Upload file" label-for="editInputFile">
           <b-form-file
             v-model="addFile"
@@ -159,7 +171,7 @@
 
         <b-button
           type="submit"
-          variant="success orange-button"
+          variant="success orange-button popUp"
           :disabled="isLoadingAddButton"
         >
           <span v-if="isLoadingAddButton">Uploading...</span>
@@ -169,7 +181,7 @@
     </b-modal>
 
     <!-- Modal for editing video -->
-    <b-modal v-model="showEditModal" title="Edit Welcome Video" hide-footer>
+    <b-modal v-model="showEditModal" title="Edit Video" hide-footer>
       <form @submit.prevent="submitEditForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -185,17 +197,39 @@
             required
           ></b-form-input>
         </b-form-group>
+        <b-form-group label="Upload thumbnail" label-for="editInputFile">
+          <b-form-file
+            v-model="editThumbnail"
+            id="editInputthumbnail"
+            :state="Boolean(editThumbnail)"
+            placeholder="Choose a file..."
+            accept=".png, .jpg, .jpeg"
+            @change="handleFileChange4"
+            ref="fileInputRef4"
+          ></b-form-file>
+        </b-form-group>
         <b-form-group label="Upload file" label-for="editInputFile">
           <b-form-file
             v-model="editedFile"
             id="editInputFile"
             :state="Boolean(editedFile)"
             placeholder="Choose a file..."
+            accept=".mp4, .mov, .avi"
+            @change="handleFileChange3"
+            ref="fileInputRef3"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button btn btn-secondary"
+          :disabled="isLoadingAddButton"
+        >
+          <span v-if="isLoadingAddButton">Updating...</span>
+          <span v-else>Update</span></b-button
+        >
       </form>
     </b-modal>
 
@@ -231,6 +265,7 @@ export default {
       showEditModal: false,
       editedTitle: "",
       editedDescription: "",
+      editThumbnail: null,
       editedFile: null,
       // Add a property to store the current edited item
       editedItem: null,
@@ -238,6 +273,7 @@ export default {
       addTitle: "",
       addDescription: "",
       addFile: null,
+      addThumbnail: null,
       addTitle: "",
       filter: "",
       sortable: true,
@@ -266,7 +302,8 @@ export default {
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
+        // let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
         obj.title = element.title;
@@ -293,6 +330,7 @@ export default {
       this.addTitle = item.title;
       this.addDescription = item.description;
       this.addFile = null;
+      this.addThumbnail = null;
       this.addVideoModel = true;
     },
     resetFileInput() {
@@ -322,6 +360,84 @@ export default {
         }
       }
     },
+    resetFileInput3() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef3.$el.querySelector("input[type=file]").value = "";
+    },
+    handleFileChange3() {
+      const allowedFormats = [
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+      ];
+      const fileInput =
+        this.$refs.fileInputRef3.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.editedFile = null;
+          this.resetFileInput3();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid video file (mp4, mov, avi).",
+          });
+        }
+      }
+    },
+    resetFileInput4() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef4.$el.querySelector("input[type=file]").value = "";
+    },
+    handleFileChange4() {
+      const allowedFormats = [
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+      ];
+      const fileInput =
+        this.$refs.fileInputRef4.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.editedFile = null;
+          this.resetFileInput4();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid video file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
+    resetFileInput2() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef2.$el.querySelector("input[type=file]").value = "";
+    },
+    handleFileChange2() {
+      const allowedFormats = ["image/png", "image/jpeg", "image/jpg"];
+
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput2();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid image file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
     async submitAddForm() {
       try {
         this.isLoadingAddButton = true;
@@ -330,6 +446,9 @@ export default {
         addFormData.append("description", this.addDescription);
         if (this.addFile) {
           addFormData.append("file", this.addFile);
+        }
+        if (this.addThumbnail) {
+          addFormData.append("thumbnail", this.addThumbnail);
         }
         const result = await API.post(endpoints.videos.addVideo, addFormData);
 
@@ -367,14 +486,20 @@ export default {
       this.editedItem = item;
       this.editedTitle = item.title;
       this.editedDescription = item.description;
+      this.editThumbnail = item.thumbnail;
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
+      this.isLoadingAddButton = false;
     },
 
     async submitEditForm() {
+      this.isLoadingAddButton = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("description", this.editedDescription);
+      if (this.editedFile) {
+        editedFormData.append("file", this.editedFile);
+      }
       if (this.editedFile) {
         editedFormData.append("file", this.editedFile);
       }

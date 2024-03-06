@@ -9,7 +9,7 @@
               <div class="auth-form-light text-left p-5">
                 <div class="brand-logo">
                   <img
-                    src="/untitled.png"
+                    src="untitled.png"
                     alt="Green Boom Logo"
                     style="
                       width: 100%;
@@ -61,7 +61,6 @@
                 <button
                   class="btn btn-block forgot_button"
                   @click="forgotPassword"
-                  
                 >
                   Forgot Password
                 </button>
@@ -120,13 +119,12 @@ button.btn.btn-block.btn-lg:hover {
   color: #ff1d2d !important;
 }
 
-
 button.btn.btn-block.forgot_button {
-    border: 1px solid #ff002d;
-    color: #ff002d;
+  border: 1px solid #ff002d;
+  color: #ff002d;
 }
 button.btn.btn-block.forgot_button:hover {
-    background-color: #ff002d;
-    color: #fff;
+  background-color: #ff002d;
+  color: #fff;
 }
 </style>

@@ -11,7 +11,7 @@
         <b-button
           @click="addScriptModal"
           variant="success"
-          class="mr-2 orange-button"
+          class="mr-2 orange-button btn-secondary"
           ><i class="mdi mdi-plus"></i>Add Script Data</b-button
         >
       </div>
@@ -72,12 +72,12 @@
                       :ref="'btn' + data.index"
                       class="mr-2 mdi mdi-eye text-muted icon-sm"
                     ></i> -->
-                <!-- <i
+                <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil btn orange-button icon-sm"
-                ></i> -->
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -225,12 +225,20 @@
             v-model="editedFile"
             id="editInputFile"
             :state="Boolean(editedFile)"
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
             placeholder="Choose a file..."
+            @change="handleFileChange"
+            ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
-
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button"
+          :disabled="isLoading"
+          >{{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
       </form>
     </b-modal>
     <div></div>
@@ -299,12 +307,23 @@ export default {
       noItems: null,
     };
   },
+  /**
+   * The 'computed' property in a Vue.js component allows for defining dynamic properties that are derived from the component's data or other computed properties.
+   * In this component, we use the 'mapGetters' helper to map getter functions from the Vuex store to the component's computed properties.
+   * Additionally, the 'rows' computed property returns the length of the 'items' array, providing the number of rows in the component.
+   */
   computed: {
     ...mapGetters(["getScriptMedia", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
   },
+  /**
+   * The 'created' hook is called when a Vue.js component is created but not yet mounted to the DOM.
+   * In this hook, we access the 'id' and 'title' route parameters using '$route.params'.
+   * These parameters are often used to identify or customize the behavior of the component.
+   * Currently, the 'fetchDataById' method is commented out, but it can be used to fetch data based on the 'id' parameter.
+   */
   created() {
     // Access the ID from the route parameters
     const id = this.$route.params.id;
@@ -313,14 +332,30 @@ export default {
     // Call the fetchDataById method with the ID
     // this.fetchDataById(id);
   },
+  /**
+   * The 'setItems' method is used to populate the 'items' array in the component with data retrieved from an external source, such as an API response.
+   * It takes an array of 'data' as input, where each element in the 'data' array represents an item to be added to the 'items' array.
+   * For each element in the 'data' array, the method creates a new object ('obj') and assigns values to its properties based on the corresponding properties of the input elements.
+   * The method assumes that the 'element' object has the following properties:
+   *   - id: Unique identifier for the item.
+   *   - title: Title or name of the item.
+   *   - file: Path to the file associated with the item.
+   *   - file_type: Type or format of the file (e.g., PDF, video).
+   *   - status: Status of the item (e.g., Active, Inactive).
+   *   - created_at: Date and time when the item was created.
+   * The method constructs the URL for the file by concatenating the base URL ('baseUrl') with the file path ('element.file').
+   * It also formats the 'created_at' property using the 'moment' library to display it in a human-readable format.
+   * Finally, it pushes the newly created object ('obj') into the 'items' array, effectively populating the component's data with the retrieved items.
+   */
   methods: {
     ...mapActions(["fetchScriptData"]),
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        //let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -370,12 +405,23 @@ export default {
         Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
-
+    /**
+     * The 'openModal' method is used to open a modal window for displaying a video.
+     * It takes a 'videoUrl' parameter, which represents the URL of the video to be displayed.
+     * The method sets the 'videoSource' property to the provided 'videoUrl' and sets the 'isModalOpen' property to true to open the modal.
+     * @param {string} videoUrl - The URL of the video to be displayed in the modal.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+    /**
+     * The 'addScriptModal' method is used to open a modal window for adding a script.
+     * It takes an 'item' parameter, which represents the item to which the script will be added.
+     * The method sets initial values for the modal properties, such as 'addItem', 'addTitle', 'addFile', 'addMediaModel', and 'isLoading'.
+     * @param {object} item - The item to which the script will be added.
+     */
     addScriptModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -384,7 +430,12 @@ export default {
       this.addMediaModel = true;
       this.isLoading = false;
     },
-
+    /**
+     * The 'openEditModal' method is used to open a modal window for editing an item.
+     * It takes an 'item' parameter, which represents the item to be edited.
+     * The method sets initial values for the modal properties, such as 'editedItem', 'editedTitle', and 'editedFile'.
+     * @param {object} item - The item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -392,6 +443,11 @@ export default {
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
     },
+    /**
+     * The 'handleFileChange' method is used to handle the change event of the file input element.
+     * It checks if the selected file has an allowed format and shows an error message if not.
+     * If the file format is valid, it clears the file input.
+     */
     handleFileChange() {
       const allowedFormats = [
         "application/pdf", // PDF
@@ -415,17 +471,25 @@ export default {
           Swal.fire({
             icon: "error",
             title: "Invalid File Format",
-            text: "Please select a valid file (pdf, mp4, mov, avi, doc, docx, ppt, pptx, xls, xlsx).",
+            text: "Please select a valid file (pdf, doc, docx, ppt, pptx, xls, xlsx).",
           });
         }
       }
     },
+    /**
+     * The 'resetFileInput' method is used to reset the value of the file input element to allow re-selection of the same file.
+     */
     resetFileInput() {
       // Reset the file input value to allow re-selection of the same file
       const fileInput =
         this.$refs.fileInputRef.$el.querySelector("input[type='file']");
       fileInput.value = null;
     },
+
+    /**
+     * The 'submitAddForm' method is used to submit a form for adding script data.
+     * It constructs form data with the input values, sends a POST request to the server, and handles the response.
+     */
     async submitAddForm() {
       this.isLoading = true;
       const addFormData = new FormData();
@@ -475,7 +539,12 @@ export default {
       }
     },
 
+    /**
+     * The 'submitEditForm' method is used to submit a form for editing script data.
+     * It constructs form data with the input values, sends a POST request to the server, and handles the response.
+     */
     async submitEditForm() {
+      this.isLoading = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("script_id", this.$route.params.id);
@@ -497,6 +566,7 @@ export default {
           title: "Success",
           text: "Script data edited successfully",
         }).then(() => {
+          this.isLoading = false;
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
         });
@@ -514,6 +584,7 @@ export default {
           ? this.setItems(this.getScriptMedia)
           : (this.noItems = "No script data found.");
       } catch (error) {
+        this.isLoading = false;
         // Handle error
         console.error("Error editing perfect sale data:", error);
 
@@ -532,6 +603,10 @@ export default {
     //     "http://localhost:8000/storage/trainingMedia/1701965964.mp4";
     //   this.isModalOpen = true;
     // },
+
+    /**
+     * The 'closeModal' method is used to close the modal window.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
@@ -551,6 +626,13 @@ export default {
       // Open the POWERPOINT file in a new window or tab
       window.open(PowerPointUrl, "_blank");
     },
+
+    /**
+     * The 'scriptData' method is used to view script media with the specified ID.
+     * It navigates to the 'script-media' route with the ID and title parameters.
+     * @param {object} Script - The script data to be viewed.
+     * @param {string} id - The ID of the script data.
+     */
     scriptData(Script, id) {
       console.log("View media with ID:", Script.id);
       console.log("Route ID:", Script.id);
@@ -560,6 +642,12 @@ export default {
         params: { id: Script.id, title: Script.title },
       });
     },
+
+    /**
+     * The 'deleteItem' method is used to delete an item.
+     * It shows a confirmation dialog and makes an API request to delete the item if confirmed.
+     * @param {string} itemId - The ID of the item to be deleted.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -609,12 +697,20 @@ export default {
         }
       });
     },
+
+    /**
+     * The 'goBack' method is used to navigate back to the previous page using Vue Router.
+     */
     goBack() {
       // Use Vue Router to navigate back to the previous page
       this.$router.go(-1); // This will go back one step in the history
       // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
     },
   },
+  /**
+   * The 'mounted' lifecycle hook is called after the component has been mounted to the DOM.
+   * It fetches script media data with the ID from the route parameters and sets the items accordingly.
+   */
   async mounted() {
     const id = this.$route.params.id;
     console.log("perfect sale id", id);

@@ -2,13 +2,13 @@
   <section class="tables">
     <div class="page-header">
       <h3 class="page-title">Product List</h3>
-      <b-button
+      <!-- <b-button
         @click="addProductModal"
         variant="success"
         class="mr-2 orange-button"
       >
         <i class="mdi mdi-plus"></i> Add Product
-      </b-button>
+      </b-button> -->
       <!-- <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
@@ -253,7 +253,7 @@ export default {
       isModalOpen: false,
       videoSource: "", // Set a default video source
       sortBy: "name",
-      perPage: 7,
+      perPage: 10,
       currentPage: 1,
       sortDesc: false,
       sortByFormatted: true,
@@ -313,9 +313,11 @@ export default {
     ...mapActions(["fetchProducts", "deleteProduct"]),
     // ...mapMutations(["setProductDetail"]),
     setItems(data) {
+      // Iterate over each element in the data array
       data.forEach((element) => {
         let obj = {};
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
+        // let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
         obj.id = element.id;
         obj.image = baseUrl + element.file;
@@ -349,6 +351,8 @@ export default {
         return text;
       }
     },
+
+    // Handle change status functionality
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -382,6 +386,8 @@ export default {
         Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
+
+    // Handle view media functionality
     viewMedia(ProductData, id) {
       localStorage.setItem("productDataDetail", JSON.stringify(ProductData));
       // this.$store.commit('setProductDetail', ProductData);
@@ -406,6 +412,8 @@ export default {
     // view(itemId) {
     //   console.log(itemId);
     // },
+
+    // Handle delete item functionality
     async deleteItem(itemId) {
       console.log(itemId);
       const result = await Swal.fire({
@@ -440,6 +448,7 @@ export default {
       }
     },
 
+    // Handle adding product modal functionality
     addProductModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -455,6 +464,7 @@ export default {
       this.addProductModel = true;
     },
 
+    // Handle submission of add form functionality
     async submitAddForm() {
       try {
         const addFormData = new FormData();

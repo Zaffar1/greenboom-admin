@@ -1,6 +1,6 @@
 <template>
   <section class="product-details">
-    <button @click="goBack" class="btn btn-primary orange-button">
+    <button @click="goBack" class="btn btn-secondary orange-button">
       <i class="mdi mdi-arrow-left"></i> Go Back
     </button>
     <div class="card">
@@ -108,6 +108,11 @@ export default {
   methods: {
     // ...mapActions(["fetchProductDataDetail"]),
 
+    /**
+     * Fetches the details of a kit from the API based on the route parameter ID.
+     * Updates the component's data with the fetched kit details.
+     */
+
     fetchKitDetails() {
       API.get(`admin/kit-detail/${this.$route.params.id}`).then((resp) => {
         this.detail = resp.data.kit_detail;
@@ -116,7 +121,11 @@ export default {
         console.log("data console", this.kit);
       });
     },
-
+    /**
+     * Navigates back to the previous page using Vue Router.
+     * This method goes back one step in the browser's history.
+     * Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route.
+     */
     goBack() {
       // Use Vue Router to navigate back to the previous page
       this.$router.go(-1); // This will go back one step in the history
@@ -144,10 +153,10 @@ h1 {
   color: white;
   /* padding: 15px; */
   margin: 0;
-  border-radius: 8px 8px 0 0;
+  border-radius: 5px 5px 0 0;
 }
 .card-body {
-  padding: 20px;
+  padding: 0px;
 }
 .card-title {
   color: #ff002d;
@@ -167,6 +176,16 @@ h1 {
   border: 1px solid #e2e2e2;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 20px;
+  /* margin: 20px; */
+  margin-top: 20px;
+}
+table h3,
+table p {
+  margin: 0;
+}
+.table th,
+.table td {
+  padding: 20px 10px;
+  font-size: unset;
 }
 </style>

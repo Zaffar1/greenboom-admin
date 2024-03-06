@@ -5,7 +5,7 @@
       <b-button
         @click="addCatalogModal"
         variant="success"
-        class="mr-2 orange-button"
+        class="mr-2 orange-button btn-secondary"
       >
         <i class="mdi mdi-plus"></i> Add Catalog
       </b-button>
@@ -19,7 +19,7 @@
               <!-- search field -->
               <b-input
                 v-model="filter"
-                placeholder="Search Catalog"
+                placeholder="Search Catalog & Broucher"
                 id="user-search"
                 style="padding: 10px"
               ></b-input>
@@ -66,12 +66,12 @@
                     :ref="'btn' + data.index"
                     class="mr-2 mdi mdi-eye text-muted icon-sm"
                   ></i> -->
-                <!-- <i
+                <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil text-muted icon-sm"
-                ></i> -->
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -176,7 +176,7 @@
         <b-button
           type="submit"
           variant="success"
-          class="orange-button"
+          class="orange-button popUp"
           :disabled="isLoading"
         >
           {{ isLoading ? "Uploading..." : "Upload" }}
@@ -184,8 +184,12 @@
       </form>
     </b-modal>
 
-    <!-- Edit Msd Sheet -->
-    <b-modal v-model="showEditModal" title="Edit Msd Sheet" hide-footer>
+    <!-- Edit Catalog -->
+    <b-modal
+      v-model="showEditModal"
+      title="Edit Catalog & Broucher"
+      hide-footer
+    >
       <form @submit.prevent="submitEditForm">
         <b-form-group label="Title" label-for="editInputTitle">
           <b-form-input
@@ -207,11 +211,21 @@
             id="editInputFile"
             :state="Boolean(editedFile)"
             placeholder="Choose a file..."
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFileChange2"
+            ref="fileInputRef2"
           ></b-form-file>
         </b-form-group>
         <!-- You can edit more fields as needed -->
 
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button popUp"
+          :disabled="isLoading"
+        >
+          {{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
       </form>
     </b-modal>
 
@@ -288,8 +302,9 @@ export default {
       data.forEach((element) => {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        // let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -307,30 +322,65 @@ export default {
         this.items.push(obj);
       });
     },
+    /**
+     * Opens a modal to display a video.
+     * Sets the video source and opens the modal.
+     *
+     * @param {string} videoUrl The URL of the video to be displayed.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+    /**
+     * Closes the currently open modal.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
+    /**
+     * Opens a PDF file in a new window or tab.
+     *
+     * @param {string} pdfUrl The URL of the PDF file to be opened.
+     */
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
+    /**
+     * Opens an Excel file in a new window or tab.
+     *
+     * @param {string} excelUrl The URL of the Excel file to be opened.
+     */
     openExcel(excelUrl) {
       // Open the EXCEL file in a new window or tab
       window.open(excelUrl, "_blank");
     },
+    /**
+     * Opens a Word document in a new window or tab.
+     *
+     * @param {string} wordUrl The URL of the Word document to be opened.
+     */
     openWord(wordUrl) {
       // Open the WORD file in a new window or tab
       window.open(wordUrl, "_blank");
     },
+    /**
+     * Opens a PowerPoint presentation in a new window or tab.
+     *
+     * @param {string} powerPointUrl The URL of the PowerPoint presentation to be opened.
+     */
     openPowerPoint(PowerPointUrl) {
       // Open the POWERPOINT file in a new window or tab
       window.open(PowerPointUrl, "_blank");
     },
+    /**
+     * Opens a modal to add a new catalog or brochure.
+     * Sets initial values and opens the modal.
+     *
+     * @param {object} item The item to be added.
+     */
     addCatalogModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -340,6 +390,10 @@ export default {
       this.addCatalogModel = true;
       this.isLoading = false;
     },
+    /**
+     * Handles the change event when selecting a file.
+     * Validates the file format and displays an error message if invalid.
+     */
     handleFileChange() {
       const allowedFormats = [
         "application/pdf", // PDF
@@ -368,12 +422,60 @@ export default {
         }
       }
     },
+    /**
+     * Resets the file input field to allow re-selection of the same file.
+     */
     resetFileInput() {
       // Reset the file input value to allow re-selection of the same file
       const fileInput =
         this.$refs.fileInputRef.$el.querySelector("input[type='file']");
       fileInput.value = null;
     },
+    /**
+     * Handles the change event when selecting a file.
+     * Validates the file format and displays an error message if invalid.
+     */
+    handleFileChange2() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
+
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.editedFile = null;
+          this.resetFileInput2();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+    /**
+     * Resets the file input field to allow re-selection of the same file.
+     */
+    resetFileInput2() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+    /**
+     * Submits the form to add a new catalog or brochure.
+     * Sends a request to the API and handles the response.
+     */
     async submitAddForm() {
       try {
         this.isLoading = true;
@@ -418,7 +520,12 @@ export default {
         });
       }
     },
-
+    /**
+     * Opens a modal to edit an existing catalog or brochure.
+     * Sets initial values and opens the modal.
+     *
+     * @param {object} item The item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -426,9 +533,15 @@ export default {
       this.editedDescription = item.description;
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
+      this.isLoading = false;
     },
-
+    /**
+     * Submits the form to edit an existing catalog or brochure.
+     * Sends a request to the API and handles the response.
+     */
     async submitEditForm() {
+      // console.log(this.editedItem.id);
+      this.isLoading = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("description", this.editedDescription);
@@ -440,7 +553,7 @@ export default {
       editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
 
       try {
-        await API.post(endpoints.msdSheets.editMsdSheet, editedFormData);
+        await API.post(endpoints.catalogs.editCatalog, editedFormData);
 
         // Handle success
         Swal.fire({
@@ -470,7 +583,12 @@ export default {
         });
       }
     },
-
+    /**
+     * Changes the status of an item (e.g., catalog or brochure) between Active and Inactive.
+     * Sends a request to the API to update the status and updates the local items array accordingly.
+     *
+     * @param {object} item The item whose status is to be changed.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -504,10 +622,20 @@ export default {
         Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
-
+    /**
+     * Logs the ID of the item for viewing.
+     *
+     * @param {number} itemId The ID of the item to view.
+     */
     view(itemId) {
       console.log(itemId);
     },
+    /**
+     * Deletes an item (e.g., catalog or brochure) after confirmation from the user.
+     * Sends a request to the API to delete the item and updates the local items array accordingly.
+     *
+     * @param {number} itemId The ID of the item to delete.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -561,6 +689,10 @@ export default {
       });
     },
   },
+  /**
+   * Lifecycle hook called when the component is mounted.
+   * Fetches the catalog list data and sets the component's items accordingly.
+   */
   async mounted() {
     // const id = this.$route.params.id;
     await this.fetchCatalogList();

@@ -5,7 +5,7 @@
       <b-button
         @click="addWelcomeModal"
         variant="success"
-        class="mr-2 orange-button"
+        class="mr-2 orange-button btn-secondary"
       >
         <i class="mdi mdi-plus"></i> Add Welcome Video
       </b-button>
@@ -79,12 +79,12 @@
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
                 ></i> -->
                 <!--  Edit  -->
-                <!-- <i
+                <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil text-muted icon-sm"
-                ></i> -->
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <!-- End edit -->
                 <i
                   @click="deleteItem(data.item.id)"
@@ -118,7 +118,7 @@
 
     <div v-if="isModalOpen" class="modal">
       <span @click="closeModal" class="close">&times;</span>
-      <video :src="videoSource" controls></video>
+      <video :src="videoSource" controls autoplay></video>
     </div>
     <!-- v-if="currentVideo" -->
     <!-- <b-modal title="Video Player" @hidden="resetModal" id="video-modal">
@@ -197,11 +197,21 @@
             id="editInputFile"
             :state="Boolean(editedFile)"
             placeholder="Choose a file..."
+            accept=".mp4, .mov, .avi"
+            @change="handleFileChange2"
+            ref="fileInputRef2"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button btn btn-secondary"
+        >
+          <span v-if="isLoadingAddButton">Updating...</span>
+          <span v-else>Update</span></b-button
+        >
       </form>
     </b-modal>
 
@@ -273,8 +283,9 @@ export default {
       data.forEach((element) => {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        //let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
         obj.id = element.id;
         obj.title = element.title;
         obj.description = element.description;
@@ -321,6 +332,33 @@ export default {
           // Clear the file input and show an error message
           this.addFile = null;
           this.resetFileInput();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid video file (mp4, mov, avi).",
+          });
+        }
+      }
+    },
+    resetFileInput2() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef2.$el.querySelector("input[type=file]").value = "";
+    },
+    handleFileChange2() {
+      const allowedFormats = [
+        "video/mp4",
+        "video/quicktime",
+        "video/x-msvideo",
+      ];
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.editedFile = null;
+          this.resetFileInput2();
           Swal.fire({
             icon: "error",
             title: "Invalid File Format",
@@ -382,6 +420,7 @@ export default {
     },
 
     async submitEditForm() {
+      this.isLoadingAddButton = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("description", this.editedDescription);

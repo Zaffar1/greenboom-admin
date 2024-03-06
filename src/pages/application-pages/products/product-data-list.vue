@@ -4,19 +4,19 @@
       <i class="mdi mdi-arrow-left"></i> Go Back
     </button>
     <div class="page-header">
-      <h3 class="page-title">
+      <h3 class="page-title mt-4">
         Product Data of ( {{ this.storedProductData.ProductName }} )
         <!-- Product Data of ( {{ this.$route.params.data.ProductName }} ) -->
         <!-- Product Data -->
       </h3>
-      <div>
+      <!-- <div>
         <b-button
           @click="addProductModal"
           variant="success"
           class="mr-2 orange-button"
           ><i class="mdi mdi-plus"></i>Add Product Data</b-button
         >
-      </div>
+      </div> -->
     </div>
     <div>
       <h3>Description:</h3>
@@ -470,6 +470,12 @@ export default {
     //   return this.$store.getters.getProductDetail;
     // },
   },
+
+  /**
+   * The 'data' function returns an object containing various data properties used within the component.
+   * These properties include flags, variables for sorting and pagination, form fields, file input, modals, and select options.
+   * @returns {Object} - An object containing data properties for the component.
+   */
   data: function () {
     return {
       isScriptsTitle: true,
@@ -541,7 +547,7 @@ export default {
         // { key: "product_name", sortable: true },
         // { key: "title", sortable: true },
         { key: "size", sortable: true },
-        { key: "dimensions", sortable: true },
+        // { key: "dimensions", sortable: true },
         // { key: "Absorbency", sortable: true },
         // { key: "qty/case", sortable: true },
         // { key: "weight_product", sortable: true },
@@ -553,12 +559,25 @@ export default {
       noItems: null,
     };
   },
+
+  /**
+   * The 'computed' property contains computed properties that are derived from the component's data or store getters.
+   * These computed properties include mapped getters for product data, default image, and image URL.
+   * Additionally, it calculates the number of rows/items in the 'items' array.
+   * @returns {Object} - An object containing computed properties for the component.
+   */
   computed: {
     ...mapGetters(["getProductData", "getDefaultImage", "getImageUrl"]),
     rows() {
       return this.items.length;
     },
   },
+
+  /**
+   * The 'created' lifecycle hook is invoked when the component has been created, but it has not been mounted yet.
+   * In this hook, it accesses the ID and title from the route parameters and logs the title to the console.
+   * It can also call the 'fetchDataById' method with the ID if needed.
+   */
   created() {
     // Access the ID from the route parameters
     const id = this.$route.params.id;
@@ -569,6 +588,13 @@ export default {
   },
   methods: {
     ...mapActions(["fetchProductData"]),
+
+    /**
+     * This function iterates over each element in the data array and constructs an object for each element.
+     * It assigns specific properties of the element to corresponding properties of the object.
+     * Finally, it pushes the constructed object into the 'items' array.
+     * This process effectively transforms the original data into a format suitable for display or manipulation.
+     */
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
@@ -610,6 +636,13 @@ export default {
         this.items.push(obj);
       });
     },
+
+    /**
+     * Function to break lines in a text after a certain number of words.
+     * @param {string} text - The text to be processed.
+     * @param {number} words - The number of words after which to break the line.
+     * @returns {string} The processed text with line breaks.
+     */
     breakLineAfterWords(text, words) {
       if (!text) return "";
       const wordArray = text.split(" ");
@@ -628,6 +661,11 @@ export default {
     //   this.showDetailsModal = true;
     // },
     ////// End
+
+    /**
+     * Redirects to the product detail page with the specified product ID and size.
+     * @param {object} item - The item containing product details.
+     */
     viewDetails(item) {
       // console.log("item data", item);
       console.log("product_id", item.product_id);
@@ -638,6 +676,10 @@ export default {
       });
     },
 
+    /**
+     * Changes the status of a product item.
+     * @param {object} item - The product item whose status is to be changed.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -672,11 +714,20 @@ export default {
       }
     },
 
+    /**
+     * Opens a modal window with a video.
+     * @param {string} videoUrl - The URL of the video to be displayed in the modal.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+
+    /**
+     * Opens the modal for adding a new product.
+     * @param {object} item - The item containing product details to be added.
+     */
     addProductModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -709,6 +760,10 @@ export default {
       this.addProductModel = true;
     },
 
+    /**
+     * Opens the modal for editing a product.
+     * @param {object} item - The item containing product details to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -717,6 +772,9 @@ export default {
       this.showEditModal = true;
     },
 
+    /**
+     * Submits the form for adding a new product.
+     */
     async submitAddForm() {
       const addFormData = new FormData();
       addFormData.append("title", this.addTitle);
@@ -806,6 +864,9 @@ export default {
       }
     },
 
+    /**
+     * Submits the form for editing a product.
+     */
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
@@ -863,21 +924,46 @@ export default {
     //     "http://localhost:8000/storage/trainingMedia/1701965964.mp4";
     //   this.isModalOpen = true;
     // },
+
+    /**
+     * Closes the modal.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
+
+    /**
+     * Opens the PDF file in a new window or tab.
+     * @param {string} pdfUrl - The URL of the PDF file to open.
+     */
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
+
+    /**
+     * Opens the WORD file in a new window or tab.
+     * @param {string} wordUrl - The URL of the WORD file to open.
+     */
     openWord(wordUrl) {
       // Open the WORD file in a new window or tab
       window.open(wordUrl, "_blank");
     },
+
+    /**
+     * Opens the POWERPOINT file in a new window or tab.
+     * @param {string} PowerPointUrl - The URL of the POWERPOINT file to open.
+     */
     openPowerPoint(PowerPointUrl) {
       // Open the POWERPOINT file in a new window or tab
       window.open(PowerPointUrl, "_blank");
     },
+
+    /**
+     * Redirects to a route for viewing media with the provided ID and title.
+     * @param {object} Script - The media script object containing ID and title.
+     * @param {string} id - The ID of the media script.
+     */
     scriptData(Script, id) {
       console.log("View media with ID:", Script.id);
       console.log("Route ID:", Script.id);
@@ -887,6 +973,11 @@ export default {
         params: { id: Script.id, title: Script.title },
       });
     },
+
+    /**
+     * Prompts the user to confirm deletion of a product item.
+     * @param {string} itemId - The ID of the product item to delete.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -940,6 +1031,10 @@ export default {
         }
       });
     },
+
+    /**
+     * Navigates back to the previous page using Vue Router.
+     */
     goBack() {
       // Use Vue Router to navigate back to the previous page
       this.$router.go(-1); // This will go back one step in the history

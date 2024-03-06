@@ -4,7 +4,7 @@
       <i class="mdi mdi-arrow-left"></i> Go Back
     </button>
     <div class="page-header">
-      <h3 class="page-title">
+      <h3 class="page-title mt-4">
         Training Media of ({{ this.$route.params.title }})
       </h3>
       <div>
@@ -13,7 +13,7 @@
           v-if="this.$route.params.title === 'FAQs'"
           @click="addFaqModal"
           variant="success"
-          class="mr-2 orange-button"
+          class="mr-2 orange-button btn-secondary"
         >
           <i class="mdi mdi-plus"></i>Add FAQ
         </b-button>
@@ -22,7 +22,7 @@
           v-else
           @click="addTrainingModal"
           variant="success"
-          class="mr-2 orange-button"
+          class="mr-2 orange-button btn-secondary"
         >
           <i class="mdi mdi-plus"></i>Add Training Media
         </b-button>
@@ -84,12 +84,21 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
                 ></i> -->
-                <!-- <i
+                <i
+                  v-if="shouldShowEditButton"
                   v-b-modal.modallg
+                  @click="openEditModal2(data.item)"
+                  :ref="'editBtn' + data.index"
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
+
+                <!-- Another Button (Second Button) -->
+                <i
+                  v-if="shouldShowSecondButton"
                   @click="openEditModal(data.item)"
-                  :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil btn orange-button icon-sm"
-                ></i> -->
+                  :ref="'editBtn' + data.index"
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -102,7 +111,7 @@
                   <button
                     v-if="data.item.type === 'video'"
                     @click="openModal(data.item.file)"
-                    class="btn btn-primary"
+                    class="btn btn-primary orange-button"
                   >
                     <i class="mdi mdi-play"></i> Play Video
                   </button>
@@ -166,6 +175,7 @@
             required
           ></b-form-input>
         </b-form-group>
+
         <b-form-group label="Upload file" label-for="editInputFile">
           <b-form-file
             v-model="addFile"
@@ -178,11 +188,22 @@
             ref="fileInputRef"
           ></b-form-file>
         </b-form-group>
-
+        <b-form-group label="Upload thumbnail" label-for="editInputFile">
+          <b-form-file
+            v-model="addThumbnail"
+            id="editInputthumbnail"
+            :state="Boolean(addThumbnail)"
+            placeholder="Choose a file..."
+            accept=".png, .jpg, .jpeg"
+            @change="handleFileChange2"
+            ref="fileInputRef2"
+            :required="isVideoFileType(addFile)"
+          ></b-form-file>
+        </b-form-group>
         <b-button
           type="submit"
           variant="success"
-          class="orange-button"
+          class="orange-button popUp"
           :disabled="isLoading"
         >
           {{ isLoading ? "Uploading..." : "Upload" }}
@@ -193,6 +214,25 @@
 
     <b-modal v-model="addFaqModel" title="Add Faq" hide-footer>
       <form @submit.prevent="submitAddFaqForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="addTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="addFile"
+            id="editInputFile"
+            :state="Boolean(addFile)"
+            placeholder="Choose a file..."
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFaqChange"
+            required
+            ref="fileInputRef5"
+          ></b-form-file>
+        </b-form-group>
         <b-form-group label="Add Faqs" label-for="editInputHtml">
           <div>
             <quill-editor
@@ -205,7 +245,7 @@
         <b-button
           type="submit"
           variant="success"
-          class="orange-button"
+          class="orange-button popUp"
           :disabled="isLoading"
         >
           {{ isLoading ? "Adding..." : "Add" }}
@@ -230,11 +270,71 @@
             id="editInputFile"
             :state="Boolean(editedFile)"
             placeholder="Choose a file..."
+            accept=".pdf, .mp4, .mov, .avi, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFileChange"
+            ref="fileInputRef"
+          ></b-form-file>
+        </b-form-group>
+        <b-form-group label="Upload Thumbnail" label-for="editInputFile1">
+          <b-form-file
+            v-model="editedThumbnail"
+            id="editInputFile1"
+            :state="Boolean(editedThumbnail)"
+            placeholder="Choose a file..."
+            accept=".png, .jpg, .jpeg"
+            @change="handleFileChange4"
+            ref="fileInputRef4"
+            :required="isVideoFileType(editedFile)"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
 
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button popUp"
+          :disabled="isLoading"
+          >{{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
+      </form>
+    </b-modal>
+    <b-modal v-model="showEditModal2" title="Edit Faq Data" hide-footer>
+      <form @submit.prevent="submitEditForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="editedTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group label="Upload file" label-for="editInputFile">
+          <b-form-file
+            v-model="editedFile"
+            id="editInputFile"
+            :state="Boolean(editedFile)"
+            placeholder="Choose a file..."
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            @change="handleFaqChange"
+            ref="fileInputRef5"
+          ></b-form-file>
+        </b-form-group>
+        <b-form-group label="Faq Text" label-for="editInputHtml">
+          <div>
+            <quill-editor
+              v-model="editorContent"
+              :options="editorOptions"
+            ></quill-editor>
+          </div>
+        </b-form-group>
+        <!-- You can add more fields as needed -->
+
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button popUp"
+          :disabled="isLoading"
+          >{{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
       </form>
     </b-modal>
     <div></div>
@@ -282,9 +382,12 @@ export default {
       addFaqModel: false,
       addTitle: "",
       addFile: null,
+      addThumbnail: null,
       showEditModal: false,
+      showEditModal2: false,
       editedTitle: "",
       editedFile: null,
+      editedThumbnail: null,
       // Add a property to store the current edited item
       editedItem: null,
       fields: [
@@ -299,12 +402,43 @@ export default {
       noItems: null,
     };
   },
+
+  /**
+   * Computed properties for the component.
+   */
   computed: {
     ...mapGetters(["getTrainingMedia", "getDefaultImage", "getImageUrl"]),
+
+    /**
+     * Computes the number of rows.
+     * @returns {number} - The number of rows.
+     */
     rows() {
       return this.items.length;
     },
+
+    /**
+     * Determines whether to show the edit button.
+     * @returns {boolean} - True if the edit button should be shown, otherwise false.
+     */
+    shouldShowEditButton() {
+      return this.$route.params.title === "FAQs";
+    },
+
+    /**
+     * Determines whether to show the second button.
+     * @returns {boolean} - True if the second button should be shown, otherwise false.
+     */
+    shouldShowSecondButton() {
+      // Add conditions for when to show the second button
+      // For example, you might use a different route parameter or condition
+      return this.$route.params.title !== "FAQs";
+    },
   },
+
+  /**
+   * Lifecycle hook called when the component is created.
+   */
   created() {
     // Access the ID from the route parameters
     const id = this.$route.params.id;
@@ -319,8 +453,9 @@ export default {
       data.forEach((element) => {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        // let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -340,6 +475,11 @@ export default {
     logContent() {
       console.log("Editor Content:", this.editorContent);
     },
+
+    /**
+     * Asynchronously changes the status of a training media item.
+     * @param {Object} item - The training media item to change status for.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -374,34 +514,75 @@ export default {
       }
     },
 
+    /**
+     * Opens a modal for viewing a video.
+     * @param {string} videoUrl - The URL of the video to view.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+
+    /**
+     * Opens a modal for adding a training.
+     * @param {Object} item - The item to be added.
+     */
     addTrainingModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
       this.addTitle = item.title;
       this.addFile = null;
+      this.addThumbnail = null;
       // this.editorContent = item.editorContent;
       this.addMediaModel = true;
       this.isLoading = false;
     },
+
+    /**
+     * Opens a modal for adding a FAQ.
+     * @param {Object} item - The item to be added.
+     */
     addFaqModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
+      this.addTitle = item.title;
       this.editorContent = item.editorContent;
       this.addFaqModel = true;
       this.isLoading = false;
     },
+
+    /**
+     * Opens a modal for editing a training.
+     * @param {Object} item - The item to be edited.
+     */
+    openEditModal2(item) {
+      // Set initial values when opening the modal
+      this.editedItem = item;
+      this.editedTitle = item.title;
+      this.editorContent = item.editorContent;
+      // this.editedThumbnail = null;
+      this.showEditModal2 = true;
+      this.isLoading = false;
+    },
+
+    /**
+     * Opens a modal for editing a training.
+     * @param {Object} item - The item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
       this.editedTitle = item.title;
       this.editedFile = null; // Clear the file input
+      this.editedThumbnail = null;
       this.showEditModal = true;
+      this.isLoading = false;
     },
+
+    /**
+     * Handles file change event for validation.
+     */
     handleFileChange() {
       const allowedFormats = [
         "application/pdf", // PDF
@@ -424,6 +605,7 @@ export default {
         if (!allowedFormats.includes(selectedFile.type)) {
           // Clear the file input and show an error message
           this.addFile = null;
+          // this.addThumbnail = null;
           this.resetFileInput();
           Swal.fire({
             icon: "error",
@@ -433,22 +615,147 @@ export default {
         }
       }
     },
+
+    /**
+     * Resets the file input element.
+     */
     resetFileInput() {
       // Reset the file input value to allow re-selection of the same file
       const fileInput =
         this.$refs.fileInputRef.$el.querySelector("input[type='file']");
       fileInput.value = null;
     },
+
+    /**
+     * Handles file change event for validation.
+     */
+    handleFileChange4() {
+      const allowedFormats = ["image/png", "image/jpg", "image/jpeg"];
+
+      const fileInput =
+        this.$refs.fileInputRef4.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addImage = null;
+          this.resetFileInput4();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
+
+    /**
+     * Resets the file input element.
+     */
+    resetFileInput4() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef4.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+
+    /**
+     * Handles file change event for validation.
+     */
+    handleFaqChange() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
+
+      const fileInput =
+        this.$refs.fileInputRef5.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          // this.addThumbnail = null;
+          this.resetFileInput5();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+
+    /**
+     * Resets the file input element.
+     */
+    resetFileInput5() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef5.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+
+    /**
+     * Resets the file input element.
+     */
+    resetFileInput2() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef2.$el.querySelector("input[type=file]").value = "";
+    },
+
+    /**
+     * Handles file change event for validation.
+     */
+    handleFileChange2() {
+      const allowedFormats = ["image/png", "image/jpeg", "image/jpg"];
+
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput2();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid image file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
+
+    /**
+     * Submits the form to add a FAQ.
+     */
     async submitAddFaqForm() {
       this.isLoading = true;
-      const addFormData = new FormData();
 
       try {
         const addFormData = new FormData();
+        const training_id = this.$route.params.id;
+        addFormData.append("title", this.addTitle);
+        addFormData.append("training_id", training_id);
         addFormData.append("faq_text", this.editorContent);
-
+        if (this.addFile) {
+          addFormData.append("file", this.addFile);
+        }
+        if (this.addThumbnail) {
+          addFormData.append("thumbnail", this.addThumbnail);
+        }
+        // const result = await API.post(endpoints.faqs.addFaq, addFormData);
         const result = await API.post(
-          endpoints.faqs.addFaq,
+          endpoints.trainings.addTrainingMedia,
           addFormData
         );
 
@@ -481,6 +788,20 @@ export default {
         });
       }
     },
+
+    /**
+     * Determines if the file type is a video.
+     * @param {File} file - The file to check.
+     * @returns {boolean} - True if the file is a video, otherwise false.
+     */
+    isVideoFileType(file) {
+      // Check if the selected file is a video type
+      return file && /\.(mp4|mov|avi)$/i.test(file.name);
+    },
+
+    /**
+     * Submits the form to add training media.
+     */
     async submitAddForm() {
       this.isLoading = true;
       const addFormData = new FormData();
@@ -494,6 +815,9 @@ export default {
         addFormData.append("faq_text", this.editorContent);
         if (this.addFile) {
           addFormData.append("file", this.addFile);
+        }
+        if (this.addThumbnail) {
+          addFormData.append("thumbnail", this.addThumbnail);
         }
         const result = await API.post(
           endpoints.trainings.addTrainingMedia,
@@ -529,15 +853,25 @@ export default {
           title: "Error",
           text: "An error occurred while adding training media",
         });
+        this.isLoading = false;
+        this.addMediaModel = false;
       }
     },
 
+    /**
+     * Submits the form to edit training media.
+     */
     async submitEditForm() {
+      this.isLoading = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("training_id", this.$route.params.id);
+      editedFormData.append("faq_text", this.editorContent);
       if (this.editedFile) {
         editedFormData.append("file", this.editedFile);
+      }
+      if (this.editedThumbnail) {
+        editedFormData.append("file", this.editedThumbnail);
       }
 
       // Add an identifier for the edited item (e.g., item ID) to the form data
@@ -547,7 +881,7 @@ export default {
       try {
         // Attempt to make the API request
         await API.post(endpoints.trainings.editTrainingMedia, editedFormData);
-
+        this.showEditModal2 = false;
         // Handle success
         Swal.fire({
           icon: "success",
@@ -572,6 +906,7 @@ export default {
           : (this.noItems = "No TrainingMedia Found.");
       } catch (error) {
         // Handle error
+        this.isLoading = false;
         console.error("Error editing TrainingMedia:", error);
 
         // Display an error message
@@ -592,25 +927,55 @@ export default {
     closeModal() {
       this.isModalOpen = false;
     },
+
+    /**
+     * Opens a PDF file in a new tab.
+     * @param {string} pdfUrl - The URL of the PDF file.
+     */
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
+
+    /**
+     * Opens a Word file in a new tab.
+     * @param {string} wordUrl - The URL of the Word file.
+     */
     openWord(wordUrl) {
       // Open the WORD file in a new window or tab
       window.open(wordUrl, "_blank");
     },
+
+    /**
+     * Opens an Excel file in a new tab.
+     * @param {string} excelUrl - The URL of the Excel file.
+     */
     openExcel(excelUrl) {
       // Open the EXCEL file in a new window or tab
       window.open(excelUrl, "_blank");
     },
+
+    /**
+     * Opens a PowerPoint file in a new tab.
+     * @param {string} PowerPointUrl - The URL of the PowerPoint file.
+     */
     openPowerPoint(PowerPointUrl) {
       // Open the POWERPOINT file in a new window or tab
       window.open(PowerPointUrl, "_blank");
     },
+
+    /**
+     * View training media item.
+     * @param {string} itemId - The ID of the training media item to view.
+     */
     view(itemId) {
       console.log(itemId);
     },
+
+    /**
+     * Deletes a training media item.
+     * @param {string} itemId - The ID of the training media item to delete.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -664,12 +1029,21 @@ export default {
         }
       });
     },
+
+    /**
+     * Navigates back to the previous page using Vue Router.
+     */
     goBack() {
       // Use Vue Router to navigate back to the previous page
       this.$router.go(-1); // This will go back one step in the history
       // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
     },
   },
+
+  /**
+   * Fetches training media data on component mount.
+   */
+
   async mounted() {
     const id = this.$route.params.id;
     await this.fetchTrainingMedia(id);

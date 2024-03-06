@@ -204,6 +204,7 @@
         <li class="nav-item">
           <router-link class="nav-link" to="/order/order-kit-list">
             <span class="menu-title">Order a kit</span>
+            <i class="mdi mdi-apps-box menu-icon"></i>
           </router-link>
         </li>
 

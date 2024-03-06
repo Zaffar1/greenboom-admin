@@ -8,22 +8,21 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from "vuex";
 export default {
-  name: 'app',
-  components: {
-  },
+  name: "app",
+  components: {},
   methods: {
-    ...mapActions(['verifyUser', 'logoutUser'])
+    ...mapActions(["verifyUser", "logoutUser"]),
   },
   async mounted() {
     let response = await this.verifyUser();
-    if(response != true){
+    if (response != true) {
       this.logoutUser();
-      this.$router.push({name: 'base'});
+      this.$router.push({ name: "base" });
     }
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
@@ -39,4 +38,8 @@ export default {
 @import "../node_modules/c3/c3.min.css";
 @import "../node_modules/chartist/dist/chartist.min.css";
 @import "./assets/scss/style";
+
+.popUp {
+  padding: 10px 15px;
+}
 </style>

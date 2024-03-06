@@ -11,7 +11,7 @@
           v-if="this.$route.params.title === 'Scripts'"
           @click="addScriptModal"
           variant="success"
-          class="mr-2 orange-button"
+          class="mr-2 orange-button btn-secondary"
         >
           <i class="mdi mdi-plus"></i>Add Data
         </b-button>
@@ -19,7 +19,7 @@
           v-else-if="this.$route.params.title === 'Videos'"
           @click="addVideoModal"
           variant="success"
-          class="mr-2 orange-button"
+          class="mr-2 orange-button btn-secondary"
         >
           <i class="mdi mdi-plus"></i>Add Video
         </b-button>
@@ -27,7 +27,7 @@
           v-else
           @click="addTrainingModal"
           variant="success"
-          class="mr-2 orange-button"
+          class="mr-2 orange-button btn-secondary"
         >
           <i class="mdi mdi-plus"></i>Add Data
         </b-button>
@@ -93,8 +93,25 @@
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil text-muted icon-sm"
+                  class="mr-2 orange-button mdi mdi-pencil icon-sm p-2 rounded"
                 ></i> -->
+                <i
+                  v-if="isScriptsTitle2"
+                  v-b-modal.modallg
+                  @click="openEditModal2(data.item)"
+                  :ref="'editBtn1' + data.index"
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
+
+                <!-- Another Button (Second Button) -->
+                <i
+                  v-else
+                  v-b-modal.modallg
+                  @click="openEditModal(data.item)"
+                  :ref="'editBtn' + data.index"
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
+
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -110,14 +127,6 @@
                     class="btn btn-primary orange-button"
                   >
                     <i class="mdi mdi-play"></i> Play Video
-                  </button>
-
-                  <button
-                    v-else-if="isScriptsTitle && data.item.type !== 'pdf'"
-                    @click="scriptData(data.item)"
-                    class="btn btn-secondary orange-button"
-                  >
-                    <i class="mdi mdi-eye"></i> View
                   </button>
 
                   <button
@@ -149,6 +158,13 @@
                   >
                     <i class="mdi mdi-file-powerpoint"></i> Open PowerPoint
                   </button>
+                  <button
+                    v-else-if="isScriptsTitle && data.item.type !== 'pdf'"
+                    @click="scriptData(data.item)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-eye"></i> View
+                  </button>
 
                   <span v-else> Unsupported file type </span>
                 </div>
@@ -168,7 +184,7 @@
     </div>
     <div v-if="isModalOpen" class="modal">
       <span @click="closeModal" class="close">&times;</span>
-      <video :src="videoSource" controls></video>
+      <video :src="videoSource" controls autoplay></video>
       <p v-if="!videoSource">No video source provided</p>
     </div>
 
@@ -201,10 +217,21 @@
               ref="fileInputRef"
             ></b-form-file>
           </b-form-group>
-
+          <b-form-group label="Upload thumbnail" label-for="editInputFile">
+            <b-form-file
+              v-model="addThumbnail"
+              id="editInputthumbnail"
+              :state="Boolean(addThumbnail)"
+              placeholder="Choose a file..."
+              accept=".png, .jpg, .jpeg"
+              @change="handleFileChange2"
+              ref="fileInputRef2"
+              :required="isVideoFileType(addFile)"
+            ></b-form-file>
+          </b-form-group>
           <b-button
             type="submit"
-            variant="success orange-button"
+            variant="success orange-button popUp"
             :disabled="isLoadingAddButton"
           >
             <span v-if="isLoadingAddButton">Uploading...</span>
@@ -238,10 +265,21 @@
               ref="fileInputRef"
             ></b-form-file>
           </b-form-group>
-
+          <b-form-group label="Upload thumbnail" label-for="editInputFile">
+            <b-form-file
+              v-model="addThumbnail"
+              id="editInputthumbnail"
+              :state="Boolean(addThumbnail)"
+              placeholder="Choose a file..."
+              accept=".png, .jpg, .jpeg"
+              @change="handleThumbnail2"
+              ref="fileInputRef2"
+              required
+            ></b-form-file>
+          </b-form-group>
           <b-button
             type="submit"
-            variant="success orange-button"
+            variant="success orange-button popUp"
             :disabled="isLoadingAddButton"
           >
             <span v-if="isLoadingAddButton">Uploading...</span>
@@ -267,7 +305,7 @@
         <b-button
           type="submit"
           variant="success"
-          class="orange-button"
+          class="orange-button popUp"
           :disabled="isLoading"
         >
           {{ isLoading ? "Adding..." : "Add" }}
@@ -294,14 +332,59 @@
             v-model="editedFile"
             id="editInputFile"
             :state="Boolean(editedFile)"
+            accept=".pdf, .mp4, .mov, .avi, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
             placeholder="Choose a file..."
+            @change="handleFileChange"
+          ></b-form-file>
+        </b-form-group>
+        <b-form-group label="Upload Thumbnail" label-for="editInputFile1">
+          <b-form-file
+            v-model="editedThumbnail"
+            id="editInputFile1"
+            :state="Boolean(editedThumbnail)"
+            placeholder="Choose a file..."
+            accept=".png, .jpg, .jpeg"
+            @change="handleFileChange2"
+            ref="fileInputRef2"
+            :required="isVideoFileType(editedFile)"
           ></b-form-file>
         </b-form-group>
         <!-- You can add more fields as needed -->
-
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button popUp"
+          :disabled="isLoading"
+          >{{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
       </form>
     </b-modal>
+
+    <b-modal
+      v-model="showEditModal2"
+      title="Edit Perfect Sale Media"
+      hide-footer
+    >
+      <form @submit.prevent="submitEditForm">
+        <b-form-group label="Title" label-for="editInputTitle">
+          <b-form-input
+            v-model="editedTitle"
+            id="editInputTitle"
+            required
+          ></b-form-input>
+        </b-form-group>
+
+        <!-- You can add more fields as needed -->
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button popUp"
+          :disabled="isLoading"
+          >{{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
+      </form>
+    </b-modal>
+
     <div></div>
   </section>
 </template>
@@ -322,7 +405,19 @@ Vue.use(SortedTablePlugin, {
 export default {
   computed: {
     isScriptsTitle() {
-      return this.$route.params.title === "scripts";
+      console.log(this.$route.params.title);
+      this.script = this.$route.params.title;
+      return this.$route.params.title === "Scripts";
+    },
+    isScriptsTitle2() {
+      console.log(this.$route.params.title);
+      this.script = this.$route.params.title;
+      return this.$route.params.title === "Scripts";
+    },
+    shouldShowSecondButton() {
+      // Add conditions for when to show the second button
+      // For example, you might use a different route parameter or condition
+      return this.$route.params.title !== "Scripts";
     },
     isVideosTitle() {
       return this.$route.params.title === "videos";
@@ -333,10 +428,22 @@ export default {
     },
   },
   data: function () {
+    const isScriptsTitle2 = this.$route.params.title === "Scripts";
+
+    const fields = [
+      { key: "title", sortable: true },
+      ...(isScriptsTitle2 ? [] : [{ key: "type", sortable: true }]),
+      { key: "status", sortable: true },
+      { key: "created_at", sortable: true },
+      { key: "Media", sortable: true },
+      { key: "action", sortable: true },
+    ];
+
     return {
       isLoading: false,
       isLoadingAddButton: false,
       isScriptsTitle: true,
+      script: null,
       isVideosTitle: true,
       isModalOpen: false,
       videoSource: "", // Set a default video source
@@ -353,31 +460,32 @@ export default {
       addVideoModel: false,
       addTitle: "",
       addFile: null,
+      addThumbnail: null,
       showEditModal: false,
+      showEditModal2: false,
       editedTitle: "",
       editedFile: null,
+      editedThumbnail: null,
       // Add a property to store the current edited item
       editedItem: null,
-      fields: [
-        { key: "title", sortable: true },
-        ...(this.isScriptsTitle
-          ? []
-          : [{ key: "type", sortable: true, label: "Type" }]),
-        { key: "status", sortable: true },
-        { key: "created_at", sortable: true },
-        { key: "Media", sortable: true },
-        { key: "action", sortable: true },
-      ],
+      fields: fields,
       items: [],
       noItems: null,
     };
   },
+
   // computed: {
   //   ...mapGetters(["getPerfectSaleMedia", "getDefaultImage", "getImageUrl"]),
   //   rows() {
   //     return this.items.length;
   //   },
   // },
+  /**
+   * Lifecycle hook called when the component is created.
+   * Accesses the ID and title from the route parameters.
+   * Logs the title parameter.
+   * Calls the fetchDataById method with the ID (if uncommented).
+   */
   created() {
     // Access the ID from the route parameters
     const id = this.$route.params.id;
@@ -392,10 +500,12 @@ export default {
       data.forEach((element) => {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        //let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
         obj.id = element.id;
         obj.title = element.title;
+        // obj.file = element.file;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
         obj.type = element.file_type; // Assuming element.file_type is the correct property for the file type
         obj.status = element.status;
@@ -410,6 +520,10 @@ export default {
         this.items.push(obj);
       });
     },
+    /**
+     * Asynchronously changes the status of a perfect sale item.
+     * @param {object} item - The perfect sale item whose status is to be changed.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -443,12 +557,19 @@ export default {
         Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
-
+    /**
+     * Opens the modal for viewing a video.
+     * @param {string} videoUrl - The URL of the video to be displayed.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+    /**
+     * Opens the modal for adding a training item.
+     * @param {object} item - The training item to be added.
+     */
     addTrainingModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -456,13 +577,22 @@ export default {
       this.addFile = null;
       this.addMediaModel = true;
     },
+    /**
+     * Opens the modal for adding a video.
+     * @param {object} item - The item for which the video is to be added.
+     */
     addVideoModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
       this.addTitle = item.title;
       this.addFile = null;
+      this.addThumbnail = null;
       this.addVideoModel = true;
     },
+    /**
+     * Opens the modal for adding a script.
+     * @param {object} item - The item for which the script is to be added.
+     */
     addScriptModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -470,14 +600,30 @@ export default {
       this.addScriptModel = true;
       this.isLoading = false;
     },
-
+    /**
+     * Opens the modal for editing an item.
+     * @param {object} item - The item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
       this.editedTitle = item.title;
       this.editedFile = null; // Clear the file input
+      this.editedThumbnail = null;
       this.showEditModal = true;
     },
+    /**
+     * Opens another modal for editing an item.
+     * @param {object} item - The item to be edited.
+     */
+    openEditModal2(item) {
+      // Set initial values when opening the modal
+      this.editedItem = item;
+      this.editedTitle = item.title;
+      this.showEditModal2 = true;
+      this.isLoading = false;
+    },
+    // Handles file input change events and validates selected file formats
     handleFileChange() {
       const allowedFormats = [
         "application/pdf", // PDF
@@ -509,6 +655,7 @@ export default {
         }
       }
     },
+    // Similar to handleFileChange, but specifically for video files.
     handleVideoFileChange() {
       const allowedFormats = [
         "video/mp4", // MP4
@@ -533,12 +680,46 @@ export default {
         }
       }
     },
+    //  Resets the value of the file input field to allow re-selection of the same file.
     resetFileInput() {
       // Reset the file input value to allow re-selection of the same file
       const fileInput =
         this.$refs.fileInputRef.$el.querySelector("input[type='file']");
       fileInput.value = null;
     },
+    // Handles thumbnail file input change events and validates selected file formats.
+    handleThumbnail2() {
+      const allowedFormats = [
+        "image/png", // PNG
+        "image/jpeg", // JPEG
+        "image/jpg", // JPG
+      ];
+
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addThumbnail = null;
+          this.resetFileInput2();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid image file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
+    // Resets the value of the thumbnail file input field.
+    resetFileInput2() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+    // Submits the form data for adding a video file.
     async submitVideoForm() {
       this.isLoadingAddButton = true;
       const addFormData = new FormData();
@@ -552,6 +733,9 @@ export default {
         addFormData.append("perfect_sale_id", perfect_sale_id);
         if (this.addFile) {
           addFormData.append("file", this.addFile);
+        }
+        if (this.addThumbnail) {
+          addFormData.append("thumbnail", this.addThumbnail);
         }
         const result = await API.post(
           endpoints.perfectSales.addPerfectSaleMedia,
@@ -591,6 +775,7 @@ export default {
         });
       }
     },
+    // Submits the form data for adding various types of files.
     async submitAddForm() {
       this.isLoadingAddButton = true;
       const addFormData = new FormData();
@@ -604,6 +789,9 @@ export default {
         addFormData.append("perfect_sale_id", perfect_sale_id);
         if (this.addFile) {
           addFormData.append("file", this.addFile);
+        }
+        if (this.addThumbnail) {
+          addFormData.append("thumbnail", this.addThumbnail);
         }
         const result = await API.post(
           endpoints.perfectSales.addPerfectSaleMedia,
@@ -634,6 +822,7 @@ export default {
           );
         }
       } catch (error) {
+        this.isLoadingAddButton = false;
         // Handle error
         console.error("Error adding perfect sale pitch media:", error);
         Swal.fire({
@@ -643,7 +832,38 @@ export default {
         });
       }
     },
+    // Checks if the selected file is a video type.
+    isVideoFileType(file) {
+      // Check if the selected file is a video type
+      return file && /\.(mp4|mov|avi)$/i.test(file.name);
+    },
+    // esets the value of the file input field.
+    resetFileInput2() {
+      // Set the file input value to an empty string
+      this.$refs.fileInputRef2.$el.querySelector("input[type=file]").value = "";
+    },
+    // Handles file input change events for thumbnails.
+    handleFileChange2() {
+      const allowedFormats = ["image/png", "image/jpeg", "image/jpg"];
 
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput2();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid image file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
+    // Submits the form data for adding a script file.
     async submitAddScriptForm() {
       this.isLoading = true;
       const addFormData = new FormData();
@@ -686,6 +906,7 @@ export default {
           );
         }
       } catch (error) {
+        this.isLoading = false;
         // Handle error
         console.error("Error adding perfect sale pitch media:", error);
         Swal.fire({
@@ -695,15 +916,18 @@ export default {
         });
       }
     },
-
+    // Submits the form data for editing an existing file.
     async submitEditForm() {
+      this.isLoading = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("perfect_sale_id", this.$route.params.id);
       if (this.editedFile) {
         editedFormData.append("file", this.editedFile);
       }
-
+      if (this.editedThumbnail) {
+        editedFormData.append("file", this.editedThumbnail);
+      }
       // Add an identifier for the edited item (e.g., item ID) to the form data
       editedFormData.append("id", this.editedItem.id); // Change "itemId" to "id"
       console.log("media id", this.editedItem.id);
@@ -721,13 +945,14 @@ export default {
           title: "Success",
           text: "Perfect sale data edited successfully",
         }).then(() => {
+          this.isLoading = false;
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
         });
 
         // Close the modal after success
         this.showEditModal = false;
-
+        this.showEditModal2 = false;
         // Fetch updated perfect sale pitch media data
         const perfect_sale_id = this.$route.params.id;
         await this.fetchPerfectSaleData(perfect_sale_id);
@@ -738,6 +963,7 @@ export default {
           ? this.setItems(this.getPerfectSaleMedia)
           : (this.noItems = "No perfect sale data found.");
       } catch (error) {
+        this.isLoading = false;
         // Handle error
         console.error("Error editing perfect sale data:", error);
 
@@ -756,9 +982,12 @@ export default {
     //     "http://localhost:8000/storage/trainingMedia/1701965964.mp4";
     //   this.isModalOpen = true;
     // },
+
+    // Closes the modal window.
     closeModal() {
       this.isModalOpen = false;
     },
+    //  Opens the respective file types in a new window or tab.
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
@@ -775,6 +1004,7 @@ export default {
       // Open the POWERPOINT file in a new window or tab
       window.open(PowerPointUrl, "_blank");
     },
+    //  Handles navigation to a specific route with script data.
     scriptData(Script, id) {
       console.log("View media with ID:", Script.id);
       console.log("Route ID:", Script.id);
@@ -784,6 +1014,7 @@ export default {
         params: { id: Script.id, title: Script.title },
       });
     },
+    //  Deletes an item after confirmation from the user.
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -837,12 +1068,21 @@ export default {
         }
       });
     },
+    // Navigates back to the previous page.
     goBack() {
       // Use Vue Router to navigate back to the previous page
       this.$router.go(-1); // This will go back one step in the history
       // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
     },
   },
+  /**
+   * The mounted lifecycle hook is called after the Vue instance has been mounted,
+   * i.e., the Vue component has been rendered to the DOM.
+   *
+   * In this hook, we fetch the data related to the perfect sale identified by the route parameter 'id'.
+   * After fetching the data, if there are perfect sale media items available, we set them using the 'setItems' method.
+   * If no perfect sale media items are found, we display a message indicating that no data is available.
+   */
   async mounted() {
     const id = this.$route.params.id;
     console.log("perfect sale id", id);

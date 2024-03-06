@@ -5,7 +5,7 @@
       <b-button
         @click="addMsdSheetModal"
         variant="success"
-        class="mr-2 orange-button"
+        class="mr-2 orange-button btn-secondary"
       >
         <i class="mdi mdi-plus"></i> Add Msds Sheet
       </b-button>
@@ -66,12 +66,12 @@
                   :ref="'btn' + data.index"
                   class="mr-2 mdi mdi-eye text-muted icon-sm"
                 ></i> -->
-                <!-- <i
+                <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil btn orange-button icon-sm"
-                ></i> -->
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -82,11 +82,35 @@
               <template v-slot:cell(Media)="data">
                 <div>
                   <button
+                    v-if="data.item.type === 'pdf'"
                     @click="openPdf(data.item.file)"
                     class="btn btn-secondary orange-button"
                   >
-                    <i class="mdi mdi-file-pdf"></i>Open Pdf
+                    <i class="mdi mdi-file-pdf"></i> Open PDF
                   </button>
+                  <button
+                    v-else-if="['excel'].includes(data.item.type)"
+                    @click="openExcel(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-excel"></i> Open Excel
+                  </button>
+                  <button
+                    v-else-if="['word'].includes(data.item.type)"
+                    @click="openWord(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-word"></i> Open Word
+                  </button>
+
+                  <button
+                    v-else-if="['ppt'].includes(data.item.type)"
+                    @click="openPowerPoint(data.item.file)"
+                    class="btn btn-secondary orange-button"
+                  >
+                    <i class="mdi mdi-file-powerpoint"></i> Open PowerPoint
+                  </button>
+                  <span v-else> Unsupported file type </span>
                 </div>
               </template>
             </b-table>
@@ -125,13 +149,25 @@
             required
           ></b-form-input>
         </b-form-group>
+        <b-form-group label="Upload image" label-for="editInputFile5">
+          <b-form-file
+            v-model="addImage"
+            id="editInputFile5"
+            :state="Boolean(addImage)"
+            accept=".png, .jpg, .jpeg"
+            placeholder="Choose a file..."
+            @change="handleFileChange4"
+            ref="fileInputRef4"
+            required
+          ></b-form-file>
+        </b-form-group>
         <b-form-group label="Upload file" label-for="editInputFile">
           <b-form-file
             v-model="addFile"
             id="editInputFile"
             :state="Boolean(addFile)"
             placeholder="Choose a file..."
-            accept=".pdf, .mp4, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
             @change="handleFileChange"
             required
             ref="fileInputRef"
@@ -142,7 +178,7 @@
         <b-button
           type="submit"
           variant="success"
-          class="orange-button"
+          class="orange-button popUp"
           :disabled="isLoading"
         >
           {{ isLoading ? "Uploading..." : "Upload" }}
@@ -167,17 +203,37 @@
             required
           ></b-form-input>
         </b-form-group>
+        <b-form-group label="Upload image" label-for="editInputFile1">
+          <b-form-file
+            v-model="editedImage"
+            id="editInputFile1"
+            :state="Boolean(editedImage)"
+            accept=".png, .jpg, .jpeg"
+            placeholder="Choose a file..."
+            @change="handleFileChange3"
+            ref="fileInputRef3"
+          ></b-form-file>
+        </b-form-group>
         <b-form-group label="Upload file" label-for="editInputFile">
           <b-form-file
             v-model="editedFile"
             id="editInputFile"
             :state="Boolean(editedFile)"
+            accept=".pdf, .doc, .docx, .ppt, .pptx, .xls, .xlsx"
             placeholder="Choose a file..."
+            @change="handleFileChange2"
+            ref="fileInputRef2"
           ></b-form-file>
         </b-form-group>
         <!-- You can edit more fields as needed -->
 
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button popUp"
+          :disabled="isLoading"
+          >{{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
       </form>
     </b-modal>
 
@@ -215,12 +271,14 @@ export default {
       addMsdModel: false,
       showEditModal: false,
       addTitle: "",
+      addImage: null,
       addDescription: "",
       addFile: null,
       // Add a property to store the current edited item
       // addItem: null,
       editedTitle: "",
       editedDescription: "",
+      editedImage: null,
       editedFile: null,
       fields: [
         { key: "title", sortable: true },
@@ -254,8 +312,9 @@ export default {
       data.forEach((element) => {
         let obj = {};
         // let baseUrl = "http://localhost:8000/";
-        let baseUrl = "https://virtualrealitycreators.com/green-boom/";
+        //let baseUrl = "https://virtualrealitycreators.com/green-boom/";
         // let baseUrl = "http://18.224.159.123/green-boom/";
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
         obj.id = element.id;
         obj.title = element.title;
         obj.file = baseUrl.concat(element.file); // Assuming element.file is the correct property for the file path
@@ -273,28 +332,76 @@ export default {
         this.items.push(obj);
       });
     },
+    /**
+     * Opens a modal window with the provided video URL.
+     *
+     * @param {string} videoUrl The URL of the video to be displayed in the modal.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+    /**
+     * Closes the modal window.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
+    /**
+     * Opens a PDF file in a new window or tab.
+     *
+     * @param {string} pdfUrl The URL of the PDF file to be opened.
+     */
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
-
+    /**
+     * Opens an Excel file in a new window or tab.
+     *
+     * @param {string} excelUrl The URL of the Excel file to be opened.
+     */
+    openExcel(excelUrl) {
+      // Open the EXCEL file in a new window or tab
+      window.open(excelUrl, "_blank");
+    },
+    /**
+     * Opens a Word document in a new window or tab.
+     *
+     * @param {string} wordUrl The URL of the Word document to be opened.
+     */
+    openWord(wordUrl) {
+      // Open the WORD file in a new window or tab
+      window.open(wordUrl, "_blank");
+    },
+    /**
+     * Opens a PowerPoint presentation in a new window or tab.
+     ** @param {string} PowerPointUrl The URL of the PowerPoint presentation to be opened.
+     */
+    openPowerPoint(PowerPointUrl) {
+      // Open the POWERPOINT file in a new window or tab
+      window.open(PowerPointUrl, "_blank");
+    },
+    /**
+     * Opens the modal for adding or updating an MSDS sheet item.
+     *
+     * @param {object} item The item to be added or updated.
+     */
     addMsdSheetModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
       this.addTitle = item.title;
+      this.addImage = null;
       this.addDescription = item.description;
       this.addFile = null;
       this.addMsdModel = true;
       this.isLoading = false;
     },
+    /**
+     * Handles the change event when a file is selected.
+     * Checks if the selected file format is allowed and displays an error message if not.
+     */
     handleFileChange() {
       const allowedFormats = [
         "application/pdf", // PDF
@@ -323,12 +430,126 @@ export default {
         }
       }
     },
+    /**
+     * Resets the file input value to allow re-selection of the same file.
+     */
     resetFileInput() {
       // Reset the file input value to allow re-selection of the same file
       const fileInput =
         this.$refs.fileInputRef.$el.querySelector("input[type='file']");
       fileInput.value = null;
     },
+    /**
+     * Handles the change event when an image file is selected.
+     * Checks if the selected file format is allowed and displays an error message if not.
+     */
+    handleFileChange3() {
+      const allowedFormats = ["image/png", "image/jpg", "image/jpeg"];
+
+      const fileInput =
+        this.$refs.fileInputRef3.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addFile = null;
+          this.resetFileInput3();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
+    /**
+     * Resets the image file input value to allow re-selection of the same file.
+     */
+    resetFileInput3() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef3.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+    /**
+     * Handles the change event when a file is selected for image upload.
+     * Checks if the selected file format is allowed and displays an error message if not.
+     */
+    handleFileChange4() {
+      const allowedFormats = ["image/png", "image/jpg", "image/jpeg"];
+
+      const fileInput =
+        this.$refs.fileInputRef4.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.addImage = null;
+          this.resetFileInput4();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (png, jpg, jpeg).",
+          });
+        }
+      }
+    },
+    /**
+     * Resets the image file input value to allow re-selection of the same file.
+     */
+    resetFileInput4() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef4.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+    /**
+     * Handles the change event when a file is selected for upload.
+     * Checks if the selected file format is allowed and displays an error message if not.
+     */
+    handleFileChange2() {
+      const allowedFormats = [
+        "application/pdf", // PDF
+        "application/msword", // DOC
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+        "application/vnd.ms-powerpoint", // PPT
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
+        "application/vnd.ms-excel", // XLS
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX
+      ];
+
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      const selectedFile = fileInput.files[0];
+
+      if (selectedFile) {
+        if (!allowedFormats.includes(selectedFile.type)) {
+          // Clear the file input and show an error message
+          this.editedFile = null;
+          this.resetFileInput2();
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please select a valid file (pdf, doc, docx, ppt, pptx, xls, xlsx).",
+          });
+        }
+      }
+    },
+    /**
+     * Resets the file input value to allow re-selection of the same file.
+     */
+    resetFileInput2() {
+      // Reset the file input value to allow re-selection of the same file
+      const fileInput =
+        this.$refs.fileInputRef2.$el.querySelector("input[type='file']");
+      fileInput.value = null;
+    },
+    /**
+     * Submits the form data to add a new MSDS sheet item.
+     * Handles form validation, form data preparation, API request, and success/error handling.
+     */
     async submitAddForm() {
       try {
         this.isLoading = true;
@@ -337,6 +558,9 @@ export default {
         addFormData.append("description", this.addDescription);
         if (this.addFile) {
           addFormData.append("file", this.addFile);
+        }
+        if (this.addImage) {
+          addFormData.append("image", this.addImage);
         }
         const result = await API.post(
           endpoints.msdSheets.addMsdSheet,
@@ -369,22 +593,35 @@ export default {
         });
       }
     },
-
+    /**
+     * Opens the modal for editing an MSDS sheet item.
+     *
+     * @param {object} item The MSDS sheet item to be edited.
+     */
     openEditModal(item) {
+      this.isLoading = false;
       // Set initial values when opening the modal
       this.editedItem = item;
       this.editedTitle = item.title;
       this.editedDescription = item.description;
+      this.editedImage = item.image;
       this.editedFile = null; // Clear the file input
       this.showEditModal = true;
     },
-
+    /**
+     * Submits the form data to edit an existing MSDS sheet item.
+     * Handles form validation, form data preparation, API request, and success/error handling.
+     */
     async submitEditForm() {
+      this.isLoading = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       editedFormData.append("description", this.editedDescription);
       if (this.editedFile) {
         editedFormData.append("file", this.editedFile);
+      }
+      if (this.editedImage) {
+        editedFormData.append("image", this.editedImage);
       }
 
       // Add an identifier for the edited item (e.g., item ID) to the form data
@@ -399,6 +636,7 @@ export default {
           title: "Success",
           text: "MsdSheet edited successfully",
         }).then(() => {
+          this.isLoading = false;
           // Redirect to the same page after Swal success message
           // this.$router.go(); // This will reload the current route
         });
@@ -413,6 +651,7 @@ export default {
           : (this.noItems = "No MsdSheet Found.");
       } catch (error) {
         // Handle error
+        this.isLoading = false;
         console.error("Error editing MsdSheet:", error);
         Swal.fire({
           icon: "error",
@@ -421,7 +660,12 @@ export default {
         });
       }
     },
-
+    /**
+     * Changes the status of an MSDS sheet item.
+     * Toggles the status locally in the items array and displays a success or error message.
+     *
+     * @param {object} item The MSDS sheet item to change the status for.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -455,10 +699,21 @@ export default {
         Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
-
+    /**
+     * Logs the ID of the item to be viewed.
+     *
+     * @param {number} itemId The ID of the MSDS sheet item to view.
+     */
     view(itemId) {
       console.log(itemId);
     },
+    /**
+     * Deletes an MSDS sheet item.
+     * Displays a confirmation dialog and makes an API request to delete the item.
+     * Updates the items array with the latest data after deletion.
+     *
+     * @param {number} itemId The ID of the MSDS sheet item to delete.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -508,6 +763,9 @@ export default {
       });
     },
   },
+  /**
+   * Fetches MSDS sheet data on component mount and sets the component's data accordingly.
+   */
   async mounted() {
     // const id = this.$route.params.id;
     await this.fetchMsdSheets();

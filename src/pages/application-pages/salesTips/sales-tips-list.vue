@@ -219,12 +219,16 @@ export default {
       noItems: null,
     };
   },
+
+  // Maps getters from Vuex store
   computed: {
     ...mapGetters(["getSalesTips", "getDefaultImage", "getImageUrl"]),
+    // Computes the number of rows in the items array
     rows() {
       return this.items.length;
     },
   },
+
   created() {
     // Access the ID from the route parameters
     const id = this.$route.params.id;
@@ -233,8 +237,10 @@ export default {
     this.fetchDataById(id);
   },
   methods: {
+    // Maps actions from Vuex store
     ...mapActions(["fetchSalesTips"]),
     setItems(data) {
+      // Iterate over each element in the data array
       data.forEach((element) => {
         let obj = {};
         let baseUrl = "http://localhost:8000/";
@@ -254,19 +260,26 @@ export default {
         this.items.push(obj);
       });
     },
+
+    // Opens modal to play video
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+
+    // Closes modal
     closeModal() {
       this.isModalOpen = false;
     },
+
+    // Opens PDF file in new window/tab
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
 
+    // Initializes modal to add MSD sheet
     addMsdSheetModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -276,6 +289,7 @@ export default {
       this.addMsdModel = true;
     },
 
+    // Submits form to add MSD sheet
     async submitAddForm() {
       try {
         const addFormData = new FormData();
@@ -316,6 +330,7 @@ export default {
       }
     },
 
+    // Opens modal to edit sales tip
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -325,6 +340,7 @@ export default {
       this.showEditModal = true;
     },
 
+    // Submits form to edit sales tip
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
@@ -368,6 +384,10 @@ export default {
       }
     },
 
+    /**
+     * Asynchronously changes the status of a sales tip item.
+     * @param {Object} item - The sales tip item to change status for.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -402,9 +422,18 @@ export default {
       }
     },
 
+    /**
+     * Logs the itemId to the console.
+     * @param {string} itemId - The ID of the item to view.
+     */
     view(itemId) {
       console.log(itemId);
     },
+
+    /**
+     * Deletes a sales tip item.
+     * @param {string} itemId - The ID of the sales tip item to delete.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -454,6 +483,10 @@ export default {
       });
     },
   },
+
+  /**
+   * Fetches sales tips data upon component mounting.
+   */
   async mounted() {
     // const id = this.$route.params.id;
     await this.fetchSalesTips();

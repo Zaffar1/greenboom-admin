@@ -36,11 +36,12 @@ export default new Vuex.Store({
     productDetail: [],
 
     imageUrl:
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === "production" || "/"
         ? process.env.VUE_APP_IMAGE_URL_SERVER
         : process.env.VUE_APP_IMAGE_URL_LOCAL,
     defaultImage:
-      "https://res.cloudinary.com/dflj1n3fn/image/upload/v1690274484/wold_r5bnpw.jpg",
+      "https://greenboom-bucket.s3.us-east-2.amazonaws.com/profile/dummy.png",
+    // "https://res.cloudinary.com/dflj1n3fn/image/upload/v1690274484/wold_r5bnpw.jpg",
   },
   getters: {
     getImageUrl: (state) => state.imageUrl,
@@ -73,7 +74,7 @@ export default new Vuex.Store({
     getUserImage: (state, getters) => {
       return getters.getCurrentUser.profile_image === null
         ? getters.getDefaultImage
-        : getters.getImageUrl + getters.getCurrentUser.profile_image;
+        : getters.getImageUrl + "/" + getters.getCurrentUser.profile_image;
     },
 
     getJobs: (state) => state.allJobs,
@@ -108,6 +109,7 @@ export default new Vuex.Store({
       try {
         let response = await API.get(endpoints.user.fetchAll);
         commit("setUsers", response.data.users);
+        console.log("all_userss", response.data.users);
         return true;
       } catch (error) {
         return error.response;

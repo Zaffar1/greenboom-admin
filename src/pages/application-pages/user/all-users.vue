@@ -121,7 +121,7 @@ Vue.use(SortedTablePlugin, {
 export default {
   data: function () {
     return {
-      sortBy: "name",
+      // sortBy: "name",
       perPage: 10,
       currentPage: 1,
       sortDesc: false,
@@ -153,13 +153,14 @@ export default {
     setItems(data) {
       data.forEach((element) => {
         let obj = {};
+        let baseUrl = "https://greenboom-bucket.s3.us-east-2.amazonaws.com/";
         obj.id = element.id;
         obj.name = element.name;
         // obj.phone = element.phone;
         obj.profile =
-          element.profile_picture == null
+          element.profile_image == null
             ? this.getDefaultImage
-            : this.getImageUrl + element.profile_picture;
+            : this.getImageUrl + "/" + element.profile_image;
         obj.email = element.email;
         // obj.role = element.role?.name ?? "DELETED";
         obj.status = element.status;
@@ -175,10 +176,20 @@ export default {
         this.items.push(obj);
       });
     },
+
+    /**
+     * Handles viewing user details.
+     * @param {string} itemId - The ID of the user to view.
+     */
     async view(itemId) {
       await this.fetchUserDetails(itemId);
       console.log(itemId);
     },
+
+    /**
+     * Handles deleting a user.
+     * @param {string} itemId - The ID of the user to delete.
+     */
     async deleteItem(itemId) {
       console.log(itemId);
       const result = await Swal.fire({
@@ -214,6 +225,11 @@ export default {
         }
       }
     },
+
+    /**
+     * Handles changing the status of a user.
+     * @param {object} item - The user object whose status is to be changed.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -250,6 +266,10 @@ export default {
       }
     },
   },
+
+  /**
+   * Fetches user data on component mount.
+   */
   async mounted() {
     await this.fetchUsers();
     this.getUsers.length > 0

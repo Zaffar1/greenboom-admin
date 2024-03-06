@@ -6,7 +6,7 @@
       <b-button
         @click="addTrainingModal"
         variant="success"
-        class="mr-2 orange-button"
+        class="mr-2 orange-button btn-secondary"
       >
         <i class="mdi mdi-plus"></i> Add Perfect Sale
       </b-button>
@@ -80,12 +80,12 @@
                     :ref="'btn' + data.index"
                     class="mr-2 mdi mdi-eye text-muted icon-sm"
                   ></i> -->
-                <!-- <i
+                <i
                   v-b-modal.modallg
                   @click="openEditModal(data.item)"
                   :ref="'btn' + data.index"
-                  class="mr-2 mdi mdi-pencil btn orange-button icon-sm"
-                ></i> -->
+                  class="mr-2 mdi mdi-pencil orange-button icon-sm p-2 rounded"
+                ></i>
                 <i
                   @click="deleteItem(data.item.id)"
                   :ref="'btnDelete' + data.index"
@@ -134,7 +134,7 @@
         <b-button
           type="submit"
           variant="success"
-          class="orange-button"
+          class="orange-button popUp"
           :disabled="isLoading"
         >
           {{ isLoading ? "Adding..." : "Add" }}
@@ -151,7 +151,13 @@
             required
           ></b-form-input>
         </b-form-group>
-        <b-button type="submit" variant="success">Save Changes</b-button>
+        <b-button
+          type="submit"
+          variant="success"
+          class="orange-button popUp"
+          :disabled="isLoading"
+          >{{ isLoading ? "Updating..." : "Update" }}</b-button
+        >
       </form>
     </b-modal>
     <div></div>
@@ -237,7 +243,11 @@ export default {
 
       console.log("mister", this.items);
     },
-
+    /**
+     * Opens a modal for adding a new perfect sale entry.
+     * Sets initial values and prepares the modal for user input.
+     * @param {Object} item - The item to be added as a perfect sale.
+     */
     addTrainingModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -245,7 +255,11 @@ export default {
       this.addModel = true;
       this.isLoading = false;
     },
-
+    /**
+     * Submits the form data for adding a new perfect sale entry.
+     * Sends a POST request to the server and handles the response accordingly.
+     * Displays success or error messages based on the response.
+     */
     async submitAddForm() {
       this.isLoading = true;
       const addFormData = new FormData();
@@ -281,7 +295,11 @@ export default {
         });
       }
     },
-
+    /**
+     * Redirects to the detail page of a specific perfect sale media.
+     * @param {Object} PerfectSaleMedia - The media associated with the perfect sale.
+     * @param {number} id - The ID of the perfect sale media.
+     */
     viewMedia(PerfectSaleMedia, id) {
       console.log("View media with ID:", PerfectSaleMedia.id);
       console.log("Route ID:", PerfectSaleMedia.id);
@@ -291,22 +309,41 @@ export default {
         params: { id: PerfectSaleMedia.id, title: PerfectSaleMedia.title },
       });
     },
-
+    /**
+     * Opens a modal for viewing a video.
+     * Sets the video source and opens the modal.
+     * @param {string} videoUrl - The URL of the video to be viewed.
+     */
     openModal(videoUrl) {
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+    /**
+     * Closes the currently open modal.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
-
+    /**
+     * Opens a modal for editing a perfect sale entry.
+     * Sets initial values and prepares the modal for user input.
+     * @param {Object} item - The item to be edited as a perfect sale.
+     */
     openEditModal(item) {
+      this.isLoading = false;
       // Set initial values when opening the modal
       this.editedItem = item;
       this.editedTitle = item.title;
       this.showEditModal = true;
     },
+    /**
+     * Submits the form data for editing a perfect sale entry.
+     * Sends a POST request to the server with the edited data and handles the response.
+     * Closes the edit modal upon success and updates the component's data with the latest entries.
+     * @throws {Error} Throws an error if there is an issue editing the perfect sale entry.
+     */
     async submitEditForm() {
+      this.isLoading = true;
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
       // editedFormData.append("description", this.editedDescription);
@@ -348,9 +385,21 @@ export default {
         });
       }
     },
+    /**
+     * Logs the ID of the perfect sale item being viewed.
+     * @param {number} itemId - The ID of the perfect sale item.
+     */
     view(itemId) {
       console.log(itemId);
     },
+
+    /**
+     * Deletes a perfect sale item based on its ID.
+     * Prompts the user for confirmation before deletion.
+     * Updates the component's data with the latest entries upon successful deletion.
+     * @param {number} itemId - The ID of the perfect sale item to be deleted.
+     * @throws {Error} Throws an error if there is an issue deleting the perfect sale item.
+     */
     async deleteItem(itemId) {
       console.log(itemId);
       const result = await Swal.fire({
@@ -387,6 +436,13 @@ export default {
         }
       }
     },
+    /**
+     * Changes the status of a perfect sale item (e.g., from active to inactive or vice versa).
+     * Sends a POST request to the server to update the status.
+     * Updates the local status and displays a success message upon successful status change.
+     * @param {Object} item - The perfect sale item whose status is to be changed.
+     * @throws {Error} Throws an error if there is an issue changing the status of the perfect sale item.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -431,6 +487,11 @@ export default {
     //   this.currentVideo = null;
     // },
   },
+  /**
+   * Lifecycle hook called when the component is mounted.
+   * Fetches the list of perfect sales data and updates the component's data accordingly.
+   * If no perfect sales are found, sets a message indicating so.
+   */
   async mounted() {
     await this.fetchPerfectSales();
     // console.log("mounted all training", this.getPerfectSales.length);

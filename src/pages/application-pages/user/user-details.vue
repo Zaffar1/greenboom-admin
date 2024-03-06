@@ -1,12 +1,12 @@
 <template>
   <div>
-    <button @click="goBack" class="btn btn-primary orange-button">
+    <button @click="goBack" class="btn btn-secondary orange-button">
       <i class="mdi mdi-arrow-left"></i> Go Back
     </button>
     <div class="user-details-container">
       <div class="user-details">
         <div class="card-header">
-          <h2>User Details</h2>
+          <h2>User Detail</h2>
         </div>
         <div class="user-info">
           <table>
@@ -48,11 +48,17 @@ export default {
       return this.$store.state.user;
     },
   },
+  /**
+   * Fetches user details when the component is created.
+   */
   async created() {
     const userId = this.$route.params.id;
     await this.$store.dispatch("fetchUserDetails", userId);
   },
   methods: {
+    /**
+     * Navigates back to the previous page using Vue Router.
+     */
     goBack() {
       this.$router.go(-1);
     },
@@ -68,10 +74,10 @@ export default {
 }
 
 .user-details {
-  width: 70%; /* Adjust the width as needed */
+  width: 100%; /* Adjust the width as needed */
   background-color: #ffffff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  border-radius: 5px;
   overflow: hidden;
 }
 
@@ -79,16 +85,16 @@ export default {
   background-color: red;
   color: white;
   padding: 15px;
-  border-radius: 8px 8px 0 0;
+  border-radius: 5px 5px 0 0;
 }
 
 .card-header h2 {
   margin: 0;
 }
 
-.user-info {
+/* .user-info {
   padding: 20px;
-}
+} */
 
 .user-info table {
   width: 100%;
@@ -100,7 +106,7 @@ export default {
 }
 
 .user-info td {
-  padding: 10px;
+  padding: 20px 10px;
 }
 
 .user-info td:first-child {
@@ -112,7 +118,5 @@ export default {
   background-color: red;
   border-color: orange;
   color: white;
-  margin-top: 20px; /* Add margin for better spacing */
-  margin-left: 10px;
 }
 </style>
