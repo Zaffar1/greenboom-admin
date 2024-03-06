@@ -256,6 +256,10 @@ export default {
         this.items.push(obj);
       });
     },
+    /**
+     * Changes the status of a video item.
+     * @param {Object} item - The video item to change the status for.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -268,8 +272,7 @@ export default {
           // Toggle the status locally in the items array
           const updatedItems = this.items.map((video) => {
             if (video.id === item.id) {
-              video.status =
-                video.status === "Active" ? "InActive" : "Active";
+              video.status = video.status === "Active" ? "InActive" : "Active";
             }
             return video;
           });
@@ -290,6 +293,10 @@ export default {
       }
     },
 
+    /**
+     * Opens a modal to view a video with the provided URL.
+     * @param {string} videoUrl - The URL of the video to view.
+     */
     openModal(videoUrl) {
       console.log(videoUrl);
       this.videoSource = videoUrl;
@@ -303,6 +310,10 @@ export default {
       this.addMediaModel = true;
     },
 
+    /**
+     * Sets initial values for editing a video when opening the edit video modal.
+     * @param {Object} item - The video item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -312,6 +323,9 @@ export default {
       this.showEditModal = true;
     },
 
+    /**
+     * Submits the form data for adding a new video.
+     */
     async submitAddForm() {
       const addFormData = new FormData();
 
@@ -354,6 +368,9 @@ export default {
       }
     },
 
+    /**
+     * Submits the form data for editing an existing video.
+     */
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
@@ -412,16 +429,35 @@ export default {
     //     "http://localhost:8000/storage/trainingMedia/1701965964.mp4";
     //   this.isModalOpen = true;
     // },
+
+    /**
+     * Closes the currently open modal.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
+
+    /**
+     * Opens a PDF file in a new window or tab.
+     * @param {string} pdfUrl - The URL of the PDF file to open.
+     */
     openPdf(pdfUrl) {
       // Open the PDF file in a new window or tab
       window.open(pdfUrl, "_blank");
     },
+
+    /**
+     * Logs the ID of the item being viewed.
+     * @param {number} itemId - The ID of the item being viewed.
+     */
     view(itemId) {
       console.log(itemId);
     },
+
+    /**
+     * Deletes a video item after confirmation.
+     * @param {number} itemId - The ID of the video item to delete.
+     */
     deleteItem(itemId) {
       Swal.fire({
         title: "Are you sure?",
@@ -471,12 +507,21 @@ export default {
         }
       });
     },
+
+    /**
+     * Navigates back to the previous page using Vue Router.
+     */
     goBack() {
       // Use Vue Router to navigate back to the previous page
       this.$router.go(-1); // This will go back one step in the history
       // Alternatively, you can use this.$router.push('/your-route') to navigate to a specific route
     },
   },
+
+  /**
+   * Executes after the component has been mounted.
+   * Fetches video data and updates the component's data accordingly.
+   */
   async mounted() {
     const id = this.$route.params.id;
     await this.fetchVideoCatVideos(id);

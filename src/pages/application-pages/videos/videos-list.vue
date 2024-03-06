@@ -260,10 +260,18 @@ export default {
         this.items.push(obj);
       });
     },
+    /**
+     * Opens a modal to display a video.
+     * @param {string} videoUrl - The URL of the video to display.
+     */
     openModal(videoUrl) {
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+
+    /**
+     * Closes the currently open modal.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
@@ -272,6 +280,10 @@ export default {
     //   console.log(itemId);
     // },
 
+    /**
+     * Sets initial values for adding a video when opening the add video modal.
+     * @param {Object} item - The video item to be added.
+     */
     addVideosModal(item) {
       // Set initial values when opening the modal
       //   console.log("hiting");
@@ -282,6 +294,9 @@ export default {
       this.addVideoModel = true;
     },
 
+    /**
+     * Submits the form data for adding a new video.
+     */
     async submitAddForm() {
       try {
         const addFormData = new FormData();
@@ -322,6 +337,10 @@ export default {
       }
     },
 
+    /**
+     * Sets initial values for editing a video when opening the edit video modal.
+     * @param {Object} item - The video item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -331,6 +350,9 @@ export default {
       this.showEditModal = true;
     },
 
+    /**
+     * Submits the form data for editing an existing video.
+     */
     async submitEditForm() {
       const editedFormData = new FormData();
       editedFormData.append("title", this.editedTitle);
@@ -374,6 +396,10 @@ export default {
       }
     },
 
+    /**
+     * Deletes a video category after confirmation.
+     * @param {number} itemId - The ID of the video category to delete.
+     */
     async deleteItem(itemId) {
       console.log(itemId);
       const result = await Swal.fire({
@@ -409,6 +435,11 @@ export default {
         }
       }
     },
+
+    /**
+     * Changes the status of a video category.
+     * @param {Object} item - The video category item to change status for.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -442,6 +473,10 @@ export default {
       }
     },
 
+    /**
+     * Navigates to the page displaying the videos of a particular video category.
+     * @param {Object} videos - The video category item.
+     */
     viewMedia(videos, id) {
       console.log("View videos with ID:", videos.id);
       console.log("Route ID:", videos.id);
@@ -452,6 +487,11 @@ export default {
       });
     },
   },
+
+  /**
+   * Executes after the component has been mounted.
+   * Fetches video category data and updates the component's data accordingly.
+   */
   async mounted() {
     await this.fetchVideoCat();
     this.getVideos.length > 0

@@ -62,6 +62,10 @@ export default {
     }
   },
   methods:{
+
+    /**
+ * Adds a welcome video by sending a POST request with form data.
+ */
     async addWelcomeVideo(){
       // console.log("Hello Welcome to Add Video");
       const formData = new FormData();

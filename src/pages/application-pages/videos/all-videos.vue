@@ -324,6 +324,11 @@ export default {
       console.log("mister", this.items);
     },
 
+    /**
+     * Opens a modal for adding a welcome video.
+     * Sets initial values when opening the modal.
+     * @param {Object} item - The item to be added.
+     */
     addWelcomeModal(item) {
       // Set initial values when opening the modal
       this.addItem = item;
@@ -333,10 +338,18 @@ export default {
       this.addThumbnail = null;
       this.addVideoModel = true;
     },
+
+    /**
+     * Resets the file input value to an empty string.
+     */
     resetFileInput() {
       // Set the file input value to an empty string
       this.$refs.fileInputRef.$el.querySelector("input[type=file]").value = "";
     },
+
+    /**
+     * Handles the change event when selecting a file for adding a video.
+     */
     handleFileChange() {
       const allowedFormats = [
         "video/mp4",
@@ -360,10 +373,17 @@ export default {
         }
       }
     },
+    /**
+     * Resets the file input value to an empty string for the third file input.
+     */
     resetFileInput3() {
       // Set the file input value to an empty string
       this.$refs.fileInputRef3.$el.querySelector("input[type=file]").value = "";
     },
+
+    /**
+     * Handles the change event when selecting a file for the third file input.
+     */
     handleFileChange3() {
       const allowedFormats = [
         "video/mp4",
@@ -387,10 +407,18 @@ export default {
         }
       }
     },
+
+    /**
+     * Resets the file input value to an empty string for the fourth file input.
+     */
     resetFileInput4() {
       // Set the file input value to an empty string
       this.$refs.fileInputRef4.$el.querySelector("input[type=file]").value = "";
     },
+
+    /**
+     * Handles the change event when selecting a file for the fourth file input.
+     */
     handleFileChange4() {
       const allowedFormats = [
         "video/mp4",
@@ -414,10 +442,18 @@ export default {
         }
       }
     },
+
+    /**
+     * Resets the file input value to an empty string for the second file input.
+     */
     resetFileInput2() {
       // Set the file input value to an empty string
       this.$refs.fileInputRef2.$el.querySelector("input[type=file]").value = "";
     },
+
+    /**
+     * Handles the change event when selecting a file for the second file input.
+     */
     handleFileChange2() {
       const allowedFormats = ["image/png", "image/jpeg", "image/jpg"];
 
@@ -438,6 +474,10 @@ export default {
         }
       }
     },
+
+    /**
+     * Submits the form to add a video.
+     */
     async submitAddForm() {
       try {
         this.isLoadingAddButton = true;
@@ -481,6 +521,11 @@ export default {
       }
     },
 
+    /**
+     * Opens the edit modal for a video item.
+     * Sets initial values when opening the modal.
+     * @param {Object} item - The video item to be edited.
+     */
     openEditModal(item) {
       // Set initial values when opening the modal
       this.editedItem = item;
@@ -492,6 +537,9 @@ export default {
       this.isLoadingAddButton = false;
     },
 
+    /**
+     * Submits the form to edit a video.
+     */
     async submitEditForm() {
       this.isLoadingAddButton = true;
       const editedFormData = new FormData();
@@ -538,6 +586,10 @@ export default {
         });
       }
     },
+    /**
+     * Changes the status of a video item.
+     * @param {Object} item - The video item to change status for.
+     */
     async changeStatus(item) {
       try {
         // Note the use of await here
@@ -570,16 +622,29 @@ export default {
         Swal.fire("Error!", "An error occurred during status update.", "error");
       }
     },
+    /**
+     * Opens a modal to view a video with the provided URL.
+     * @param {string} videoUrl - The URL of the video to be viewed.
+     */
     openModal(videoUrl) {
       this.videoSource = videoUrl;
       this.isModalOpen = true;
     },
+
+    /**
+     * Closes the currently open modal.
+     */
     closeModal() {
       this.isModalOpen = false;
     },
     view(itemId) {
       console.log(itemId);
     },
+
+    /**
+     * Deletes a video item with the provided ID after confirmation.
+     * @param {number} itemId - The ID of the video item to delete.
+     */
     async deleteItem(itemId) {
       console.log(itemId);
 
@@ -628,6 +693,11 @@ export default {
     //   this.currentVideo = null;
     // },
   },
+
+  /**
+   * Executes after the component has been mounted.
+   * Fetches all videos, sets items if videos are found, or sets a message if no videos are found.
+   */
   async mounted() {
     await this.fetchAllVideos();
     console.log("all videos", this.getAllVideos.length);

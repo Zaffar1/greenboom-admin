@@ -44,6 +44,9 @@
 <script>
 export default {
   computed: {
+    /**
+     * Retrieves the user state from the Vuex store.
+     */
     user() {
       return this.$store.state.user;
     },
