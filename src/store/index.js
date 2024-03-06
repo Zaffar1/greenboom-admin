@@ -82,6 +82,11 @@ export default new Vuex.Store({
       state.allJobs.filter((element) => element.id == id)[0],
   },
   actions: {
+    /**
+     * Logs in the user by sending a POST request with login data.
+     * @param {Object} data - The login data including username and password.
+     * @returns {Promise} A Promise that resolves to the response data or rejects with an error response.
+     */
     userLogin: async ({ commit }, data) => {
       try {
         let response = await API.post(endpoints.login, data);
@@ -92,6 +97,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Verifies the user by sending a GET request to verify endpoint.
+     * @returns {Promise} A Promise that resolves to a boolean indicating verification success or rejects with an error response.
+     */
     verifyUser: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.user.verify);
@@ -101,10 +111,19 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Logs out the user by clearing user authentication and redirecting to base route.
+     */
     logoutUser: async ({ commit }) => {
       commit("clearUserAuth");
       router.push({ name: "base" });
     },
+
+    /**
+     * Fetches all users by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchUsers: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.user.fetchAll);
@@ -115,6 +134,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches details of a specific user by sending a GET request with user ID.
+     * @param {string} userId - The ID of the user whose details to fetch.
+     */
     async fetchUserDetails({ commit }, userId) {
       try {
         let response = await API.get(
@@ -127,6 +151,12 @@ export default new Vuex.Store({
         console.error("Error fetching user details:", error);
       }
     },
+
+    /**
+     * Deletes a user by sending a POST request with user ID.
+     * @param {string} id - The ID of the user to delete.
+     * @returns {Promise} A Promise that resolves to a boolean indicating deletion success or rejects with an error response.
+     */
     deleteUser: async ({ commit }, id) => {
       try {
         let response = await API.post(`${endpoints.user.deleteUser}/${id}`);
@@ -137,6 +167,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Updates the status of a user by sending a POST request with the user ID.
+     * @param {string} id - The ID of the user whose status to update.
+     * @returns {Promise} A Promise that resolves to a boolean indicating update success or rejects with an error response.
+     */
     updateUserStatus: async ({ commit }, id) => {
       try {
         let response = await API.post(`${endpoints.user.userStatus}/${id}`);
@@ -147,6 +183,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all welcome videos by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchWelcomeVideos: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.welcomeVideos.fetchAll);
@@ -157,6 +198,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches a specific welcome video by sending a DELETE request with the video ID.
+     * @param {string} id - The ID of the welcome video to fetch.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchWelcomeVideoId: async ({ commit }, id) => {
       try {
         let response = await API.delete(
@@ -169,6 +216,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all trainings by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchTrainings: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.trainings.fetchAll);
@@ -179,6 +231,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Deletes a specific training by sending a DELETE request with the training ID.
+     * @param {string} id - The ID of the training to delete.
+     * @returns {Promise} A Promise that resolves to a boolean indicating deletion success or rejects with an error response.
+     */
     fetchTrainingId: async ({ commit }, id) => {
       try {
         let response = await API.delete(
@@ -190,6 +248,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches training media by sending a GET request with the training ID.
+     * @param {string} id - The ID of the training to fetch media for.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchTrainingMedia: async ({ commit }, id) => {
       try {
         let response = await API.get(`${endpoints.trainings.fetchMedia}/${id}`);
@@ -200,6 +264,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all MSD sheets by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchMsdSheets: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.msdSheets.fetchMsdSheetList);
@@ -210,6 +279,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches the list of catalogs by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchCatalogList: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.catalogs.fetchCatalogsList);
@@ -220,6 +294,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches the list of order kits by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchOrderKitList: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.orderKit.fetchAllOrderKit);
@@ -230,6 +309,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all video categories by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchVideoCat: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.videos.fetchAllVideoCat);
@@ -240,6 +324,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Deletes a video by sending a DELETE request with the video ID.
+     * @param {string} id - The ID of the video to delete.
+     * @returns {Promise} A Promise that resolves to a boolean indicating deletion success or rejects with an error response.
+     */
     deleteVideo: async ({ commit }, id) => {
       try {
         let response = await API.delete(
@@ -252,6 +342,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all videos by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchAllVideos: async ({ commit }, id) => {
       try {
         let response = await API.get(endpoints.videos.fetchAllVideos);
@@ -262,6 +357,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches videos of a specific video category by sending a GET request with the category ID.
+     * @param {string} id - The ID of the video category whose videos to fetch.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchVideoCatVideos: async ({ commit }, id) => {
       try {
         let response = await API.get(
@@ -274,6 +375,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all Perfect Sales data by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchPerfectSales: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.perfectSales.fetchAll);
@@ -284,6 +390,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Deletes a Perfect Sales data entry by sending a DELETE request with the data ID.
+     * @param {string} id - The ID of the Perfect Sales data entry to delete.
+     * @returns {Promise} A Promise that resolves to a boolean indicating deletion success or rejects with an error response.
+     */
     fetchPerfectSaleId: async ({ commit }, id) => {
       try {
         let response = await API.delete(
@@ -295,6 +407,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches Perfect Sales media data by sending a GET request with the data ID.
+     * @param {string} id - The ID of the Perfect Sales data whose media to fetch.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchPerfectSaleData: async ({ commit }, id) => {
       try {
         let response = await API.get(
@@ -307,6 +425,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches script media data by sending a GET request with the script ID.
+     * @param {string} id - The ID of the script whose media to fetch.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchScriptData: async ({ commit }, id) => {
       try {
         let response = await API.get(
@@ -319,6 +443,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches product data by sending a GET request with the product ID.
+     * @param {string} id - The ID of the product whose data to fetch.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchProductData: async ({ commit }, id) => {
       try {
         let response = await API.get(
@@ -331,6 +461,12 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches product data detail by sending a GET request with the product ID.
+     * @param {string} id - The ID of the product whose data detail to fetch.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchProductDataDetail: async ({ commit }, id) => {
       try {
         let response = await API.get(
@@ -343,6 +479,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all sales tips by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchSalesTips: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.salesTips.fetchAllSalesTips);
@@ -353,6 +494,11 @@ export default new Vuex.Store({
         return error.response;
       }
     },
+
+    /**
+     * Fetches all products by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchProducts: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.products.fetchProducts);
@@ -364,6 +510,11 @@ export default new Vuex.Store({
       }
     },
 
+    /**
+     * Deletes a product by sending a DELETE request with the product ID.
+     * @param {string} id - The ID of the product to delete.
+     * @returns {Promise} A Promise that resolves to a boolean indicating deletion success or rejects with an error response.
+     */
     deleteProduct: async ({ commit }, id) => {
       try {
         let response = await API.delete(
@@ -377,6 +528,10 @@ export default new Vuex.Store({
       }
     },
 
+    /**
+     * Fetches all jobs by sending a GET request.
+     * @returns {Promise} A Promise that resolves to a boolean indicating fetching success or rejects with an error response.
+     */
     fetchJobs: async ({ commit }) => {
       try {
         let response = await API.get(endpoints.job.fetchAll);
